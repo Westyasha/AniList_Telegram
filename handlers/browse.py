@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery, InputMediaPhoto
 
 from core.api import anilist_query, Q_VIEWER, Q_TRENDING, Q_SEASONAL, Q_AIRING_SCHEDULE
 from core.formatters import profile_card, esc, fseason, current_season, fairing_ts, ftime_until
-from keyboards import trending_kb, season_kb, schedule_kb
+from keyboards import trending_kb, season_kb, schedule_kb, auth_menu_kb
 from locales.i18n import t
 from storage import get_token, set_anilist_id
 
@@ -43,24 +43,16 @@ async def show_profile(target, uid: int):
     banner = viewer.get("bannerImage")
     avatar = (viewer.get("avatar") or {}).get("large")
     dest = _dest(target)
+    kb = auth_menu_kb(uid)
 
-    if banner and avatar:
-        try:
-            await dest.answer_media_group(media=[
-                InputMediaPhoto(media=banner, caption=caption, parse_mode="MarkdownV2"),
-                InputMediaPhoto(media=avatar),
-            ])
-            return
-        except Exception:
-            pass
     photo = banner or avatar
     if photo:
         try:
-            await dest.answer_photo(photo=photo, caption=caption, parse_mode="MarkdownV2")
+            await dest.answer_photo(photo=photo, caption=caption, parse_mode="MarkdownV2", reply_markup=kb)
             return
         except Exception:
             pass
-    await dest.answer(caption, parse_mode="MarkdownV2")
+    await dest.answer(caption, parse_mode="MarkdownV2", reply_markup=kb)
 
 
 @router.message(F.text.in_({"👤 Профиль", "👤 Profile"}))
