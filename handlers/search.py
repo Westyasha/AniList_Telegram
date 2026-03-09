@@ -66,12 +66,35 @@ async def process_search(msg: Message, state: FSMContext):
 async def search_page_cb(cb: CallbackQuery):
     parts = cb.data.split(":", 3)
     q, mtype, page = parts[1], parts[2], int(parts[3])
-    await do_search(cb.message, q, mtype, page, cb.from_user.id)
+    await do_search(cb, q, mtype, page, cb.from_user.id)
     await cb.answer()
 
 
 async def do_search(target, q: str, mtype: str, page: int, uid: int):
-    from aiogram.types import InputMediaPhoto
+    from aiogram.types import InputMediaPhoto, CallbackQuery as CQ
+    from aiogram.utils.keyboard import InlineKeyboardBuilder
+    from aiogram.types import InlineKeyboardButton
+    is_cb = isinstance(target, CQ)
+
+    async def send_text(text, **kwargs):
+        if is_cb:
+            try:
+                await target.message.edit_text(text, **kwargs)
+                return
+            except Exception:
+                pass
+            await target.message.answer(text, **kwargs)
+        else:
+            await target.answer(text, **kwargs)
+
+    async def send_media(urls):
+        dest = target.message if is_cb else target
+        if not is_cb and urls:
+            try:
+                await dest.answer_media_group(media=[InputMediaPhoto(media=u) for u in urls])
+            except Exception:
+                pass
+
     token = get_token(uid)
 
     if mtype in ("ANIME", "MANGA"):
@@ -80,19 +103,15 @@ async def do_search(target, q: str, mtype: str, page: int, uid: int):
         items = pdata.get("media", [])
         pinfo = pdata.get("pageInfo", {})
         if not items:
-            await target.answer(t(uid, "search_empty", q=q), parse_mode="MarkdownV2")
+            await send_text(t(uid, "search_empty", q=q), parse_mode="MarkdownV2")
             return
 
         covers = [item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("large")]
-        if covers:
-            try:
-                await target.answer_media_group(media=[InputMediaPhoto(media=url) for url in covers])
-            except Exception:
-                pass
+        await send_media(covers)
 
         text = t(uid, "search_results", q=q, page=page, total=pinfo.get("lastPage", 1))
         kb = search_results_kb(uid, items, page, pinfo.get("hasNextPage", False), q, mtype)
-        await target.answer(text, parse_mode="MarkdownV2", reply_markup=kb)
+        await send_text(text, parse_mode="MarkdownV2", reply_markup=kb)
 
     elif mtype == "CHARACTER":
         result = await anilist_query(Q_SEARCH_CHAR, {"search": q, "page": page}, token=token)
@@ -100,19 +119,12 @@ async def do_search(target, q: str, mtype: str, page: int, uid: int):
         chars = pdata.get("characters", [])
         pinfo = pdata.get("pageInfo", {})
         if not chars:
-            await target.answer(t(uid, "search_empty", q=q), parse_mode="MarkdownV2")
+            await send_text(t(uid, "search_empty", q=q), parse_mode="MarkdownV2")
             return
 
         photos = [c.get("image", {}).get("large") for c in chars if c.get("image", {}).get("large")]
-        if photos:
-            try:
-                from aiogram.types import InputMediaPhoto
-                await target.answer_media_group(media=[InputMediaPhoto(media=url) for url in photos[:6]])
-            except Exception:
-                pass
+        await send_media(photos[:6])
 
-        from aiogram.utils.keyboard import InlineKeyboardBuilder
-        from aiogram.types import InlineKeyboardButton
         b = InlineKeyboardBuilder()
         for c in chars:
             name = c["name"]["full"]
@@ -128,8 +140,8 @@ async def do_search(target, q: str, mtype: str, page: int, uid: int):
             nav.append(InlineKeyboardButton(text="▶️", callback_data=f"sp:{q}:CHARACTER:{page+1}"))
         if nav:
             b.row(*nav)
-        await target.answer(t(uid, "search_results", q=q, page=page, total=pinfo.get("lastPage", 1)),
-                             parse_mode="MarkdownV2", reply_markup=b.as_markup())
+        await send_text(t(uid, "search_results", q=q, page=page, total=pinfo.get("lastPage", 1)),
+                        parse_mode="MarkdownV2", reply_markup=b.as_markup())
 
     elif mtype == "STAFF":
         result = await anilist_query(Q_SEARCH_STAFF, {"search": q, "page": page}, token=token)
@@ -137,9 +149,8 @@ async def do_search(target, q: str, mtype: str, page: int, uid: int):
         staff_list = pdata.get("staff", [])
         pinfo = pdata.get("pageInfo", {})
         if not staff_list:
-            await target.answer(t(uid, "search_empty", q=q), parse_mode="MarkdownV2")
+            await send_text(t(uid, "search_empty", q=q), parse_mode="MarkdownV2")
             return
-        from aiogram.utils.keyboard import InlineKeyboardBuilder
         b = InlineKeyboardBuilder()
         for s in staff_list:
             name = s["name"]["full"]
@@ -147,8 +158,8 @@ async def do_search(target, q: str, mtype: str, page: int, uid: int):
             favs = s.get("favourites", 0)
             b.button(text=f"{name} — {occ}  ❤️{favs}", callback_data=f"staffperson:{s['id']}")
         b.adjust(1)
-        await target.answer(t(uid, "search_results", q=q, page=page, total=pinfo.get("lastPage", 1)),
-                             parse_mode="MarkdownV2", reply_markup=b.as_markup())
+        await send_text(t(uid, "search_results", q=q, page=page, total=pinfo.get("lastPage", 1)),
+                        parse_mode="MarkdownV2", reply_markup=b.as_markup())
 
 
 # ─── FUZZY SEARCH ─────────────────────────────────────────────────────────────

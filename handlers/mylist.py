@@ -28,7 +28,28 @@ async def mylist_cmd(msg: Message):
 @router.callback_query(F.data == "mylistmenu")
 async def mylistmenu_cb(cb: CallbackQuery):
     uid = cb.from_user.id
-    await cb.message.answer(t(uid, "mylist_title"), parse_mode="MarkdownV2", reply_markup=my_list_menu_kb(uid))
+    try:
+        await cb.message.edit_text(t(uid, "mylist_title"), parse_mode="MarkdownV2", reply_markup=my_list_menu_kb(uid))
+    except Exception:
+        await cb.message.answer(t(uid, "mylist_title"), parse_mode="MarkdownV2", reply_markup=my_list_menu_kb(uid))
+    await cb.answer()
+
+
+@router.callback_query(F.data.startswith("mylist_tab:"))
+async def mylist_tab_cb(cb: CallbackQuery):
+    uid = cb.from_user.id
+    from keyboards import my_list_manga_kb
+    tab = cb.data.split(":")[1]
+    if tab == "MANGA":
+        kb = my_list_manga_kb(uid)
+        text = "📚 *Manga List*"
+    else:
+        kb = my_list_menu_kb(uid)
+        text = "📺 *Anime List*"
+    try:
+        await cb.message.edit_text(text, parse_mode="MarkdownV2", reply_markup=kb)
+    except Exception:
+        await cb.message.answer(text, parse_mode="MarkdownV2", reply_markup=kb)
     await cb.answer()
 
 
@@ -67,12 +88,12 @@ async def mylist_view(cb: CallbackQuery):
     type_label = "Anime" if mtype == "ANIME" else "Manga"
 
     from core.formatters import esc
+    text = f"{icon} *{esc(type_label)}* — *{esc(status.title())}*\n_{esc(str(total))} titles, page {page}_"
     kb = list_entries_kb(uid, entries, mtype, status, page, has_prev, has_next)
-    await cb.message.answer(
-        f"{icon} *{esc(type_label)}* — *{esc(status.title())}*\n{total} entries, page {page}",
-        parse_mode="MarkdownV2",
-        reply_markup=kb
-    )
+    try:
+        await cb.message.edit_text(text, parse_mode="MarkdownV2", reply_markup=kb)
+    except Exception:
+        await cb.message.answer(text, parse_mode="MarkdownV2", reply_markup=kb)
     await cb.answer()
 
 
