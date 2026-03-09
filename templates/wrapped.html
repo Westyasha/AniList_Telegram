@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1200px;
+    height: 860px;
+    font-family: 'Inter', 'DejaVu Sans', Arial, sans-serif;
+    background: #0d1117;
+    color: #fff;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── BANNER BACKGROUND ── */
+  .banner-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('{{ banner_url }}');
+    background-size: cover;
+    background-position: center;
+    filter: blur(3px) brightness(0.25) saturate(1.4);
+    z-index: 0;
+  }
+  .banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(13,17,23,0.92) 0%, rgba(13,17,23,0.75) 100%);
+    z-index: 1;
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    padding: 36px 44px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+  .avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #63b3ed;
+    object-fit: cover;
+    display: block;
+  }
+  .avatar-glow {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,179,237,0.3), transparent 70%);
+  }
+  .header-text { flex: 1; }
+  .username {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #63b3ed;
+    margin-top: 6px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .header-right {
+    text-align: right;
+    opacity: 0.5;
+    font-size: 12px;
+    color: #8892a4;
+    font-weight: 500;
+  }
+
+  /* ── TOP ANIME ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #4a5568;
+    margin-bottom: 10px;
+  }
+  .covers-row {
+    display: flex;
+    gap: 12px;
+  }
+  .cover-item {
+    position: relative;
+    flex: 1;
+  }
+  .cover-img {
+    width: 100%;
+    height: 155px;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+    background: #1a2035;
+  }
+  .cover-placeholder {
+    width: 100%;
+    height: 155px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1a2035, #252d42);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2d3748;
+    font-size: 28px;
+  }
+  .cover-rank {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .rank-1 { background: #f6c636; color: #1a1a00; }
+  .rank-2 { background: #9aa0a6; color: #0d0d0d; }
+  .rank-3 { background: #cd7f32; color: #1a0d00; }
+  .rank-other { background: rgba(255,255,255,0.12); color: #fff; }
+  .cover-title {
+    font-size: 11px;
+    color: #718096;
+    margin-top: 6px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── STAT CARDS ── */
+  .stats-row {
+    display: flex;
+    gap: 10px;
+  }
+  .stat-card {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 14px 12px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 12px 12px 0 0;
+    background: var(--accent);
+  }
+  .stat-icon { font-size: 16px; margin-bottom: 6px; }
+  .stat-value {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 10px;
+    color: #4a5568;
+    margin-top: 5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── BOTTOM SECTION ── */
+  .bottom {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Genre bars */
+  .genres-block { flex: 1; }
+  .genre-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+  }
+  .genre-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #a0aec0;
+    width: 120px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .genre-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .genre-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--bar-color);
+    opacity: 0.85;
+  }
+  .genre-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--bar-color);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Activity chart */
+  .activity-block { width: 340px; flex-shrink: 0; }
+  .chart-area {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 14px 16px 10px;
+    height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 80px;
+  }
+  .chart-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .chart-bar {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    background: rgba(99,179,237,0.25);
+    transition: height 0.3s;
+    min-height: 2px;
+  }
+  .chart-bar.peak { background: #63b3ed; }
+  .chart-month {
+    font-size: 9px;
+    color: #2d3748;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .peak-label {
+    font-size: 9px;
+    color: #f6c636;
+    font-weight: 700;
+    position: absolute;
+    margin-top: -14px;
+  }
+
+  .extra-cards {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .extra-card {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .extra-card-label { font-size: 10px; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .extra-card-value { font-size: 14px; font-weight: 700; margin-top: 3px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 12px;
+    font-size: 11px;
+    color: #2d3748;
+    font-weight: 500;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(99,179,237,0.2), transparent);
+  }
+</style>
+</head>
+<body>
+  {% if banner_url %}<div class="banner-bg"></div>{% endif %}
+  <div class="banner-overlay"></div>
+
+  <div class="content">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="avatar-wrap">
+        <div class="avatar-glow"></div>
+        {% if avatar_url %}
+        <img class="avatar" src="{{ avatar_url }}" onerror="this.style.display='none'">
+        {% endif %}
+      </div>
+      <div class="header-text">
+        <div class="username">{{ username }}</div>
+        <div class="subtitle">AniList Wrapped 2025</div>
+      </div>
+      <div class="header-right">
+        westyasha.online<br>AniList Bot
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- TOP ANIME COVERS -->
+    {% if top_covers %}
+    <div>
+      <div class="section-label">Top Anime</div>
+      <div class="covers-row">
+        {% for i in range(top_covers|length) %}
+        <div class="cover-item">
+          {% if top_covers[i] %}
+          <img class="cover-img" src="{{ top_covers[i] }}" onerror="this.outerHTML='<div class=cover-placeholder>?</div>'">
+          {% else %}
+          <div class="cover-placeholder">?</div>
+          {% endif %}
+          <div class="cover-rank {{ 'rank-1' if i==0 else 'rank-2' if i==1 else 'rank-3' if i==2 else 'rank-other' }}">#{{ i+1 }}</div>
+          <div class="cover-title">{{ top_anime[i] if i < top_anime|length else '' }}</div>
+        </div>
+        {% endfor %}
+        {% for i in range(5 - top_covers|length) %}
+        <div class="cover-item">
+          <div class="cover-placeholder">—</div>
+          <div class="cover-title"></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- STAT CARDS -->
+    <div class="stats-row">
+      <div class="stat-card" style="--accent: #63b3ed">
+        <div class="stat-icon">📺</div>
+        <div class="stat-value">{{ anime_count }}</div>
+        <div class="stat-label">Anime Completed</div>
+      </div>
+      <div class="stat-card" style="--accent: #48bb78">
+        <div class="stat-icon">⏱</div>
+        <div class="stat-value">{{ days_watched }}</div>
+        <div class="stat-label">Days Watched</div>
+      </div>
+      <div class="stat-card" style="--accent: #9f7aea">
+        <div class="stat-icon">📖</div>
+        <div class="stat-value">{{ manga_count }}</div>
+        <div class="stat-label">Manga Read</div>
+      </div>
+      <div class="stat-card" style="--accent: #f6c636">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-value">{{ mean_score }}</div>
+        <div class="stat-label">Mean Score</div>
+      </div>
+      <div class="stat-card" style="--accent: #fc8181">
+        <div class="stat-icon">🎬</div>
+        <div class="stat-value">{{ episodes_watched }}</div>
+        <div class="stat-label">Episodes</div>
+      </div>
+    </div>
+
+    <!-- BOTTOM -->
+    <div class="bottom">
+
+      <!-- GENRE BARS -->
+      <div class="genres-block">
+        <div class="section-label">Genre Stats</div>
+        {% set bar_colors = ['#63b3ed','#48bb78','#9f7aea','#f6c636','#fc8181','#f6ad55','#76e4f7','#d6bcfa'] %}
+        {% for i in range(genres|length) %}
+        {% set ratio = (genre_counts[i] / max_genre_count * 100)|int if max_genre_count > 0 else 0 %}
+        <div class="genre-row">
+          <div class="genre-name" style="color: {{ bar_colors[i % bar_colors|length] }}">{{ genres[i] }}</div>
+          <div class="genre-bar-bg">
+            <div class="genre-bar-fill" style="width: {{ ratio }}%; --bar-color: {{ bar_colors[i % bar_colors|length] }}"></div>
+          </div>
+          <div class="genre-count" style="--bar-color: {{ bar_colors[i % bar_colors|length] }}">{{ genre_counts[i] }}</div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- ACTIVITY + EXTRAS -->
+      <div class="activity-block">
+        <div class="section-label">Monthly Activity 2025</div>
+        <div class="chart-area">
+          <div class="chart-bars">
+            {% set months = ['J','F','M','A','M','J','J','A','S','O','N','D'] %}
+            {% set max_act = monthly_activity|max if monthly_activity|max > 0 else 1 %}
+            {% for i in range(12) %}
+            {% set val = monthly_activity[i] %}
+            {% set h = (val / max_act * 72)|int %}
+            <div class="chart-bar-wrap">
+              <div class="chart-bar {{ 'peak' if val == monthly_activity|max and val > 0 else '' }}"
+                   style="height: {{ [h, 2]|max }}px"></div>
+              <div class="chart-month">{{ months[i] }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="extra-cards">
+          <div class="extra-card">
+            <div class="extra-card-label">List Activity</div>
+            <div class="extra-card-value" style="color:#63b3ed">{{ list_activity }}</div>
+          </div>
+          <div class="extra-card">
+            <div class="extra-card-label">Chapters Read</div>
+            <div class="extra-card-value" style="color:#9f7aea">{{ chapters_read }}</div>
+          </div>
+          <div class="extra-card">
+            <div class="extra-card-label">Manga Score</div>
+            <div class="extra-card-value" style="color:#f6c636">{{ manga_score }}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span>westyasha.online • AniList Bot</span>
+      <span>@westyasha_AniList_bot</span>
+    </div>
+
+  </div>
+</body>
+</html>
