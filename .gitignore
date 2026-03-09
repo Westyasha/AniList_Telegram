@@ -1,13 +1,28 @@
-config.py
-/__pycache__
-/locales/__pycache__
-locales/__pycache__/i18n.cpython-313.pyc
-/core/__pycache__
+# Secrets
+.env
 users.json
-users.json
-core/__pycache__/formatters.cpython-313.pyc
-users.json
-/core/__pycache__
-/handlers/__pycache__
-users.json
-/handlers/__pycache__
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
