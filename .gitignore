@@ -4,3 +4,5 @@ config.py
 locales/__pycache__/i18n.cpython-313.pyc
 /core/__pycache__
 users.json
+users.json
+core/__pycache__/formatters.cpython-313.pyc
