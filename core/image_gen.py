@@ -25,6 +25,32 @@ async def _render(template_name: str, data: dict, width: int, height: int) -> io
     return io.BytesIO(buf)
 
 
+async def _render_adaptive(template_name: str, data: dict) -> io.BytesIO:
+    from playwright.async_api import async_playwright
+
+    html = _jinja.get_template(template_name).render(**data)
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+        )
+        page = await browser.new_page(viewport={"width": 8000, "height": 4000})
+        await page.set_content(html, wait_until="networkidle")
+        await asyncio.sleep(0.3)
+        dims = await page.evaluate("""() => ({
+            w: document.body.scrollWidth,
+            h: document.body.scrollHeight
+        })""")
+        w = max(int(dims["w"]), 800)
+        h = max(int(dims["h"]), 400)
+        await page.set_viewport_size({"width": w, "height": h})
+        await asyncio.sleep(0.1)
+        buf = await page.screenshot(clip={"x": 0, "y": 0, "width": w, "height": h})
+        await browser.close()
+
+    return io.BytesIO(buf)
+
+
 async def generate_wrapped(data: dict) -> io.BytesIO:
     render_data = {
         "username":         data.get("username", "?"),
@@ -64,4 +90,4 @@ async def generate_profile_card(data: dict) -> io.BytesIO:
         "fav_char_images":  data.get("fav_char_images", []),
         "fav_char_names":   data.get("fav_char_names", []),
     }
-    return await _render("profile_card.html", render_data, 2560, 823)
+    return await _render_adaptive("profile_card.html", render_data)

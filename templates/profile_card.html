@@ -3,135 +3,178 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    width: 2560px;
-    height: 823px;
+    display: inline-flex;
     font-family: 'Inter', 'DejaVu Sans', Arial, sans-serif;
     background: #0d1117;
     color: #fff;
-    overflow: hidden;
     position: relative;
+    min-height: 560px;
   }
 
   .banner-bg {
-    position: absolute; inset: -50px;
+    position: fixed; inset: -60px;
     background-image: url('{{ banner_url }}');
     background-size: cover; background-position: center;
-    filter: blur(24px) brightness(0.55) saturate(1.4);
+    filter: blur(28px) brightness(0.5) saturate(1.4);
     z-index: 0;
   }
-
-  .blobs { position: absolute; inset: 0; z-index: 1; overflow: hidden; mix-blend-mode: overlay; }
-  .blob { position: absolute; border-radius: 50%; filter: blur(150px); opacity: 0.4; }
-  .blob-1 { width: 1200px; height: 1200px; background: #63b3ed; top: -400px; left: -200px; }
-  .blob-2 { width: 1000px; height: 1000px; background: #9f7aea; bottom: -400px; right: -100px; }
-  .blob-3 { width: 700px; height: 700px; background: #48bb78; top: 100px; left: 45%; opacity: 0.2; }
+  .blobs { position: fixed; inset: 0; z-index: 1; overflow: hidden; mix-blend-mode: overlay; pointer-events: none; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(160px); opacity: 0.35; }
+  .blob-1 { width: 900px; height: 900px; background: #63b3ed; top: -300px; left: -150px; }
+  .blob-2 { width: 800px; height: 800px; background: #9f7aea; bottom: -300px; right: -100px; }
+  .blob-3 { width: 600px; height: 600px; background: #48bb78; top: 50px; left: 40%; opacity: 0.2; }
 
   .card {
     position: relative; z-index: 2;
-    display: flex; align-items: center;
-    height: 100%;
-    padding: 50px 70px;
-    gap: 60px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015));
+    display: inline-flex; align-items: center;
+    padding: 50px 60px;
+    gap: 0;
+    min-height: 560px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.01));
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-top: 2px solid rgba(255,255,255,0.25);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-top: 2px solid rgba(255,255,255,0.22);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
   }
 
-  /* ── AVATAR ── */
+  /* ── LEFT: avatar + name + stats ── */
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 44px;
+    flex-shrink: 0;
+    padding-right: 0;
+  }
+
   .avatar-wrap { position: relative; flex-shrink: 0; }
   .avatar {
-    width: 240px; height: 240px; border-radius: 50%; object-fit: cover;
-    border: 4px solid rgba(255,255,255,0.5);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-    display: block; background: rgba(0,0,0,0.3);
+    width: 220px; height: 220px; border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255,255,255,0.45);
+    box-shadow: 0 10px 36px rgba(0,0,0,0.45);
+    display: block; background: #1a2035;
   }
   .avatar-ring {
-    position: absolute; inset: -14px; border-radius: 50%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.35), transparent, rgba(255,255,255,0.1));
+    position: absolute; inset: -13px; border-radius: 50%;
+    background: conic-gradient(rgba(255,255,255,0.3), transparent 60%, rgba(255,255,255,0.1));
     mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 0);
     -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 0);
   }
 
-  /* ── NAME + TAGLINE ── */
   .identity { flex-shrink: 0; }
-  .username { font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -1px; text-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .username {
+    font-size: 64px; font-weight: 800; line-height: 1;
+    letter-spacing: -1px; text-shadow: 0 3px 10px rgba(0,0,0,0.35);
+    white-space: nowrap;
+  }
   .tagline {
-    font-size: 19px; color: #cbd5e0; margin-top: 14px; font-weight: 700;
-    letter-spacing: 5px; text-transform: uppercase;
-    background: rgba(0,0,0,0.18); display: inline-block;
-    padding: 8px 24px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
+    margin-top: 12px; font-size: 17px; font-weight: 700;
+    letter-spacing: 5px; text-transform: uppercase; color: #cbd5e0;
+    background: rgba(0,0,0,0.2); display: inline-block;
+    padding: 7px 22px; border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.1);
+    white-space: nowrap;
   }
 
-  /* ── STATS ── */
-  .stats { display: flex; gap: 18px; flex-shrink: 0; }
+  .stats { display: flex; gap: 16px; flex-shrink: 0; }
   .stat {
-    background: rgba(0,0,0,0.18);
+    background: rgba(0,0,0,0.2);
     border: 1px solid rgba(255,255,255,0.08);
     border-top: 1px solid rgba(255,255,255,0.2);
-    border-radius: 28px; padding: 22px 32px; text-align: center;
-    position: relative; overflow: hidden; min-width: 170px;
+    border-radius: 24px; padding: 20px 28px;
+    text-align: center; position: relative; overflow: hidden;
+    min-width: 150px;
   }
   .stat::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--c); }
-  .stat-val { font-size: 52px; font-weight: 800; color: #fff; line-height: 1; }
-  .stat-lbl { font-size: 17px; color: rgba(255,255,255,0.7); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 8px; }
+  .stat-val { font-size: 46px; font-weight: 800; line-height: 1; }
+  .stat-lbl { font-size: 15px; color: rgba(255,255,255,0.65); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 7px; }
 
   /* ── DIVIDER ── */
-  .divider { width: 2px; height: 500px; background: rgba(255,255,255,0.1); border-radius: 2px; flex-shrink: 0; }
+  .divider {
+    flex-shrink: 0;
+    width: 2px; align-self: stretch;
+    margin: 30px 44px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+  }
 
-  /* ── FAVORITES ── */
-  .favs { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px; justify-content: center; height: 100%; }
+  /* ── FAVS ── */
+  .favs {
+    display: flex; flex-direction: column;
+    gap: 24px; justify-content: center;
+    flex-shrink: 0;
+    padding-right: 10px;
+  }
 
   .fav-block { display: flex; flex-direction: column; gap: 12px; }
   .fav-label {
-    font-size: 18px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
-    color: rgba(255,255,255,0.75);
     display: flex; align-items: center; gap: 8px;
+    font-size: 16px; font-weight: 800;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.75); white-space: nowrap;
   }
-  .fav-label::before { content:''; width:4px; height:16px; background:var(--lc); border-radius:2px; display:block; }
+  .fav-label::before {
+    content: ''; display: block;
+    width: 4px; height: 15px;
+    background: var(--lc); border-radius: 2px;
+  }
 
-  .fav-row { display: flex; gap: 12px; }
+  .fav-row { display: flex; gap: 12px; align-items: flex-start; }
 
-  /* anime poster: 2:3 */
+  /* Poster sizes — CSS vars controlled by data-count attribute */
+  .fav-row[data-count="1"]  { --pw: 160px; --ph: 240px; --cw: 160px; --ch: 240px; }
+  .fav-row[data-count="2"]  { --pw: 140px; --ph: 210px; --cw: 140px; --ch: 210px; }
+  .fav-row[data-count="3"]  { --pw: 120px; --ph: 180px; --cw: 120px; --ch: 180px; }
+  .fav-row[data-count="4"]  { --pw: 108px; --ph: 162px; --cw: 108px; --ch: 162px; }
+  .fav-row[data-count="5"]  { --pw: 96px;  --ph: 144px; --cw: 96px;  --ch: 144px; }
+  .fav-row[data-count="6"]  { --pw: 86px;  --ph: 129px; --cw: 86px;  --ch: 129px; }
+  .fav-row[data-count="7"]  { --pw: 78px;  --ph: 117px; --cw: 78px;  --ch: 117px; }
+  .fav-row[data-count="8"]  { --pw: 72px;  --ph: 108px; --cw: 72px;  --ch: 108px; }
+  .fav-row[data-count="9"]  { --pw: 66px;  --ph: 99px;  --cw: 66px;  --ch: 99px;  }
+  .fav-row[data-count="10"] { --pw: 62px;  --ph: 93px;  --cw: 62px;  --ch: 93px;  }
+  .fav-row[data-count="11"] { --pw: 58px;  --ph: 87px;  --cw: 58px;  --ch: 87px;  }
+  .fav-row[data-count="12"] { --pw: 54px;  --ph: 81px;  --cw: 54px;  --ch: 81px;  }
+  .fav-row[data-count="13"] { --pw: 52px;  --ph: 78px;  --cw: 52px;  --ch: 78px;  }
+  .fav-row[data-count="14"] { --pw: 50px;  --ph: 75px;  --cw: 50px;  --ch: 75px;  }
+  .fav-row[data-count="15"] { --pw: 48px;  --ph: 72px;  --cw: 48px;  --ch: 72px;  }
+  .fav-row[data-count="16"] { --pw: 46px;  --ph: 69px;  --cw: 46px;  --ch: 69px;  }
+  .fav-row[data-count="17"] { --pw: 44px;  --ph: 66px;  --cw: 44px;  --ch: 66px;  }
+  .fav-row[data-count="18"] { --pw: 42px;  --ph: 63px;  --cw: 42px;  --ch: 63px;  }
+  .fav-row[data-count="19"] { --pw: 40px;  --ph: 60px;  --cw: 40px;  --ch: 60px;  }
+  .fav-row[data-count="20"] { --pw: 38px;  --ph: 57px;  --cw: 38px;  --ch: 57px;  }
+
   .anime-poster {
     flex-shrink: 0;
-    width: 90px; height: 135px;
-    object-fit: cover;
-    border-radius: 10px;
+    width: var(--pw); height: var(--ph);
+    object-fit: cover; border-radius: 10px;
     border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
   }
-  .anime-poster-ph {
-    flex-shrink: 0; width: 90px; height: 135px;
-    border-radius: 10px; background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.06);
-  }
-
-  /* char portrait: 1:1 */
   .char-portrait {
     flex-shrink: 0;
-    width: 120px; height: 120px;
-    object-fit: cover; object-position: top center;
+    width: var(--cw); height: var(--ch);
+    object-fit: cover; object-position: center top;
     border-radius: 10px;
     border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
   }
-  .char-portrait-ph {
-    flex-shrink: 0; width: 120px; height: 120px;
-    border-radius: 10px; background: rgba(255,255,255,0.04);
+  .ph {
+    flex-shrink: 0; border-radius: 10px;
+    background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.06);
   }
+  .anime-ph { width: var(--pw); height: var(--ph); }
+  .char-ph  { width: var(--cw); height: var(--ch); }
 
-  /* ── FOOTER ── */
   .footer {
-    position: absolute; bottom: 22px; right: 70px;
-    font-size: 19px; color: rgba(255,255,255,0.2); font-weight: 600; z-index: 3;
+    position: fixed; bottom: 18px; right: 36px;
+    font-size: 17px; color: rgba(255,255,255,0.18);
+    font-weight: 600; z-index: 10; white-space: nowrap;
   }
 </style>
 </head>
@@ -143,64 +186,74 @@
     <div class="blob blob-3"></div>
   </div>
 
+  {% set anime_items = [] %}
+  {% if fav_anime_covers %}
+    {% for url in fav_anime_covers %}
+      {% if url %}{% set _ = anime_items.append(loop.index0) %}{% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% set char_items = [] %}
+  {% if fav_char_images %}
+    {% for url in fav_char_images %}
+      {% if url %}{% set _ = char_items.append(loop.index0) %}{% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% set max_cnt = [anime_items|length, char_items|length]|max %}
+  {% set has_favs = max_cnt > 0 %}
+  {% set cnt = max_cnt if max_cnt <= 10 else 10 %}
+
   <div class="card">
+    <div class="left">
+      <div class="avatar-wrap">
+        <div class="avatar-ring"></div>
+        {% if avatar_url %}
+        <img class="avatar" src="{{ avatar_url }}" onerror="this.style.background='#1a2035'">
+        {% else %}
+        <div class="avatar"></div>
+        {% endif %}
+      </div>
 
-    <!-- Avatar -->
-    <div class="avatar-wrap">
-      <div class="avatar-ring"></div>
-      {% if avatar_url %}
-      <img class="avatar" src="{{ avatar_url }}" onerror="this.style.background='#1a2035'">
-      {% else %}
-      <div class="avatar"></div>
-      {% endif %}
+      <div class="identity">
+        <div class="username">{{ username }}</div>
+        <div class="tagline">AniList Profile</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat" style="--c:#63b3ed"><div class="stat-val">{{ anime_count }}</div><div class="stat-lbl">Anime</div></div>
+        <div class="stat" style="--c:#f6c636"><div class="stat-val">{{ mean_score }}</div><div class="stat-lbl">Score</div></div>
+        <div class="stat" style="--c:#9f7aea"><div class="stat-val">{{ manga_count }}</div><div class="stat-lbl">Manga</div></div>
+        <div class="stat" style="--c:#48bb78"><div class="stat-val">{{ days_watched }}</div><div class="stat-lbl">Days</div></div>
+      </div>
     </div>
 
-    <!-- Name -->
-    <div class="identity">
-      <div class="username">{{ username }}</div>
-      <div class="tagline">AniList Profile</div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats">
-      <div class="stat" style="--c:#63b3ed"><div class="stat-val">{{ anime_count }}</div><div class="stat-lbl">Anime</div></div>
-      <div class="stat" style="--c:#f6c636"><div class="stat-val">{{ mean_score }}</div><div class="stat-lbl">Score</div></div>
-      <div class="stat" style="--c:#9f7aea"><div class="stat-val">{{ manga_count }}</div><div class="stat-lbl">Manga</div></div>
-      <div class="stat" style="--c:#48bb78"><div class="stat-val">{{ days_watched }}</div><div class="stat-lbl">Days</div></div>
-    </div>
-
-    {% set has_anime = fav_anime_covers and fav_anime_covers | reject('equalto', '') | list | length > 0 %}
-    {% set has_chars = fav_char_images and fav_char_images | reject('equalto', '') | list | length > 0 %}
-
-    {% if has_anime or has_chars %}
+    {% if has_favs %}
     <div class="divider"></div>
-
     <div class="favs">
 
-      {% if has_anime %}
+      {% if anime_items|length > 0 %}
       <div class="fav-block">
         <div class="fav-label" style="--lc:#fc8181">❤️ Любимое аниме</div>
-        <div class="fav-row">
-          {% for i in range([fav_anime_covers|length, 10]|min) %}
+        <div class="fav-row" data-count="{{ [anime_items|length, 10]|min }}">
+          {% for i in range(fav_anime_covers|length) %}
             {% if fav_anime_covers[i] %}
-            <img class="anime-poster" src="{{ fav_anime_covers[i] }}" title="{{ fav_anime_names[i] if i < fav_anime_names|length else '' }}" onerror="this.style.display='none'">
-            {% else %}
-            <div class="anime-poster-ph"></div>
+            <img class="anime-poster" src="{{ fav_anime_covers[i] }}"
+                 onerror="this.outerHTML='<div class=&quot;ph anime-ph&quot;></div>'">
             {% endif %}
           {% endfor %}
         </div>
       </div>
       {% endif %}
 
-      {% if has_chars %}
+      {% if char_items|length > 0 %}
       <div class="fav-block">
         <div class="fav-label" style="--lc:#f6c636">⭐ Любимые персонажи</div>
-        <div class="fav-row">
-          {% for i in range([fav_char_images|length, 10]|min) %}
+        <div class="fav-row" data-count="{{ [char_items|length, 10]|min }}">
+          {% for i in range(fav_char_images|length) %}
             {% if fav_char_images[i] %}
-            <img class="char-portrait" src="{{ fav_char_images[i] }}" title="{{ fav_char_names[i] if i < fav_char_names|length else '' }}" onerror="this.style.display='none'">
-            {% else %}
-            <div class="char-portrait-ph"></div>
+            <img class="char-portrait" src="{{ fav_char_images[i] }}"
+                 onerror="this.outerHTML='<div class=&quot;ph char-ph&quot;></div>'">
             {% endif %}
           {% endfor %}
         </div>
@@ -209,7 +262,6 @@
 
     </div>
     {% endif %}
-
   </div>
 
   <div class="footer">@westyasha_AniList_bot</div>

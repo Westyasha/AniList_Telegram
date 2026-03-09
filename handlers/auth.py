@@ -67,10 +67,10 @@ async def _send_welcome(msg: Message, uid: int, viewer: dict = None):
             "mean_score": mean,
             "fav_anime": (fa[0]["title"].get("english") or fa[0]["title"].get("romaji") or "") if fa else "",
             "fav_char": (fc[0]["name"].get("full") or "") if fc else "",
-            "fav_anime_covers": [(n.get("coverImage") or {}).get("large") or "" for n in fa[:10]],
-            "fav_char_images": [(n.get("image") or {}).get("large") or "" for n in fc[:10]],
-            "fav_anime_names": [(n["title"].get("english") or n["title"].get("romaji") or "") for n in fa[:10]],
-            "fav_char_names": [(n["name"].get("full") or "") for n in fc[:10]],
+            "fav_anime_covers": [(n.get("coverImage") or {}).get("extraLarge") or (n.get("coverImage") or {}).get("large") or "" for n in fa[:25]],
+            "fav_char_images": [(n.get("image") or {}).get("large") or "" for n in fc[:25]],
+            "fav_anime_names": [(n["title"].get("english") or n["title"].get("romaji") or "") for n in fa[:25]],
+            "fav_char_names": [(n["name"].get("full") or "") for n in fc[:25]],
         }
 
         cached_data, cached_file_id = get_card_cache(uid)
