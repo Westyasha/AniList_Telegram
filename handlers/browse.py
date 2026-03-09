@@ -9,26 +9,44 @@ from storage import get_token, set_anilist_id
 
 router = Router()
 
+
+def _dest(target):
+    return target.message if isinstance(target, CallbackQuery) else target
+
+
+async def _edit_or_answer(target, text: str, **kwargs):
+    if isinstance(target, CallbackQuery):
+        try:
+            await target.message.edit_text(text, **kwargs)
+            return
+        except Exception:
+            pass
+        await target.message.answer(text, **kwargs)
+    else:
+        await target.answer(text, **kwargs)
+
+
 # ─── PROFILE ──────────────────────────────────────────────────────────────────
 
 async def show_profile(target, uid: int):
     token = get_token(uid)
     if not token:
-        await target.answer(t(uid, "profile_need_auth"), parse_mode="MarkdownV2")
+        await _dest(target).answer(t(uid, "profile_need_auth"), parse_mode="MarkdownV2")
         return
     result = await anilist_query(Q_VIEWER, token=token)
     viewer = result.get("data", {}).get("Viewer")
     if not viewer:
-        await target.answer(t(uid, "profile_error"), parse_mode="MarkdownV2")
+        await _dest(target).answer(t(uid, "profile_error"), parse_mode="MarkdownV2")
         return
     set_anilist_id(uid, viewer["id"])
     caption = profile_card(viewer)
     banner = viewer.get("bannerImage")
     avatar = (viewer.get("avatar") or {}).get("large")
+    dest = _dest(target)
 
     if banner and avatar:
         try:
-            await target.answer_media_group(media=[
+            await dest.answer_media_group(media=[
                 InputMediaPhoto(media=banner, caption=caption, parse_mode="MarkdownV2"),
                 InputMediaPhoto(media=avatar),
             ])
@@ -38,16 +56,22 @@ async def show_profile(target, uid: int):
     photo = banner or avatar
     if photo:
         try:
-            await target.answer_photo(photo=photo, caption=caption, parse_mode="MarkdownV2")
+            await dest.answer_photo(photo=photo, caption=caption, parse_mode="MarkdownV2")
             return
         except Exception:
             pass
-    await target.answer(caption, parse_mode="MarkdownV2")
+    await dest.answer(caption, parse_mode="MarkdownV2")
 
 
 @router.message(F.text.in_({"👤 Профиль", "👤 Profile"}))
 async def profile_cmd(msg: Message):
     await show_profile(msg, msg.from_user.id)
+
+
+@router.callback_query(F.data == "myprofile")
+async def profile_cb(cb: CallbackQuery):
+    await show_profile(cb, cb.from_user.id)
+    await cb.answer()
 
 
 # ─── TRENDING ─────────────────────────────────────────────────────────────────
@@ -61,7 +85,7 @@ async def trending_cmd(msg: Message):
 async def trending_cb(cb: CallbackQuery):
     parts = cb.data.split(":")
     mtype, page = parts[1], int(parts[2])
-    await _show_trending(cb.message, mtype, page, cb.from_user.id)
+    await _show_trending(cb, mtype, page, cb.from_user.id)
     await cb.answer()
 
 
@@ -70,8 +94,9 @@ async def _show_trending(target, mtype: str, page: int, uid: int):
     pdata = result.get("data", {}).get("Page", {})
     items = pdata.get("media", [])
     pinfo = pdata.get("pageInfo", {})
+
     if not items:
-        await target.answer(t(uid, "trending_empty"), parse_mode="MarkdownV2")
+        await _edit_or_answer(target, t(uid, "trending_empty"), parse_mode="MarkdownV2")
         return
 
     key = "trending_anime" if mtype == "ANIME" else "trending_manga"
@@ -87,16 +112,19 @@ async def _show_trending(target, mtype: str, page: int, uid: int):
         lines.append(f"   ⭐{score} 🔥{trend} \\| {esc(genres)}{esc(ep_str)}")
 
     kb = trending_kb(uid, items, mtype, page, pinfo.get("hasNextPage", False))
+    text = "\n".join(lines)
+    is_cb = isinstance(target, CallbackQuery)
 
-    covers = [item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("large")]
-    if covers:
-        try:
-            media_group = [InputMediaPhoto(media=url) for url in covers[:10]]
-            await target.answer_media_group(media=media_group)
-        except Exception:
-            pass
-
-    await target.answer("\n".join(lines), parse_mode="MarkdownV2", reply_markup=kb)
+    if is_cb:
+        await _edit_or_answer(target, text, parse_mode="MarkdownV2", reply_markup=kb)
+    else:
+        covers = [item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("large")]
+        if covers:
+            try:
+                await target.answer_media_group(media=[InputMediaPhoto(media=url) for url in covers[:10]])
+            except Exception:
+                pass
+        await target.answer(text, parse_mode="MarkdownV2", reply_markup=kb)
 
 
 # ─── SEASON ───────────────────────────────────────────────────────────────────
@@ -111,7 +139,7 @@ async def season_cmd(msg: Message):
 async def season_cb(cb: CallbackQuery):
     parts = cb.data.split(":")
     s, y, page = parts[1], int(parts[2]), int(parts[3])
-    await _show_season(cb.message, s, y, page, cb.from_user.id)
+    await _show_season(cb, s, y, page, cb.from_user.id)
     await cb.answer()
 
 
@@ -120,12 +148,12 @@ async def _show_season(target, season: str, year: int, page: int, uid: int):
     pdata = result.get("data", {}).get("Page", {})
     items = pdata.get("media", [])
     pinfo = pdata.get("pageInfo", {})
-    if not items:
-        await target.answer(t(uid, "season_empty"), parse_mode="MarkdownV2")
-        return
-
     season_icons = {"WINTER": "❄️", "SPRING": "🌸", "SUMMER": "☀️", "FALL": "🍂"}
     season_label = f"{season_icons.get(season, '')} {fseason(season)}"
+
+    if not items:
+        await _edit_or_answer(target, t(uid, "season_empty"), parse_mode="MarkdownV2")
+        return
 
     lines = [t(uid, "season_title", season=season_label, year=year, page=page), ""]
     for i, item in enumerate(items, start=(page - 1) * 8 + 1):
@@ -140,16 +168,19 @@ async def _show_season(target, season: str, year: int, page: int, uid: int):
         lines.append(f"   ⭐{score} \\| {esc(ep_info)}" + (f" \\| {esc(studio[:20])}" if studio else ""))
 
     kb = season_kb(uid, items, season, year, page, pinfo.get("hasNextPage", False))
+    text = "\n".join(lines)
+    is_cb = isinstance(target, CallbackQuery)
 
-    covers = [item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("large")]
-    if covers:
-        try:
-            media_group = [InputMediaPhoto(media=url) for url in covers[:10]]
-            await target.answer_media_group(media=media_group)
-        except Exception:
-            pass
-
-    await target.answer("\n".join(lines), parse_mode="MarkdownV2", reply_markup=kb)
+    if is_cb:
+        await _edit_or_answer(target, text, parse_mode="MarkdownV2", reply_markup=kb)
+    else:
+        covers = [item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("large")]
+        if covers:
+            try:
+                await target.answer_media_group(media=[InputMediaPhoto(media=url) for url in covers[:10]])
+            except Exception:
+                pass
+        await target.answer(text, parse_mode="MarkdownV2", reply_markup=kb)
 
 
 # ─── SCHEDULE ─────────────────────────────────────────────────────────────────
@@ -163,7 +194,7 @@ async def schedule_cmd(msg: Message):
 async def schedule_cb(cb: CallbackQuery):
     parts = cb.data.split(":")
     upcoming, page = bool(int(parts[1])), int(parts[2])
-    await _show_schedule(cb.message, upcoming=upcoming, page=page, uid=cb.from_user.id)
+    await _show_schedule(cb, upcoming=upcoming, page=page, uid=cb.from_user.id)
     await cb.answer()
 
 
@@ -172,8 +203,9 @@ async def _show_schedule(target, upcoming: bool, page: int, uid: int):
     pdata = result.get("data", {}).get("Page", {})
     schedules = pdata.get("airingSchedules", [])
     pinfo = pdata.get("pageInfo", {})
+
     if not schedules:
-        await target.answer(t(uid, "schedule_empty"), parse_mode="MarkdownV2")
+        await _edit_or_answer(target, t(uid, "schedule_empty"), parse_mode="MarkdownV2")
         return
 
     key = "schedule_upcoming" if upcoming else "schedule_aired"
@@ -191,23 +223,19 @@ async def _show_schedule(target, upcoming: bool, page: int, uid: int):
         score_str = f" ⭐{score}" if score else ""
         time_str = ftime_until(time_left) if upcoming else fairing_ts(airing_ts_val)
         lines.append(f"{in_list}*Ep\\.{ep}* — {esc(title[:35])}{esc(score_str)}")
-        if upcoming:
-            lines.append(f"   ⏰ in {esc(time_str)}")
-        else:
-            lines.append(f"   📅 {esc(time_str)}")
+        lines.append(f"   {'⏰' if upcoming else '📅'} {esc(time_str)}")
 
     kb = schedule_kb(uid, schedules, page, pinfo.get("hasNextPage", False), upcoming)
+    text = "\n".join(lines)
+    is_cb = isinstance(target, CallbackQuery)
 
-    covers = [
-        item["media"].get("coverImage", {}).get("medium")
-        for item in schedules
-        if item["media"].get("coverImage", {}).get("medium")
-    ]
-    if covers:
-        try:
-            media_group = [InputMediaPhoto(media=url) for url in covers[:10]]
-            await target.answer_media_group(media=media_group)
-        except Exception:
-            pass
-
-    await target.answer("\n".join(lines), parse_mode="MarkdownV2", reply_markup=kb)
+    if is_cb:
+        await _edit_or_answer(target, text, parse_mode="MarkdownV2", reply_markup=kb)
+    else:
+        covers = [item["media"].get("coverImage", {}).get("medium") for item in schedules if item["media"].get("coverImage", {}).get("medium")]
+        if covers:
+            try:
+                await target.answer_media_group(media=[InputMediaPhoto(media=url) for url in covers[:10]])
+            except Exception:
+                pass
+        await target.answer(text, parse_mode="MarkdownV2", reply_markup=kb)
