@@ -16,7 +16,10 @@ def init_db():
                 created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
                 notifications  INTEGER DEFAULT 1,
-                keyboard_layout TEXT
+                keyboard_layout TEXT,
+                card_cache_data TEXT,
+                card_cache_file_id TEXT,
+                card_cache_at   INTEGER DEFAULT 0
             )
         """)
         conn.execute("""
@@ -26,6 +29,15 @@ def init_db():
                 UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE user_id = NEW.user_id;
             END
         """)
+        for col, definition in [
+            ("card_cache_data", "TEXT"),
+            ("card_cache_file_id", "TEXT"),
+            ("card_cache_at", "INTEGER DEFAULT 0"),
+        ]:
+            try:
+                conn.execute(f"ALTER TABLE users ADD COLUMN {col} {definition}")
+            except Exception:
+                pass
 
 
 @contextmanager
@@ -157,4 +169,42 @@ def set_keyboard_layout(user_id: int, layout: list):
         conn.execute(
             "UPDATE users SET keyboard_layout = ? WHERE user_id = ?",
             (json.dumps(layout), user_id)
+        )
+
+
+CARD_CACHE_TTL = 3600
+
+
+def get_card_cache(user_id: int) -> tuple[dict | None, str | None]:
+    import json, time
+    with _conn() as conn:
+        row = conn.execute(
+            "SELECT card_cache_data, card_cache_file_id, card_cache_at FROM users WHERE user_id = ?",
+            (user_id,)
+        ).fetchone()
+        if not row or not row["card_cache_data"] or not row["card_cache_file_id"]:
+            return None, None
+        if time.time() - (row["card_cache_at"] or 0) > CARD_CACHE_TTL:
+            return None, None
+        try:
+            return json.loads(row["card_cache_data"]), row["card_cache_file_id"]
+        except Exception:
+            return None, None
+
+
+def set_card_cache(user_id: int, data: dict, file_id: str):
+    import json, time
+    with _conn() as conn:
+        _ensure_user(conn, user_id)
+        conn.execute(
+            "UPDATE users SET card_cache_data = ?, card_cache_file_id = ?, card_cache_at = ? WHERE user_id = ?",
+            (json.dumps(data), file_id, int(time.time()), user_id)
+        )
+
+
+def invalidate_card_cache(user_id: int):
+    with _conn() as conn:
+        conn.execute(
+            "UPDATE users SET card_cache_at = 0 WHERE user_id = ?",
+            (user_id,)
         )

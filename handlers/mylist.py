@@ -179,6 +179,30 @@ async def progress_cb(cb: CallbackQuery):
     await cb.answer(t(uid, "progress_updated", cur=new_prog, total=total_str, complete=complete), show_alert=True)
 
 
+@router.callback_query(F.data.startswith("progress_minus:"))
+async def progress_minus_cb(cb: CallbackQuery):
+    uid = cb.from_user.id
+    media_id = int(cb.data.split(":")[1])
+    token = get_token(uid)
+    if not token:
+        await cb.answer(t(uid, "auth_need"), show_alert=True)
+        return
+    result = await anilist_query(Q_MEDIA_DETAIL, {"id": media_id}, token=token)
+    media = result.get("data", {}).get("Media", {})
+    entry = media.get("mediaListEntry")
+    cur = (entry.get("progress") or 0) if entry else 0
+    if cur <= 0:
+        await cb.answer(t(uid, "progress_already_zero"), show_alert=True)
+        return
+    new_prog = cur - 1
+    cur_status = entry.get("status", "CURRENT") if entry else "CURRENT"
+    new_status = "CURRENT" if cur_status == "COMPLETED" else cur_status
+    await anilist_query(M_SAVE_LIST_ENTRY, {"mediaId": media_id, "progress": new_prog, "status": new_status}, token=token)
+    total = media.get("episodes") or media.get("chapters")
+    total_str = str(total) if total else "?"
+    await cb.answer(t(uid, "progress_updated", cur=new_prog, total=total_str, complete=""), show_alert=True)
+
+
 @router.callback_query(F.data.startswith("rate:"))
 async def rate_cb(cb: CallbackQuery):
     uid = cb.from_user.id
