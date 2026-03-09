@@ -24,8 +24,8 @@ def main_menu(uid: int) -> ReplyKeyboardMarkup:
 
 def search_menu_kb(uid: int) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
-    b.add(btn(t(uid, "search_anime_btn"), "searchtype:ANIME", "primary"))
-    b.add(btn(t(uid, "search_manga_btn"), "searchtype:MANGA", "primary"))
+    b.add(btn(t(uid, "search_anime_btn"), "searchtype:ANIME"))
+    b.add(btn(t(uid, "search_manga_btn"), "searchtype:MANGA"))
     b.add(btn(t(uid, "search_char_btn"), "searchtype:CHARACTER"))
     b.add(btn(t(uid, "search_staff_btn"), "searchtype:STAFF"))
     b.add(btn(t(uid, "search_fuzzy_btn"), "searchtype:FUZZY"))
@@ -73,7 +73,7 @@ def fuzzy_results_kb(results: list) -> InlineKeyboardMarkup:
 def media_kb(uid: int, media_id: int, mtype: str, in_list: bool) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
     if in_list:
-        b.add(btn(t(uid, "edit_list"), f"liststatus:{media_id}:{mtype}", "primary"))
+        b.add(btn(t(uid, "edit_list"), f"liststatus:{media_id}:{mtype}"))
     else:
         b.add(btn(t(uid, "add_to_list"), f"liststatus:{media_id}:{mtype}", "success"))
     b.add(btn(t(uid, "to_fav"), f"togglefav:{media_id}:{mtype}"))
@@ -91,17 +91,17 @@ def media_kb(uid: int, media_id: int, mtype: str, in_list: bool) -> InlineKeyboa
 
 def list_status_kb(uid: int, media_id: int, current: str = None) -> InlineKeyboardMarkup:
     statuses = [
-        ("status_current", "CURRENT", "success"),
-        ("status_planning", "PLANNING", None),
-        ("status_completed", "COMPLETED", "primary"),
-        ("status_dropped", "DROPPED", "danger"),
-        ("status_paused", "PAUSED", None),
-        ("status_repeating", "REPEATING", None),
+        ("status_current", "CURRENT"),
+        ("status_planning", "PLANNING"),
+        ("status_completed", "COMPLETED"),
+        ("status_dropped", "DROPPED"),
+        ("status_paused", "PAUSED"),
+        ("status_repeating", "REPEATING"),
     ]
     b = InlineKeyboardBuilder()
-    for key, val, style in statuses:
+    for key, val in statuses:
         mark = "✓ " if val == current else ""
-        b.add(btn(f"{mark}{t(uid, key)}", f"setstatus:{media_id}:{val}", style))
+        b.add(btn(f"{mark}{t(uid, key)}", f"setstatus:{media_id}:{val}"))
     b.add(btn(t(uid, "delete_from_list"), f"dellist:{media_id}", "danger"))
     b.adjust(2, 2, 2, 1)
     return b.as_markup()
@@ -111,8 +111,7 @@ def score_kb(media_id: int) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
     for s in [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]:
         stars = "⭐" * min(s, 5)
-        style = "success" if s >= 8 else ("primary" if s >= 6 else ("danger" if s <= 3 else None))
-        b.add(btn(f"{s} {stars}", f"setscore:{media_id}:{s}", style))
+        b.add(btn(f"{s} {stars}", f"setscore:{media_id}:{s}"))
     b.add(btn("✖️ Remove score", f"setscore:{media_id}:0", "danger"))
     b.adjust(5)
     return b.as_markup()
@@ -186,8 +185,8 @@ def recs_kb(uid: int, nodes: list, media_id: int) -> InlineKeyboardMarkup:
 def my_list_menu_kb(uid: int) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
     b.row(
-        btn("📺 Аниме", "mylist_tab:ANIME", "primary"),
-        btn("📚 Манга", "mylist_tab:MANGA", "primary"),
+        btn("📺 Аниме", "mylist_tab:ANIME"),
+        btn("📚 Манга", "mylist_tab:MANGA"),
     )
     b.row(
         btn(t(uid, "list_current_anime"), "mylist:ANIME:CURRENT:1", "success"),
@@ -207,8 +206,8 @@ def my_list_menu_kb(uid: int) -> InlineKeyboardMarkup:
 def my_list_manga_kb(uid: int) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
     b.row(
-        btn("📺 Аниме", "mylist_tab:ANIME", "primary"),
-        btn("📚 Манга", "mylist_tab:MANGA", "primary"),
+        btn("📺 Аниме", "mylist_tab:ANIME"),
+        btn("📚 Манга", "mylist_tab:MANGA"),
     )
     b.row(
         btn(t(uid, "list_current_manga"), "mylist:MANGA:CURRENT:1", "success"),
@@ -273,7 +272,7 @@ def trending_kb(uid: int, items: list, mtype: str, page: int, has_next: bool) ->
         b.row(*nav)
     sw = "MANGA" if mtype == "ANIME" else "ANIME"
     sw_label = t(uid, "trending_to_manga") if mtype == "ANIME" else t(uid, "trending_to_anime")
-    b.row(btn(sw_label, f"trending:{sw}:1", "primary"))
+    b.row(btn(sw_label, f"trending:{sw}:1"))
     return b.as_markup()
 
 
@@ -329,7 +328,7 @@ def schedule_kb(uid: int, items: list, page: int, has_next: bool, upcoming: bool
     if nav:
         b.row(*nav)
     sw_label = t(uid, "schedule_switch_aired") if upcoming else t(uid, "schedule_switch_upcoming")
-    b.row(btn(sw_label, f"schedule:{int(not upcoming)}:1", "primary"))
+    b.row(btn(sw_label, f"schedule:{int(not upcoming)}:1"))
     return b.as_markup()
 
 
@@ -346,8 +345,6 @@ def filter_kb(uid: int, genre=None, year=None, score=None) -> InlineKeyboardMark
     b.add(btn(t(uid, "filter_search"), "filter:dosearch", "success"))
     b.adjust(3, 2)
     return b.as_markup()
-
-
 def filter_pick_genre_kb(uid: int) -> InlineKeyboardMarkup:
     from core.filter import GENRE_DISPLAY
     b = InlineKeyboardBuilder()
@@ -413,7 +410,7 @@ def settings_kb(uid: int) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
     b.add(btn(f"🌐 Language: {lang_label}", "settings:lang"))
     if token:
-        b.add(btn("👤 My profile", "myprofile", "primary"))
+        b.add(btn("👤 My profile", "myprofile"))
         b.add(btn("🚪 Log out", "logout", "danger"))
     else:
         b.add(btn("🔐 Authorize", "openauth", "success"))
@@ -451,7 +448,7 @@ def auth_kb(uid: int, auth_url: str) -> InlineKeyboardMarkup:
 
 def auth_menu_kb(uid: int) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
-    b.add(btn(t(uid, "profile_btn"), "myprofile", "primary"))
+    b.add(btn(t(uid, "profile_btn"), "myprofile"))
     b.add(btn(t(uid, "logout_btn"), "logout", "danger"))
     b.adjust(1)
     return b.as_markup()
