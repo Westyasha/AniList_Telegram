@@ -151,3 +151,18 @@ async def my_profile_cb(cb: CallbackQuery):
     from handlers.browse import show_profile
     await show_profile(cb, cb.from_user.id)
     await cb.answer()
+
+@router.callback_query(F.data == "settings:notif")
+async def settings_notif_cb(cb: CallbackQuery):
+    from storage import get_notifications_enabled, set_notifications_enabled
+    uid = cb.from_user.id
+    current = get_notifications_enabled(uid)
+    set_notifications_enabled(uid, not current)
+    from keyboards import settings_kb
+    try:
+        await cb.message.edit_reply_markup(reply_markup=settings_kb(uid))
+    except Exception:
+        pass
+    lang = get_lang(uid)
+    msg = ("🔔 Уведомления включены" if not current else "🔕 Уведомления выключены") if lang == "ru" else ("🔔 Notifications enabled" if not current else "🔕 Notifications disabled")
+    await cb.answer(msg, show_alert=True)

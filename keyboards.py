@@ -403,13 +403,16 @@ def filter_results_kb(uid: int, results: list, page: int, has_prev: bool, has_ne
 
 
 def settings_kb(uid: int) -> InlineKeyboardMarkup:
-    from storage import get_lang, get_token
+    from storage import get_lang, get_token, get_notifications_enabled
     lang = get_lang(uid)
     token = get_token(uid)
+    notif = get_notifications_enabled(uid)
     lang_label = "🇷🇺 Русский" if lang == "ru" else "🇬🇧 English"
+    notif_label = ("🔔 Уведомления: ВКЛ" if lang == "ru" else "🔔 Notifications: ON") if notif else ("🔕 Уведомления: ВЫКЛ" if lang == "ru" else "🔕 Notifications: OFF")
     b = InlineKeyboardBuilder()
     b.add(btn(f"🌐 Language: {lang_label}", "settings:lang"))
     if token:
+        b.add(btn(notif_label, "settings:notif"))
         b.add(btn("👤 My profile", "myprofile"))
         b.add(btn("🚪 Log out", "logout", "danger"))
     else:

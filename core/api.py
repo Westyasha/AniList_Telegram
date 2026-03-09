@@ -21,7 +21,7 @@ query ($search: String, $type: MediaType, $page: Int, $perPage: Int) {
     media(search: $search, type: $type, sort: SEARCH_MATCH, isAdult: false) {
       id type format status episodes chapters averageScore meanScore popularity
       title { romaji english native }
-      coverImage { large medium }
+      coverImage { extraLarge large }
       genres startDate { year } season seasonYear
     }
   }
@@ -36,7 +36,7 @@ query ($search: String, $page: Int) {
       id favourites
       name { full native }
       image { large }
-      media(perPage: 3, sort: POPULARITY_DESC) { nodes { id title { romaji } coverImage { medium } type } }
+      media(perPage: 3, sort: POPULARITY_DESC) { nodes { id title { romaji } coverImage { extraLarge large } type } }
     }
   }
 }
@@ -82,11 +82,11 @@ query ($id: Int) {
     relations {
       edges {
         relationType
-        node { id type format status title { romaji english } coverImage { medium } }
+        node { id type format status title { romaji english } coverImage { extraLarge large } }
       }
     }
     recommendations(perPage: 6) {
-      nodes { mediaRecommendation { id title { romaji } coverImage { medium } averageScore type } }
+      nodes { mediaRecommendation { id title { romaji } coverImage { extraLarge large } averageScore type } }
     }
     mediaListEntry {
       id status score progress progressVolumes repeat notes
@@ -108,7 +108,7 @@ query ($id: Int, $page: Int) {
       edges {
         role
         node { id name { full native } image { large } favourites }
-        voiceActors(language: JAPANESE) { id name { full } image { medium } }
+        voiceActors(language: JAPANESE) { id name { full } image { large } }
       }
     }
   }
@@ -140,7 +140,7 @@ query ($id: Int) {
     description(asHtml: false)
     gender age dateOfBirth { year month day }
     media(perPage: 6, sort: POPULARITY_DESC) {
-      nodes { id type title { romaji } coverImage { medium } format averageScore }
+      nodes { id type title { romaji } coverImage { extraLarge large } format averageScore }
     }
   }
 }
@@ -156,7 +156,7 @@ query ($id: Int) {
     primaryOccupations gender age
     dateOfBirth { year month day }
     staffMedia(perPage: 6, sort: POPULARITY_DESC) {
-      nodes { id type title { romaji } coverImage { medium } format averageScore }
+      nodes { id type title { romaji } coverImage { extraLarge large } format averageScore }
     }
   }
 }
@@ -175,10 +175,10 @@ query {
       manga { count chaptersRead volumesRead meanScore }
     }
     favourites {
-      anime(perPage: 5) { nodes { id title { romaji } coverImage { medium } } }
-      manga(perPage: 5) { nodes { id title { romaji } coverImage { medium } } }
-      characters(perPage: 5) { nodes { id name { full } image { medium } } }
-      staff(perPage: 3) { nodes { id name { full } image { medium } } }
+      anime(perPage: 5) { nodes { id title { romaji } coverImage { extraLarge large } } }
+      manga(perPage: 5) { nodes { id title { romaji } coverImage { extraLarge large } } }
+      characters(perPage: 5) { nodes { id name { full } image { large } } }
+      staff(perPage: 3) { nodes { id name { full } image { large } } }
     }
   }
 }
@@ -197,7 +197,7 @@ query ($userId: Int, $type: MediaType, $status: MediaListStatus) {
         media {
           id episodes chapters format
           title { romaji english }
-          coverImage { medium }
+          coverImage { extraLarge large }
           averageScore nextAiringEpisode { episode }
         }
       }
@@ -281,7 +281,7 @@ query ($page: Int, $notYetAired: Boolean) {
       media {
         id averageScore
         title { romaji english }
-        coverImage { medium }
+        coverImage { extraLarge large }
         mediaListEntry { status progress }
       }
     }

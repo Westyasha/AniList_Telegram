@@ -118,7 +118,7 @@ async def _show_trending(target, mtype: str, page: int, uid: int):
     if is_cb:
         await _edit_or_answer(target, text, parse_mode="MarkdownV2", reply_markup=kb)
     else:
-        covers = [item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("large")]
+        covers = [item.get("coverImage", {}).get("extraLarge") or item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("extraLarge") or item.get("coverImage", {}).get("large")]
         if covers:
             try:
                 await target.answer_media_group(media=[InputMediaPhoto(media=url) for url in covers[:10]])
@@ -174,7 +174,7 @@ async def _show_season(target, season: str, year: int, page: int, uid: int):
     if is_cb:
         await _edit_or_answer(target, text, parse_mode="MarkdownV2", reply_markup=kb)
     else:
-        covers = [item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("large")]
+        covers = [item.get("coverImage", {}).get("extraLarge") or item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("extraLarge") or item.get("coverImage", {}).get("large")]
         if covers:
             try:
                 await target.answer_media_group(media=[InputMediaPhoto(media=url) for url in covers[:10]])
@@ -232,7 +232,7 @@ async def _show_schedule(target, upcoming: bool, page: int, uid: int):
     if is_cb:
         await _edit_or_answer(target, text, parse_mode="MarkdownV2", reply_markup=kb)
     else:
-        covers = [item["media"].get("coverImage", {}).get("medium") for item in schedules if item["media"].get("coverImage", {}).get("medium")]
+        covers = [item["media"].get("coverImage", {}).get("extraLarge") or item["media"].get("coverImage", {}).get("large") for item in schedules if item["media"].get("coverImage", {}).get("extraLarge") or item["media"].get("coverImage", {}).get("large")]
         if covers:
             try:
                 await target.answer_media_group(media=[InputMediaPhoto(media=url) for url in covers[:10]])
