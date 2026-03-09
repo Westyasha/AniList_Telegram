@@ -255,14 +255,14 @@
 
       <div class="identity">
         <div class="username">{{ username }}</div>
-        <div class="tagline">AniList Profile</div>
+        <div class="tagline">{{ "AniList Профиль" if lang == "ru" else "AniList Profile" }}</div>
       </div>
 
       <div class="stats">
-        <div class="stat" style="--c:#63b3ed"><div class="stat-val">{{ anime_count }}</div><div class="stat-lbl">Anime</div></div>
-        <div class="stat" style="--c:#f6c636"><div class="stat-val">{{ mean_score }}</div><div class="stat-lbl">Score</div></div>
-        <div class="stat" style="--c:#9f7aea"><div class="stat-val">{{ manga_count }}</div><div class="stat-lbl">Manga</div></div>
-        <div class="stat" style="--c:#48bb78"><div class="stat-val">{{ days_watched }}</div><div class="stat-lbl">Days</div></div>
+        <div class="stat" style="--c:#63b3ed"><div class="stat-val">{{ anime_count }}</div><div class="stat-lbl">{{ "Аниме" if lang == "ru" else "Anime" }}</div></div>
+        <div class="stat" style="--c:#f6c636"><div class="stat-val">{{ mean_score }}</div><div class="stat-lbl">{{ "Оценка" if lang == "ru" else "Score" }}</div></div>
+        <div class="stat" style="--c:#9f7aea"><div class="stat-val">{{ manga_count }}</div><div class="stat-lbl">{{ "Манга" if lang == "ru" else "Manga" }}</div></div>
+        <div class="stat" style="--c:#48bb78"><div class="stat-val">{{ days_watched }}</div><div class="stat-lbl">{{ "Дней" if lang == "ru" else "Days" }}</div></div>
       </div>
     </div>
 
@@ -272,7 +272,7 @@
 
       {% if anime_show > 0 %}
       <div class="fav-block">
-        <div class="fav-label" style="--lc:#fc8181">❤️ Любимое аниме</div>
+        <div class="fav-label" style="--lc:#fc8181">{{ "❤️ Любимое аниме" if lang == "ru" else "❤️ Favourite anime" }}</div>
         <div class="fav-row" data-count="{{ anime_show + (1 if anime_extra > 0 else 0) }}">
           {% set shown = namespace(n=0) %}
           {% for i in range(fav_anime_covers|length) %}
@@ -285,7 +285,7 @@
           {% if anime_extra > 0 %}
           <div class="more-tile">
             <div class="more-plus">+{{ anime_extra }}</div>
-            <div class="more-count">MORE</div>
+            <div class="more-count">{{ "ЕЩЁ" if lang == "ru" else "MORE" }}</div>
             <svg class="more-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="10" fill="white" fill-opacity="0.15"/>
               <path d="M8 12H16M16 12L12 8M16 12L12 16" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -298,7 +298,7 @@
 
       {% if char_show > 0 %}
       <div class="fav-block">
-        <div class="fav-label" style="--lc:#f6c636">⭐ Любимые персонажи</div>
+        <div class="fav-label" style="--lc:#f6c636">{{ "⭐ Любимые персонажи" if lang == "ru" else "⭐ Favourite chars" }}</div>
         <div class="fav-row" data-count="{{ char_show + (1 if char_extra > 0 else 0) }}">
           {% set shown = namespace(n=0) %}
           {% for i in range(fav_char_images|length) %}
@@ -311,7 +311,7 @@
           {% if char_extra > 0 %}
           <div class="more-tile">
             <div class="more-plus">+{{ char_extra }}</div>
-            <div class="more-count">MORE</div>
+            <div class="more-count">{{ "ЕЩЁ" if lang == "ru" else "MORE" }}</div>
             <svg class="more-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="10" fill="white" fill-opacity="0.15"/>
               <path d="M8 12H16M16 12L12 8M16 12L12 16" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>

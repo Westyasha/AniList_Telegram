@@ -58,6 +58,7 @@ async def _send_welcome(msg: Message, uid: int, viewer: dict = None):
         manga = stats.get("manga", {})
 
         card_data = {
+            "lang": lang,
             "username": name,
             "banner_url": viewer.get("bannerImage") or "",
             "avatar_url": (viewer.get("avatar") or {}).get("large") or "",
