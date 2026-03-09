@@ -186,7 +186,10 @@ async def rate_cb(cb: CallbackQuery):
     if not get_token(uid):
         await cb.answer(t(uid, "auth_need"), show_alert=True)
         return
-    await cb.message.answer(t(uid, "choose_score"), parse_mode="MarkdownV2", reply_markup=score_kb(media_id))
+    try:
+        await cb.message.edit_text(t(uid, "choose_score"), parse_mode="MarkdownV2", reply_markup=score_kb(media_id))
+    except Exception:
+        await cb.message.answer(t(uid, "choose_score"), parse_mode="MarkdownV2", reply_markup=score_kb(media_id))
     await cb.answer()
 
 
@@ -203,10 +206,23 @@ async def setscore_cb(cb: CallbackQuery):
     if "errors" in result:
         await cb.answer(t(uid, "save_error"), show_alert=True)
         return
-    if score == 0:
-        await cb.answer(t(uid, "score_removed"), show_alert=True)
-    else:
-        await cb.answer(t(uid, "score_saved", score=int(score)), show_alert=True)
+    msg = t(uid, "score_saved", score=int(score)) if score else t(uid, "score_removed")
+    await cb.answer(msg, show_alert=True)
+    # Restore media card keyboard
+    from core.api import Q_MEDIA_DETAIL
+    detail = await anilist_query(Q_MEDIA_DETAIL, {"id": media_id}, token=token)
+    media = detail.get("data", {}).get("Media", {})
+    entry = media.get("mediaListEntry")
+    if media:
+        from core.formatters import media_card
+        from keyboards import media_kb
+        mtype = media.get("type", "ANIME")
+        try:
+            caption = media_card(media)
+            kb = media_kb(uid, media_id, mtype, bool(entry))
+            await cb.message.edit_text(caption, parse_mode="MarkdownV2", reply_markup=kb)
+        except Exception:
+            pass
 
 
 @router.callback_query(F.data.startswith("notes:"))
