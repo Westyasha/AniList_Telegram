@@ -45,7 +45,7 @@ async def generate_wrapped(data: dict) -> io.BytesIO:
         "chapters_read":    data.get("chapters_read", 0),
         "manga_score":      f"{data.get('manga_score', 0):.1f}",
     }
-    return await _render("wrapped.html", render_data, 1080, 1600)
+    return await _render("wrapped.html", render_data, 1080, 1920)
 
 
 async def generate_profile_card(data: dict) -> io.BytesIO:
