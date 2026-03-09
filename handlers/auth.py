@@ -25,9 +25,8 @@ def auth_url(uid: int) -> str:
 
 async def _send_welcome(msg: Message, uid: int, viewer: dict = None):
     from core.image_gen import generate_profile_card
-    from core.api import anilist_query
     from aiogram.types import BufferedInputFile
-    from storage import get_anilist_id
+    from storage import get_card_cache, set_card_cache
 
     if viewer:
         stats = viewer.get("statistics", {})
@@ -68,19 +67,33 @@ async def _send_welcome(msg: Message, uid: int, viewer: dict = None):
             "mean_score": mean,
             "fav_anime": (fa[0]["title"].get("english") or fa[0]["title"].get("romaji") or "") if fa else "",
             "fav_char": (fc[0]["name"].get("full") or "") if fc else "",
-            "fav_anime_covers": [(n.get("coverImage") or {}).get("large") or "" for n in fa[:5]],
-            "fav_char_images": [(n.get("image") or {}).get("large") or "" for n in fc[:5]],
-            "fav_anime_names": [(n["title"].get("english") or n["title"].get("romaji") or "") for n in fa[:5]],
-            "fav_char_names": [(n["name"].get("full") or "") for n in fc[:5]],
+            "fav_anime_covers": [(n.get("coverImage") or {}).get("large") or "" for n in fa[:10]],
+            "fav_char_images": [(n.get("image") or {}).get("large") or "" for n in fc[:10]],
+            "fav_anime_names": [(n["title"].get("english") or n["title"].get("romaji") or "") for n in fa[:10]],
+            "fav_char_names": [(n["name"].get("full") or "") for n in fc[:10]],
         }
+
+        cached_data, cached_file_id = get_card_cache(uid)
+
         try:
+            if cached_file_id:
+                await msg.answer_photo(
+                    photo=cached_file_id,
+                    caption=text,
+                    parse_mode="MarkdownV2",
+                    reply_markup=main_menu(uid)
+                )
+                return
+
             buf = await generate_profile_card(card_data)
-            await msg.answer_photo(
+            sent = await msg.answer_photo(
                 photo=BufferedInputFile(buf.read(), filename="card.png"),
                 caption=text,
                 parse_mode="MarkdownV2",
                 reply_markup=main_menu(uid)
             )
+            if sent.photo:
+                set_card_cache(uid, card_data, sent.photo[-1].file_id)
             return
         except Exception:
             pass
@@ -194,6 +207,8 @@ async def receive_token(msg: Message, state: FSMContext):
 async def logout(cb: CallbackQuery):
     uid = cb.from_user.id
     remove_token(uid)
+    from storage import invalidate_card_cache
+    invalidate_card_cache(uid)
     await cb.message.answer(t(uid, "logout_done"), parse_mode="MarkdownV2", reply_markup=main_menu(uid))
     await cb.answer()
 
@@ -205,8 +220,14 @@ async def my_profile_cb(cb: CallbackQuery):
     await cb.answer()
 
 
-@router.callback_query(F.data == "settings:notif")
-async def settings_notif_cb(cb: CallbackQuery):
+@router.callback_query(F.data == "settings:clearcache")
+async def settings_clearcache_cb(cb: CallbackQuery):
+    uid = cb.from_user.id
+    lang = get_lang(uid)
+    from storage import invalidate_card_cache
+    invalidate_card_cache(uid)
+    msg = "🗑 Кэш карточки сброшен\\. Следующий /start перегенерирует её\\." if lang == "ru" else "🗑 Card cache cleared\\. Next /start will regenerate it\\."
+    await cb.answer(msg if len(msg) <= 200 else msg[:197] + "...", show_alert=True)
     from storage import get_notifications_enabled, set_notifications_enabled
     uid = cb.from_user.id
     lang = get_lang(uid)

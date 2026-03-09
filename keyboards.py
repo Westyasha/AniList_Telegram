@@ -121,9 +121,10 @@ def media_kb(uid: int, media_id: int, mtype: str, in_list: bool) -> InlineKeyboa
     b.add(btn(t(uid, "recs_btn"), f"recs:{media_id}"))
     if in_list:
         b.add(btn(t(uid, "progress_btn"), f"progress:{media_id}", "success"))
+        b.add(btn(t(uid, "progress_minus_btn"), f"progress_minus:{media_id}"))
         b.add(btn(t(uid, "rate_btn"), f"rate:{media_id}"))
         b.add(btn(t(uid, "notes_btn"), f"notes:{media_id}"))
-    b.adjust(2, 2, 2, 3)
+    b.adjust(2, 2, 2, 2, 2)
     return b.as_markup()
 
 
@@ -445,6 +446,7 @@ def settings_kb(uid: int) -> InlineKeyboardMarkup:
     b.add(btn("⌨️ Настройка клавиатуры" if lang == "ru" else "⌨️ Customize keyboard", "customize_keyboard"))
     if token:
         b.add(btn(notif_label, "settings:notif"))
+        b.add(btn("🗑 Сбросить кэш карточки" if lang == "ru" else "🗑 Clear card cache", "settings:clearcache"))
         b.add(btn("🚪 Log out", "logout", "danger"))
     else:
         b.add(btn("🔐 Authorize", "openauth", "success"))

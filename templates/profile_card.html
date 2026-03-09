@@ -9,6 +9,7 @@
 
   body {
     width: 2560px;
+    height: 823px;
     font-family: 'Inter', 'DejaVu Sans', Arial, sans-serif;
     background: #0d1117;
     color: #fff;
@@ -17,118 +18,120 @@
   }
 
   .banner-bg {
-    position: absolute;
-    inset: -50px;
+    position: absolute; inset: -50px;
     background-image: url('{{ banner_url }}');
-    background-size: cover;
-    background-position: center;
-    filter: blur(24px) brightness(0.6) saturate(1.4);
+    background-size: cover; background-position: center;
+    filter: blur(24px) brightness(0.55) saturate(1.4);
     z-index: 0;
   }
 
-  .blobs {
-    position: absolute; inset: 0; z-index: 1; overflow: hidden; mix-blend-mode: overlay;
-  }
-  .blob { position: absolute; border-radius: 50%; filter: blur(150px); opacity: 0.5; }
-  .blob-1 { width: 1200px; height: 1200px; background: #63b3ed; top: -300px; left: -200px; }
-  .blob-2 { width: 1000px; height: 1000px; background: #9f7aea; bottom: -300px; right: -100px; }
-  .blob-3 { width: 800px; height: 800px; background: #48bb78; top: 150px; left: 40%; opacity: 0.3; }
+  .blobs { position: absolute; inset: 0; z-index: 1; overflow: hidden; mix-blend-mode: overlay; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(150px); opacity: 0.4; }
+  .blob-1 { width: 1200px; height: 1200px; background: #63b3ed; top: -400px; left: -200px; }
+  .blob-2 { width: 1000px; height: 1000px; background: #9f7aea; bottom: -400px; right: -100px; }
+  .blob-3 { width: 700px; height: 700px; background: #48bb78; top: 100px; left: 45%; opacity: 0.2; }
 
-  .content {
+  .card {
     position: relative; z-index: 2;
-    display: flex; flex-direction: column;
-    padding: 60px; gap: 40px;
-  }
-
-  .glass-panel {
-    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    display: flex; align-items: center;
+    height: 100%;
+    padding: 50px 70px;
+    gap: 60px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015));
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-top: 2px solid rgba(255,255,255,0.3);
-    border-left: 2px solid rgba(255,255,255,0.3);
-    border-radius: 50px;
-    box-shadow: 0 25px 80px rgba(0,0,0,0.2);
-    padding: 50px 70px;
+    border-top: 2px solid rgba(255,255,255,0.25);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
   }
 
-  .top-row { display: flex; align-items: center; gap: 60px; }
-
+  /* ── AVATAR ── */
   .avatar-wrap { position: relative; flex-shrink: 0; }
   .avatar {
-    width: 280px; height: 280px; border-radius: 50%; object-fit: cover;
-    border: 4px solid rgba(255,255,255,0.5); box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    width: 240px; height: 240px; border-radius: 50%; object-fit: cover;
+    border: 4px solid rgba(255,255,255,0.5);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
     display: block; background: rgba(0,0,0,0.3);
   }
   .avatar-ring {
-    position: absolute; inset: -16px; border-radius: 50%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent, rgba(255,255,255,0.1));
-    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
-    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
+    position: absolute; inset: -14px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.35), transparent, rgba(255,255,255,0.1));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 0);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 0);
   }
 
-  .info { flex: 1; }
-  .username { font-size: 80px; font-weight: 800; line-height: 1; letter-spacing: -1.5px; text-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+  /* ── NAME + TAGLINE ── */
+  .identity { flex-shrink: 0; }
+  .username { font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -1px; text-shadow: 0 4px 12px rgba(0,0,0,0.3); }
   .tagline {
-    font-size: 22px; color: #e2e8f0; margin-top: 16px; font-weight: 600;
+    font-size: 19px; color: #cbd5e0; margin-top: 14px; font-weight: 700;
     letter-spacing: 5px; text-transform: uppercase;
-    background: rgba(0,0,0,0.15); display: inline-block;
-    padding: 10px 28px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.18); display: inline-block;
+    padding: 8px 24px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
   }
 
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; flex-shrink: 0; }
-  .stat-pill {
-    background: rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.08);
-    border-top: 1px solid rgba(255,255,255,0.2); border-left: 1px solid rgba(255,255,255,0.2);
-    border-radius: 32px; padding: 26px 32px; text-align: center;
-    position: relative; overflow: hidden; min-width: 200px;
+  /* ── STATS ── */
+  .stats { display: flex; gap: 18px; flex-shrink: 0; }
+  .stat {
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    border-radius: 28px; padding: 22px 32px; text-align: center;
+    position: relative; overflow: hidden; min-width: 170px;
   }
-  .stat-pill::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--c); }
-  .stat-pill-value { font-size: 60px; font-weight: 800; color: #fff; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-  .stat-pill-label { font-size: 20px; color: rgba(255,255,255,0.8); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 10px; }
+  .stat::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--c); }
+  .stat-val { font-size: 52px; font-weight: 800; color: #fff; line-height: 1; }
+  .stat-lbl { font-size: 17px; color: rgba(255,255,255,0.7); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 8px; }
 
-  .favs-row { display: flex; gap: 50px; align-items: flex-start; }
-  .fav-section { flex: 1; min-width: 0; }
-  .fav-title {
-    font-size: 24px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
-    color: rgba(255,255,255,0.9); margin-bottom: 22px;
-    display: flex; align-items: center; gap: 10px;
+  /* ── DIVIDER ── */
+  .divider { width: 2px; height: 500px; background: rgba(255,255,255,0.1); border-radius: 2px; flex-shrink: 0; }
+
+  /* ── FAVORITES ── */
+  .favs { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px; justify-content: center; height: 100%; }
+
+  .fav-block { display: flex; flex-direction: column; gap: 12px; }
+  .fav-label {
+    font-size: 18px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+    display: flex; align-items: center; gap: 8px;
   }
-  .fav-title::before { content: ''; display: block; width: 5px; height: 22px; background: var(--tc); border-radius: 3px; }
+  .fav-label::before { content:''; width:4px; height:16px; background:var(--lc); border-radius:2px; display:block; }
 
-  .covers-grid { display: flex; gap: 14px; }
-  .cover-item { flex: 1; min-width: 0; }
+  .fav-row { display: flex; gap: 12px; }
 
-  .cover-img, .cover-placeholder {
-    width: 100%; border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
-    display: block;
+  /* anime poster: 2:3 */
+  .anime-poster {
+    flex-shrink: 0;
+    width: 90px; height: 135px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
   }
-  .cover-img { object-fit: cover; }
-  .cover-placeholder {
-    background: rgba(255,255,255,0.05);
-    display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,0.15); font-size: 28px;
-  }
-
-  /* height scales with count */
-  {% set ac = fav_anime_covers|length if fav_anime_covers else 0 %}
-  {% set cc = fav_char_images|length if fav_char_images else 0 %}
-  {% set max_fav = [ac, cc]|max %}
-  {% set img_h = [320 - max_fav * 12, 140]|max %}
-
-  .cover-img, .cover-placeholder { height: {{ img_h }}px; }
-
-  .cover-name {
-    font-size: 16px; color: rgba(255,255,255,0.8); margin-top: 10px;
-    text-align: center; white-space: nowrap; overflow: hidden;
-    text-overflow: ellipsis; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  .anime-poster-ph {
+    flex-shrink: 0; width: 90px; height: 135px;
+    border-radius: 10px; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
   }
 
-  .footer-tag {
-    text-align: right; font-size: 20px; color: rgba(255,255,255,0.25);
-    font-weight: 600; padding: 0 10px 0 0;
+  /* char portrait: 1:1 */
+  .char-portrait {
+    flex-shrink: 0;
+    width: 120px; height: 120px;
+    object-fit: cover; object-position: top center;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  .char-portrait-ph {
+    flex-shrink: 0; width: 120px; height: 120px;
+    border-radius: 10px; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    position: absolute; bottom: 22px; right: 70px;
+    font-size: 19px; color: rgba(255,255,255,0.2); font-weight: 600; z-index: 3;
   }
 </style>
 </head>
@@ -140,78 +143,65 @@
     <div class="blob blob-3"></div>
   </div>
 
-  <div class="content">
+  <div class="card">
 
-    <div class="glass-panel top-row">
-      <div class="avatar-wrap">
-        <div class="avatar-ring"></div>
-        {% if avatar_url %}
-        <img class="avatar" src="{{ avatar_url }}" onerror="this.style.background='#1a2035'">
-        {% else %}
-        <div class="avatar"></div>
-        {% endif %}
-      </div>
-      <div class="info">
-        <div class="username">{{ username }}</div>
-        <div class="tagline">AniList Profile</div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-pill" style="--c: #63b3ed">
-          <div class="stat-pill-value">{{ anime_count }}</div>
-          <div class="stat-pill-label">Anime</div>
-        </div>
-        <div class="stat-pill" style="--c: #f6c636">
-          <div class="stat-pill-value">{{ mean_score }}</div>
-          <div class="stat-pill-label">Score</div>
-        </div>
-        <div class="stat-pill" style="--c: #9f7aea">
-          <div class="stat-pill-value">{{ manga_count }}</div>
-          <div class="stat-pill-label">Manga</div>
-        </div>
-        <div class="stat-pill" style="--c: #48bb78">
-          <div class="stat-pill-value">{{ days_watched }}</div>
-          <div class="stat-pill-label">Days</div>
-        </div>
-      </div>
+    <!-- Avatar -->
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      {% if avatar_url %}
+      <img class="avatar" src="{{ avatar_url }}" onerror="this.style.background='#1a2035'">
+      {% else %}
+      <div class="avatar"></div>
+      {% endif %}
+    </div>
+
+    <!-- Name -->
+    <div class="identity">
+      <div class="username">{{ username }}</div>
+      <div class="tagline">AniList Profile</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat" style="--c:#63b3ed"><div class="stat-val">{{ anime_count }}</div><div class="stat-lbl">Anime</div></div>
+      <div class="stat" style="--c:#f6c636"><div class="stat-val">{{ mean_score }}</div><div class="stat-lbl">Score</div></div>
+      <div class="stat" style="--c:#9f7aea"><div class="stat-val">{{ manga_count }}</div><div class="stat-lbl">Manga</div></div>
+      <div class="stat" style="--c:#48bb78"><div class="stat-val">{{ days_watched }}</div><div class="stat-lbl">Days</div></div>
     </div>
 
     {% set has_anime = fav_anime_covers and fav_anime_covers | reject('equalto', '') | list | length > 0 %}
     {% set has_chars = fav_char_images and fav_char_images | reject('equalto', '') | list | length > 0 %}
 
     {% if has_anime or has_chars %}
-    <div class="glass-panel favs-row">
+    <div class="divider"></div>
+
+    <div class="favs">
 
       {% if has_anime %}
-      <div class="fav-section">
-        <div class="fav-title" style="--tc: #fc8181">❤️ Любимое аниме</div>
-        <div class="covers-grid">
-          {% for i in range(fav_anime_covers|length) %}
-          <div class="cover-item">
+      <div class="fav-block">
+        <div class="fav-label" style="--lc:#fc8181">❤️ Любимое аниме</div>
+        <div class="fav-row">
+          {% for i in range([fav_anime_covers|length, 10]|min) %}
             {% if fav_anime_covers[i] %}
-            <img class="cover-img" src="{{ fav_anime_covers[i] }}" onerror="this.outerHTML='<div class=cover-placeholder>?</div>'">
+            <img class="anime-poster" src="{{ fav_anime_covers[i] }}" title="{{ fav_anime_names[i] if i < fav_anime_names|length else '' }}" onerror="this.style.display='none'">
             {% else %}
-            <div class="cover-placeholder">?</div>
+            <div class="anime-poster-ph"></div>
             {% endif %}
-            <div class="cover-name">{{ fav_anime_names[i] if i < fav_anime_names|length else '' }}</div>
-          </div>
           {% endfor %}
         </div>
       </div>
       {% endif %}
 
       {% if has_chars %}
-      <div class="fav-section">
-        <div class="fav-title" style="--tc: #f6c636">⭐ Любимые персонажи</div>
-        <div class="covers-grid">
-          {% for i in range(fav_char_images|length) %}
-          <div class="cover-item">
+      <div class="fav-block">
+        <div class="fav-label" style="--lc:#f6c636">⭐ Любимые персонажи</div>
+        <div class="fav-row">
+          {% for i in range([fav_char_images|length, 10]|min) %}
             {% if fav_char_images[i] %}
-            <img class="cover-img" src="{{ fav_char_images[i] }}" onerror="this.outerHTML='<div class=cover-placeholder>?</div>'">
+            <img class="char-portrait" src="{{ fav_char_images[i] }}" title="{{ fav_char_names[i] if i < fav_char_names|length else '' }}" onerror="this.style.display='none'">
             {% else %}
-            <div class="cover-placeholder">?</div>
+            <div class="char-portrait-ph"></div>
             {% endif %}
-            <div class="cover-name">{{ fav_char_names[i] if i < fav_char_names|length else '' }}</div>
-          </div>
           {% endfor %}
         </div>
       </div>
@@ -220,8 +210,8 @@
     </div>
     {% endif %}
 
-    <div class="footer-tag">@westyasha_AniList_bot</div>
-
   </div>
+
+  <div class="footer">@westyasha_AniList_bot</div>
 </body>
 </html>
