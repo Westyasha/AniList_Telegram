@@ -1,6 +1,8 @@
-# Secrets
+# Secrets & data
 .env
-users.json
+*.db
+*.db-shm
+*.db-wal
 
 # Python
 __pycache__/
