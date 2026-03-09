@@ -22,6 +22,10 @@ class SearchState(StatesGroup):
     fuzzy_query = State()
 
 
+class FilterState(StatesGroup):
+    active = State()
+
+
 # ─── MENU ────────────────────────────────────────────────────────────────────
 
 @router.message(F.text.in_({"🔍 Поиск", "🔍 Search"}))
@@ -187,14 +191,23 @@ async def process_fuzzy(msg: Message, state: FSMContext):
 
 # ─── FILTER ──────────────────────────────────────────────────────────────────
 
-_filter_state: dict = {}
+def _get_filter(data: dict) -> tuple:
+    fs = data.get("filter_state", {})
+    return fs.get("genre"), fs.get("year"), fs.get("score")
+
+
+def _set_filter(data: dict, **kwargs) -> dict:
+    fs = dict(data.get("filter_state", {}))
+    fs.update(kwargs)
+    data["filter_state"] = fs
+    return data
 
 
 @router.callback_query(F.data == "openfilter")
-async def open_filter(cb: CallbackQuery):
+async def open_filter(cb: CallbackQuery, state: FSMContext):
     uid = cb.from_user.id
-    fs = _filter_state.get(uid, {})
-    g, y, s = fs.get("genre"), fs.get("year"), fs.get("score")
+    data = await state.get_data()
+    g, y, s = _get_filter(data)
     from core.formatters import esc
     params = (
         f"  🏷 {GENRE_DISPLAY.get(g, g) if g else t(uid, 'filter_none')}\n"
@@ -226,24 +239,25 @@ async def filter_pick(cb: CallbackQuery):
 
 
 @router.callback_query(F.data.startswith("filter:set"))
-async def filter_set(cb: CallbackQuery):
+async def filter_set(cb: CallbackQuery, state: FSMContext):
     uid = cb.from_user.id
     parts = cb.data.split(":", 3)
     field_cmd = parts[1]
     val = parts[2] if len(parts) > 2 else None
 
-    if uid not in _filter_state:
-        _filter_state[uid] = {}
+    data = await state.get_data()
+    fs = dict(data.get("filter_state", {}))
 
     if field_cmd == "setgenre":
-        _filter_state[uid]["genre"] = None if val == "__none__" else val
+        fs["genre"] = None if val == "__none__" else val
     elif field_cmd == "setyear":
-        _filter_state[uid]["year"] = None if val == "__none__" else val
+        fs["year"] = None if val == "__none__" else val
     elif field_cmd == "setscore":
-        _filter_state[uid]["score"] = None if val == "__none__" else val
+        fs["score"] = None if val == "__none__" else val
 
+    await state.update_data(filter_state=fs)
     await cb.answer("✅ Set!")
-    fs = _filter_state.get(uid, {})
+
     g, y, s = fs.get("genre"), fs.get("year"), fs.get("score")
     from core.formatters import esc
     params = (
@@ -259,18 +273,18 @@ async def filter_set(cb: CallbackQuery):
 
 
 @router.callback_query(F.data == "filter:reset")
-async def filter_reset(cb: CallbackQuery):
+async def filter_reset(cb: CallbackQuery, state: FSMContext):
     uid = cb.from_user.id
-    _filter_state[uid] = {}
+    await state.update_data(filter_state={})
     await cb.answer("🔄 Reset!")
-    await open_filter(cb)
+    await open_filter(cb, state)
 
 
 @router.callback_query(F.data == "filter:dosearch")
-async def filter_do_search(cb: CallbackQuery):
+async def filter_do_search(cb: CallbackQuery, state: FSMContext):
     uid = cb.from_user.id
-    fs = _filter_state.get(uid, {})
-    g, y, s = fs.get("genre"), fs.get("year"), fs.get("score")
+    data = await state.get_data()
+    g, y, s = _get_filter(data)
 
     if not any([g, y, s]):
         await cb.answer(t(uid, "filter_no_params"), show_alert=True)
@@ -287,18 +301,17 @@ async def filter_do_search(cb: CallbackQuery):
         await cb.answer()
         return
 
-    _filter_state[uid]["results"] = results
-    _filter_state[uid]["results_page"] = 1
-
+    await state.update_data(filter_results=results, filter_results_page=1)
     await _show_filter_results(cb.message, uid, results, 1)
     await cb.answer()
 
 
 @router.callback_query(F.data.startswith("filterpage:"))
-async def filter_page_cb(cb: CallbackQuery):
+async def filter_page_cb(cb: CallbackQuery, state: FSMContext):
     uid = cb.from_user.id
     page = int(cb.data.split(":")[1])
-    results = _filter_state.get(uid, {}).get("results", [])
+    data = await state.get_data()
+    results = data.get("filter_results", [])
     await _show_filter_results(cb.message, uid, results, page)
     await cb.answer()
 

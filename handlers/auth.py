@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 from config import ANILIST_CLIENT_ID, ANILIST_AUTH_URL
-from storage import get_token, set_token, remove_token, get_anilist_id, set_anilist_id
+from storage import get_token, set_token, remove_token, get_anilist_id, set_anilist_id, get_lang
 from core.api import anilist_query, Q_VIEWER
 from core.formatters import esc
 from keyboards import main_menu, auth_kb, auth_menu_kb, settings_kb
@@ -152,17 +152,17 @@ async def my_profile_cb(cb: CallbackQuery):
     await show_profile(cb, cb.from_user.id)
     await cb.answer()
 
+
 @router.callback_query(F.data == "settings:notif")
 async def settings_notif_cb(cb: CallbackQuery):
     from storage import get_notifications_enabled, set_notifications_enabled
     uid = cb.from_user.id
+    lang = get_lang(uid)
     current = get_notifications_enabled(uid)
     set_notifications_enabled(uid, not current)
-    from keyboards import settings_kb
     try:
         await cb.message.edit_reply_markup(reply_markup=settings_kb(uid))
     except Exception:
         pass
-    lang = get_lang(uid)
     msg = ("🔔 Уведомления включены" if not current else "🔕 Уведомления выключены") if lang == "ru" else ("🔔 Notifications enabled" if not current else "🔕 Notifications disabled")
     await cb.answer(msg, show_alert=True)

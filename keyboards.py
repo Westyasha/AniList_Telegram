@@ -13,7 +13,6 @@ def btn(text: str, callback_data: str, style: str = None) -> InlineKeyboardButto
     return InlineKeyboardButton(**kwargs)
 
 
-# Default layout — ordered list of button keys shown in main menu
 DEFAULT_LAYOUT = [
     ["menu_search", "menu_mylist"],
     ["menu_trending", "menu_schedule"],
@@ -21,7 +20,6 @@ DEFAULT_LAYOUT = [
     ["menu_settings"],
 ]
 
-# All available buttons user can add to keyboard
 ALL_BUTTONS = {
     "menu_search":   "🔍",
     "menu_mylist":   "📋",
@@ -214,9 +212,9 @@ def recs_kb(uid: int, nodes: list, media_id: int) -> InlineKeyboardMarkup:
         m = rec.get("mediaRecommendation")
         if not m:
             continue
-        title = m["title"]["romaji"]
+        title = m["title"].get("english") or m["title"]["romaji"]
         score = m.get("averageScore") or 0
-        b.add(btn(f"{title[:35]} ⭐{score}", f"media:{m['id']}"))
+        b.add(btn(f"{title[:35]}  ⭐{score}", f"media:{m['id']}"))
     b.adjust(1)
     b.row(btn(t(uid, "back_btn"), f"media:{media_id}"))
     return b.as_markup()
@@ -224,62 +222,53 @@ def recs_kb(uid: int, nodes: list, media_id: int) -> InlineKeyboardMarkup:
 
 def my_list_menu_kb(uid: int) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
-    b.row(
-        btn("📺 Аниме", "mylist_tab:ANIME"),
-        btn("📚 Манга", "mylist_tab:MANGA"),
-    )
-    b.row(
-        btn(t(uid, "list_current_anime"), "mylist:ANIME:CURRENT:1", "success"),
-        btn(t(uid, "list_completed_anime"), "mylist:ANIME:COMPLETED:1"),
-    )
-    b.row(
-        btn(t(uid, "list_planning_anime"), "mylist:ANIME:PLANNING:1"),
-        btn(t(uid, "list_repeating_anime"), "mylist:ANIME:REPEATING:1"),
-    )
-    b.row(
-        btn(t(uid, "list_paused_anime"), "mylist:ANIME:PAUSED:1"),
-        btn(t(uid, "list_dropped_anime"), "mylist:ANIME:DROPPED:1", "danger"),
-    )
+    statuses = [
+        ("list_current_anime", "CURRENT"),
+        ("list_completed_anime", "COMPLETED"),
+        ("list_planning_anime", "PLANNING"),
+        ("list_dropped_anime", "DROPPED"),
+        ("list_paused_anime", "PAUSED"),
+        ("list_repeating_anime", "REPEATING"),
+    ]
+    for key, val in statuses:
+        b.add(btn(t(uid, key), f"mylist:ANIME:{val}:1"))
+    b.adjust(2, 2, 2)
+    b.row(btn("📚 Manga List", "mylist_tab:MANGA"))
     return b.as_markup()
 
 
 def my_list_manga_kb(uid: int) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
-    b.row(
-        btn("📺 Аниме", "mylist_tab:ANIME"),
-        btn("📚 Манга", "mylist_tab:MANGA"),
-    )
-    b.row(
-        btn(t(uid, "list_current_manga"), "mylist:MANGA:CURRENT:1", "success"),
-        btn(t(uid, "list_completed_manga"), "mylist:MANGA:COMPLETED:1"),
-    )
-    b.row(
-        btn(t(uid, "list_planning_anime"), "mylist:MANGA:PLANNING:1"),
-        btn(t(uid, "list_repeating_anime"), "mylist:MANGA:REPEATING:1"),
-    )
-    b.row(
-        btn(t(uid, "list_paused_anime"), "mylist:MANGA:PAUSED:1"),
-        btn(t(uid, "list_dropped_anime"), "mylist:MANGA:DROPPED:1", "danger"),
-    )
+    statuses = [
+        ("list_current_manga", "CURRENT"),
+        ("list_completed_manga", "COMPLETED"),
+        ("list_planning_anime", "PLANNING"),
+        ("list_dropped_anime", "DROPPED"),
+        ("list_paused_anime", "PAUSED"),
+        ("list_repeating_anime", "REPEATING"),
+    ]
+    for key, val in statuses:
+        b.add(btn(t(uid, key), f"mylist:MANGA:{val}:1"))
+    b.adjust(2, 2, 2)
+    b.row(btn("📺 Anime List", "mylist_tab:ANIME"))
     return b.as_markup()
 
 
 def list_entries_kb(uid: int, entries: list, mtype: str, status: str, page: int, has_prev: bool, has_next: bool) -> InlineKeyboardMarkup:
-    PER_PAGE = 8
-    start = (page - 1) * PER_PAGE
-    page_entries = entries[start:start + PER_PAGE]
+    per_page = 8
+    start = (page - 1) * per_page
+    page_entries = entries[start:start + per_page]
     b = InlineKeyboardBuilder()
     for e in page_entries:
-        media = e.get("media", {})
-        title_obj = media.get("title", {})
+        media = e.get("media") or {}
+        title_obj = media.get("title") or {}
         title = title_obj.get("english") or title_obj.get("romaji") or "?"
-        if len(title) > 38:
-            title = title[:35] + "…"
-        score = e.get("score", 0)
-        prog = e.get("progress", 0)
-        total = media.get("episodes") or media.get("chapters") or "?"
-        score_str = f" ⭐{int(score)}" if score else ""
-        b.add(btn(f"{title}  {prog}/{total}{score_str}", f"media:{media['id']}"))
+        if len(title) > 35:
+            title = title[:32] + "…"
+        score = e.get("score") or 0
+        prog = e.get("progress") or 0
+        label = f"{title}  {f'⭐{int(score)}' if score else ''} [{prog}]"
+        b.add(btn(label, f"media:{media.get('id', 0)}"))
     b.adjust(1)
     nav = []
     if has_prev:
@@ -385,6 +374,8 @@ def filter_kb(uid: int, genre=None, year=None, score=None) -> InlineKeyboardMark
     b.add(btn(t(uid, "filter_search"), "filter:dosearch", "success"))
     b.adjust(3, 2)
     return b.as_markup()
+
+
 def filter_pick_genre_kb(uid: int) -> InlineKeyboardMarkup:
     from core.filter import GENRE_DISPLAY
     b = InlineKeyboardBuilder()
@@ -454,7 +445,6 @@ def settings_kb(uid: int) -> InlineKeyboardMarkup:
     b.add(btn("⌨️ Настройка клавиатуры" if lang == "ru" else "⌨️ Customize keyboard", "customize_keyboard"))
     if token:
         b.add(btn(notif_label, "settings:notif"))
-        b.add(btn("📊 Wrapped / Статистика", "wrapped"))
         b.add(btn("👤 My profile", "myprofile"))
         b.add(btn("🚪 Log out", "logout", "danger"))
     else:
