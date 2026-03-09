@@ -175,9 +175,9 @@ query {
       manga { count chaptersRead volumesRead meanScore }
     }
     favourites {
-      anime(perPage: 10) { nodes { id title { romaji english } coverImage { extraLarge large } } }
+      anime(perPage: 5) { nodes { id title { romaji } coverImage { extraLarge large } } }
       manga(perPage: 5) { nodes { id title { romaji } coverImage { extraLarge large } } }
-      characters(perPage: 10) { nodes { id name { full } image { large } } }
+      characters(perPage: 5) { nodes { id name { full } image { large } } }
       staff(perPage: 3) { nodes { id name { full } image { large } } }
     }
   }
@@ -247,7 +247,7 @@ query ($type: MediaType, $page: Int) {
     media(type: $type, sort: TRENDING_DESC, isAdult: false) {
       id type format status episodes chapters averageScore trending popularity
       title { romaji english }
-      coverImage { large }
+      coverImage { extraLarge large }
       genres season seasonYear
       nextAiringEpisode { episode airingAt timeUntilAiring }
     }
@@ -263,7 +263,7 @@ query ($season: MediaSeason, $seasonYear: Int, $page: Int) {
           sort: POPULARITY_DESC, isAdult: false) {
       id format status episodes averageScore popularity
       title { romaji english }
-      coverImage { large }
+      coverImage { extraLarge large }
       genres
       studios(isMain: true) { nodes { name } }
       nextAiringEpisode { episode airingAt timeUntilAiring }
