@@ -33,6 +33,7 @@ def init_db():
             ("card_cache_data", "TEXT"),
             ("card_cache_file_id", "TEXT"),
             ("card_cache_at", "INTEGER DEFAULT 0"),
+            ("notif_settings", "TEXT"),
         ]:
             try:
                 conn.execute(f"ALTER TABLE users ADD COLUMN {col} {definition}")
@@ -208,3 +209,56 @@ def invalidate_card_cache(user_id: int):
             "UPDATE users SET card_cache_at = 0 WHERE user_id = ?",
             (user_id,)
         )
+
+
+DEFAULT_NOTIF_SETTINGS = {
+    "enabled": True,
+    "airing_watching": True,
+    "airing_planned": False,
+    "airing_paused": False,
+    "airing_dropped": False,
+    "related_addition": False,
+}
+
+
+def get_notif_settings(user_id: int) -> dict:
+    import json
+    with _conn() as conn:
+        row = conn.execute(
+            "SELECT notif_settings FROM users WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        if row and row["notif_settings"]:
+            try:
+                saved = json.loads(row["notif_settings"])
+                return {**DEFAULT_NOTIF_SETTINGS, **saved}
+            except Exception:
+                pass
+    return dict(DEFAULT_NOTIF_SETTINGS)
+
+
+def set_notif_settings(user_id: int, settings: dict):
+    import json
+    with _conn() as conn:
+        _ensure_user(conn, user_id)
+        conn.execute(
+            "UPDATE users SET notif_settings = ? WHERE user_id = ?",
+            (json.dumps(settings), user_id)
+        )
+
+
+def get_notifications_users_with_settings() -> list[tuple[int, dict]]:
+    import json
+    with _conn() as conn:
+        rows = conn.execute(
+            "SELECT user_id, notif_settings FROM users WHERE token IS NOT NULL"
+        ).fetchall()
+        result = []
+        for row in rows:
+            try:
+                saved = json.loads(row["notif_settings"]) if row["notif_settings"] else {}
+                s = {**DEFAULT_NOTIF_SETTINGS, **saved}
+            except Exception:
+                s = dict(DEFAULT_NOTIF_SETTINGS)
+            if s.get("enabled"):
+                result.append((row["user_id"], s))
+        return result

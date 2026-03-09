@@ -435,17 +435,19 @@ def filter_results_kb(uid: int, results: list, page: int, has_prev: bool, has_ne
 
 
 def settings_kb(uid: int) -> InlineKeyboardMarkup:
-    from storage import get_lang, get_token, get_notifications_enabled
+    from storage import get_lang, get_token
     lang = get_lang(uid)
     token = get_token(uid)
-    notif = get_notifications_enabled(uid)
     lang_label = "🇷🇺 Русский" if lang == "ru" else "🇬🇧 English"
-    notif_label = ("🔔 Уведомления: ВКЛ" if lang == "ru" else "🔔 Notifications: ON") if notif else ("🔕 Уведомления: ВЫКЛ" if lang == "ru" else "🔕 Notifications: OFF")
     b = InlineKeyboardBuilder()
     b.add(btn(f"🌐 Language: {lang_label}", "settings:lang"))
     b.add(btn("⌨️ Настройка клавиатуры" if lang == "ru" else "⌨️ Customize keyboard", "customize_keyboard"))
     if token:
-        b.add(btn(notif_label, "settings:notif"))
+        from storage import get_notif_settings
+        ns = get_notif_settings(uid)
+        notif_icon = "🔔" if ns.get("enabled") else "🔕"
+        notif_label = (f"{notif_icon} Уведомления" if lang == "ru" else f"{notif_icon} Notifications")
+        b.add(btn(notif_label, "settings:notif_menu"))
         b.add(btn("🗑 Сбросить кэш карточки" if lang == "ru" else "🗑 Clear card cache", "settings:clearcache"))
         b.add(btn("🚪 Log out", "logout", "danger"))
     else:
@@ -491,4 +493,40 @@ def auth_menu_kb(uid: int) -> InlineKeyboardMarkup:
     b.add(btn("📊 Wrapped", "wrapped"))
     b.add(btn(t(uid, "logout_btn"), "logout", "danger"))
     b.adjust(2, 1)
+    return b.as_markup()
+
+
+def notif_settings_kb(uid: int) -> InlineKeyboardMarkup:
+    from storage import get_lang, get_notif_settings
+    lang = get_lang(uid)
+    ns = get_notif_settings(uid)
+
+    def tog(val: bool) -> str:
+        return "✅" if val else "◻️"
+
+    if lang == "ru":
+        rows = [
+            (f"{tog(ns['enabled'])} Уведомления вкл/выкл", "notif:toggle:enabled"),
+            (f"{tog(ns['airing_watching'])} Новые эпизоды — Смотрю", "notif:toggle:airing_watching"),
+            (f"{tog(ns['airing_planned'])} Новые эпизоды — Запланировано", "notif:toggle:airing_planned"),
+            (f"{tog(ns['airing_paused'])} Новые эпизоды — На паузе", "notif:toggle:airing_paused"),
+            (f"{tog(ns['airing_dropped'])} Новые эпизоды — Брошено", "notif:toggle:airing_dropped"),
+            (f"{tog(ns['related_addition'])} Выход продолжений/приквелов", "notif:toggle:related_addition"),
+            ("◀️ Назад", "settings"),
+        ]
+    else:
+        rows = [
+            (f"{tog(ns['enabled'])} Notifications on/off", "notif:toggle:enabled"),
+            (f"{tog(ns['airing_watching'])} New episodes — Watching", "notif:toggle:airing_watching"),
+            (f"{tog(ns['airing_planned'])} New episodes — Planned", "notif:toggle:airing_planned"),
+            (f"{tog(ns['airing_paused'])} New episodes — On hold", "notif:toggle:airing_paused"),
+            (f"{tog(ns['airing_dropped'])} New episodes — Dropped", "notif:toggle:airing_dropped"),
+            (f"{tog(ns['related_addition'])} Sequel/prequel releases", "notif:toggle:related_addition"),
+            ("◀️ Back", "settings"),
+        ]
+
+    b = InlineKeyboardBuilder()
+    for label, cb_data in rows:
+        b.add(btn(label, cb_data))
+    b.adjust(1)
     return b.as_markup()
