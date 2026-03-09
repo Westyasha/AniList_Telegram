@@ -9,7 +9,6 @@
 
   body {
     width: 2560px;
-    height: 823px;
     font-family: 'Inter', 'DejaVu Sans', Arial, sans-serif;
     background: #0d1117;
     color: #fff;
@@ -23,16 +22,12 @@
     background-image: url('{{ banner_url }}');
     background-size: cover;
     background-position: center;
-    filter: blur(24px) brightness(0.7) saturate(1.4);
+    filter: blur(24px) brightness(0.6) saturate(1.4);
     z-index: 0;
   }
-  
+
   .blobs {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    overflow: hidden;
-    mix-blend-mode: overlay;
+    position: absolute; inset: 0; z-index: 1; overflow: hidden; mix-blend-mode: overlay;
   }
   .blob { position: absolute; border-radius: 50%; filter: blur(150px); opacity: 0.5; }
   .blob-1 { width: 1200px; height: 1200px; background: #63b3ed; top: -300px; left: -200px; }
@@ -40,132 +35,105 @@
   .blob-3 { width: 800px; height: 800px; background: #48bb78; top: 150px; left: 40%; opacity: 0.3; }
 
   .content {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 60px;
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column;
+    padding: 60px; gap: 40px;
   }
 
   .glass-panel {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    gap: 80px;
-    padding: 0 80px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-top: 2px solid rgba(255, 255, 255, 0.3);
-    border-left: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 60px;
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-top: 2px solid rgba(255,255,255,0.3);
+    border-left: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.2);
+    padding: 50px 70px;
   }
+
+  .top-row { display: flex; align-items: center; gap: 60px; }
 
   .avatar-wrap { position: relative; flex-shrink: 0; }
   .avatar {
-    width: 340px;
-    height: 340px;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
-    background: rgba(0,0,0,0.3);
-    border: 4px solid rgba(255,255,255,0.5);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    width: 280px; height: 280px; border-radius: 50%; object-fit: cover;
+    border: 4px solid rgba(255,255,255,0.5); box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    display: block; background: rgba(0,0,0,0.3);
   }
   .avatar-ring {
-    position: absolute;
-    inset: -20px;
-    border-radius: 50%;
+    position: absolute; inset: -16px; border-radius: 50%;
     background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent, rgba(255,255,255,0.1));
     mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
     -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
   }
 
-  .info { flex: 1; text-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-  .username { font-size: 85px; font-weight: 800; line-height: 1; letter-spacing: -1.5px; }
-  .tagline { 
-    font-size: 28px; 
-    color: #e2e8f0; 
-    margin-top: 20px; 
-    font-weight: 600; 
-    letter-spacing: 6px; 
-    text-transform: uppercase;
-    background: rgba(0,0,0,0.15);
-    display: inline-block;
-    padding: 12px 34px;
-    border-radius: 50px;
-    border: 1px solid rgba(255,255,255,0.1);
+  .info { flex: 1; }
+  .username { font-size: 80px; font-weight: 800; line-height: 1; letter-spacing: -1.5px; text-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+  .tagline {
+    font-size: 22px; color: #e2e8f0; margin-top: 16px; font-weight: 600;
+    letter-spacing: 5px; text-transform: uppercase;
+    background: rgba(0,0,0,0.15); display: inline-block;
+    padding: 10px 28px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1);
   }
 
-  .favs { margin-top: 45px; display: flex; flex-direction: column; gap: 24px; }
-  .fav-row { display: flex; align-items: center; gap: 20px; font-size: 34px; color: #cbd5e0; }
-  
-  /* Иконки в избранном */
-  .fav-icon { width: 40px; height: 40px; }
-  .fav-icon svg { width: 100%; height: 100%; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
-  
-  .fav-row span { color: #fff; font-weight: 600; }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    flex-shrink: 0;
-  }
-  
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; flex-shrink: 0; }
   .stat-pill {
-    background: rgba(0,0,0,0.1);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-top: 1px solid rgba(255,255,255,0.2);
-    border-left: 1px solid rgba(255,255,255,0.2);
-    border-radius: 40px;
-    padding: 34px 44px;
-    text-align: center;
-    min-width: 280px;
-    position: relative;
-    overflow: hidden;
+    background: rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.2); border-left: 1px solid rgba(255,255,255,0.2);
+    border-radius: 32px; padding: 26px 32px; text-align: center;
+    position: relative; overflow: hidden; min-width: 200px;
   }
-  
-  .stat-pill::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
-    background: var(--c);
+  .stat-pill::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--c); }
+  .stat-pill-value { font-size: 60px; font-weight: 800; color: #fff; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+  .stat-pill-label { font-size: 20px; color: rgba(255,255,255,0.8); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 10px; }
+
+  .favs-row { display: flex; gap: 50px; align-items: flex-start; }
+  .fav-section { flex: 1; min-width: 0; }
+  .fav-title {
+    font-size: 24px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.9); margin-bottom: 22px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .fav-title::before { content: ''; display: block; width: 5px; height: 22px; background: var(--tc); border-radius: 3px; }
+
+  .covers-grid { display: flex; gap: 14px; }
+  .cover-item { flex: 1; min-width: 0; }
+
+  .cover-img, .cover-placeholder {
+    width: 100%; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    display: block;
+  }
+  .cover-img { object-fit: cover; }
+  .cover-placeholder {
+    background: rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.15); font-size: 28px;
   }
 
-  .stat-pill-value { 
-    font-size: 75px; 
-    font-weight: 800; 
-    color: #fff; 
-    line-height: 1; 
-    text-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  }
-  .stat-pill-label { 
-    font-size: 26px; 
-    color: rgba(255,255,255,0.8); 
-    font-weight: 700; 
-    text-transform: uppercase; 
-    letter-spacing: 1.5px; 
-    margin-top: 12px; 
+  /* height scales with count */
+  {% set ac = fav_anime_covers|length if fav_anime_covers else 0 %}
+  {% set cc = fav_char_images|length if fav_char_images else 0 %}
+  {% set max_fav = [ac, cc]|max %}
+  {% set img_h = [320 - max_fav * 12, 140]|max %}
+
+  .cover-img, .cover-placeholder { height: {{ img_h }}px; }
+
+  .cover-name {
+    font-size: 16px; color: rgba(255,255,255,0.8); margin-top: 10px;
+    text-align: center; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   }
 
   .footer-tag {
-    position: absolute;
-    bottom: -80px;
-    right: 50px;
-    font-size: 26px;
-    color: rgba(255,255,255,0.4);
-    font-weight: 600;
-    z-index: 3;
+    text-align: right; font-size: 20px; color: rgba(255,255,255,0.25);
+    font-weight: 600; padding: 0 10px 0 0;
   }
 </style>
 </head>
 <body>
   {% if banner_url %}<div class="banner-bg"></div>{% endif %}
-  
   <div class="blobs">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -173,7 +141,8 @@
   </div>
 
   <div class="content">
-    <div class="glass-panel">
+
+    <div class="glass-panel top-row">
       <div class="avatar-wrap">
         <div class="avatar-ring"></div>
         {% if avatar_url %}
@@ -182,30 +151,10 @@
         <div class="avatar"></div>
         {% endif %}
       </div>
-
       <div class="info">
         <div class="username">{{ username }}</div>
         <div class="tagline">AniList Profile</div>
-        <div class="favs">
-          {% if fav_anime %}
-          <div class="fav-row">
-            <div class="fav-icon" style="color: #fc8181;">
-              <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-            </div>
-            <span>{{ fav_anime }}</span>
-          </div>
-          {% endif %}
-          {% if fav_char %}
-          <div class="fav-row">
-            <div class="fav-icon" style="color: #f6c636;">
-              <svg viewBox="0 0 24 24" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </div>
-            <span>{{ fav_char }}</span>
-          </div>
-          {% endif %}
-        </div>
       </div>
-
       <div class="stats-grid">
         <div class="stat-pill" style="--c: #63b3ed">
           <div class="stat-pill-value">{{ anime_count }}</div>
@@ -224,9 +173,55 @@
           <div class="stat-pill-label">Days</div>
         </div>
       </div>
-      
-      <div class="footer-tag">@westyasha_AniList_bot</div>
     </div>
+
+    {% set has_anime = fav_anime_covers and fav_anime_covers | reject('equalto', '') | list | length > 0 %}
+    {% set has_chars = fav_char_images and fav_char_images | reject('equalto', '') | list | length > 0 %}
+
+    {% if has_anime or has_chars %}
+    <div class="glass-panel favs-row">
+
+      {% if has_anime %}
+      <div class="fav-section">
+        <div class="fav-title" style="--tc: #fc8181">❤️ Любимое аниме</div>
+        <div class="covers-grid">
+          {% for i in range(fav_anime_covers|length) %}
+          <div class="cover-item">
+            {% if fav_anime_covers[i] %}
+            <img class="cover-img" src="{{ fav_anime_covers[i] }}" onerror="this.outerHTML='<div class=cover-placeholder>?</div>'">
+            {% else %}
+            <div class="cover-placeholder">?</div>
+            {% endif %}
+            <div class="cover-name">{{ fav_anime_names[i] if i < fav_anime_names|length else '' }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if has_chars %}
+      <div class="fav-section">
+        <div class="fav-title" style="--tc: #f6c636">⭐ Любимые персонажи</div>
+        <div class="covers-grid">
+          {% for i in range(fav_char_images|length) %}
+          <div class="cover-item">
+            {% if fav_char_images[i] %}
+            <img class="cover-img" src="{{ fav_char_images[i] }}" onerror="this.outerHTML='<div class=cover-placeholder>?</div>'">
+            {% else %}
+            <div class="cover-placeholder">?</div>
+            {% endif %}
+            <div class="cover-name">{{ fav_char_names[i] if i < fav_char_names|length else '' }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+    {% endif %}
+
+    <div class="footer-tag">@westyasha_AniList_bot</div>
+
   </div>
 </body>
 </html>

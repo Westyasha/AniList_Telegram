@@ -49,15 +49,24 @@ async def generate_wrapped(data: dict) -> io.BytesIO:
 
 
 async def generate_profile_card(data: dict) -> io.BytesIO:
+    fav_anime_covers = data.get("fav_anime_covers") or []
+    fav_char_images = data.get("fav_char_images") or []
+    has_favs = bool(fav_anime_covers or fav_char_images)
+    height = 1100 if has_favs else 823
+
     render_data = {
-        "username":    data.get("username", "?"),
-        "banner_url":  data.get("banner_url") or "",
-        "avatar_url":  data.get("avatar_url") or "",
-        "anime_count": data.get("anime_count", 0),
-        "manga_count": data.get("manga_count", 0),
-        "mean_score":  f"{data.get('mean_score', 0):.1f}",
-        "days_watched": data.get("days_watched", 0),
-        "fav_anime":   data.get("fav_anime", ""),
-        "fav_char":    data.get("fav_char", ""),
+        "username":         data.get("username", "?"),
+        "banner_url":       data.get("banner_url") or "",
+        "avatar_url":       data.get("avatar_url") or "",
+        "anime_count":      data.get("anime_count", 0),
+        "manga_count":      data.get("manga_count", 0),
+        "mean_score":       f"{data.get('mean_score', 0):.1f}",
+        "days_watched":     data.get("days_watched", 0),
+        "fav_anime":        data.get("fav_anime", ""),
+        "fav_char":         data.get("fav_char", ""),
+        "fav_anime_covers": fav_anime_covers,
+        "fav_anime_names":  data.get("fav_anime_names", []),
+        "fav_char_images":  fav_char_images,
+        "fav_char_names":   data.get("fav_char_names", []),
     }
-    return await _render("profile_card.html", render_data, 2560, 823)
+    return await _render("profile_card.html", render_data, 2560, height)

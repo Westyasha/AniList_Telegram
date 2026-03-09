@@ -249,56 +249,115 @@ def staff_card(staff: dict) -> str:
     return "\n".join(lines)
 
 
-def profile_card(viewer: dict) -> str:
+def profile_card(viewer: dict, lang: str = "ru") -> str:
     name = viewer.get("name", "")
     about = clean_desc(viewer.get("about", ""), 200)
     stats = viewer.get("statistics", {})
     a = stats.get("anime", {})
     mg = stats.get("manga", {})
+    site_url = viewer.get("siteUrl", "")
 
-    lines = [f"👤 *{esc(name)}*"]
-    if viewer.get("siteUrl"):
-        lines.append(f"[AniList Profile]({viewer['siteUrl']})")
-    if about:
-        lines.append(f"_{esc(about)}_")
+    if lang == "ru":
+        lines = [f"👤 *[{esc(name)}]({site_url})*" if site_url else f"👤 *{esc(name)}*"]
+        if about:
+            lines.append(f"_{esc(about)}_")
 
-    lines.append("")
-    lines.append("📺 *Anime Stats*")
-    count = a.get("count", 0)
-    eps = a.get("episodesWatched", 0)
-    mins = a.get("minutesWatched", 0)
-    days = mins // 1440
-    hours = (mins % 1440) // 60
-    mean = a.get("meanScore", 0)
-    lines.append(f"  Titles: *{esc(str(count))}* \\| Eps: *{esc(f'{eps:,}')}*")
-    lines.append(f"  Time: *{esc(str(days))}d {esc(str(hours))}h*")
-    if mean:
-        lines.append(f"  Mean score: *{esc(str(mean))}*")
+        count = a.get("count", 0)
+        eps = a.get("episodesWatched", 0)
+        mins = a.get("minutesWatched", 0)
+        days = mins // 1440
+        hours = (mins % 1440) // 60
+        mean = a.get("meanScore", 0)
+        std = a.get("standardDeviation", 0)
 
-    lines.append("")
-    lines.append("📚 *Manga Stats*")
-    mc = mg.get("count", 0)
-    mch = mg.get("chaptersRead", 0)
-    mvol = mg.get("volumesRead", 0)
-    mmean = mg.get("meanScore", 0)
-    lines.append(f"  Titles: *{esc(str(mc))}* \\| Ch: *{esc(f'{mch:,}')}* \\| Vol: *{esc(f'{mvol:,}')}*")
-    if mmean:
-        lines.append(f"  Mean score: *{esc(str(mmean))}*")
-
-    favs = viewer.get("favourites", {})
-    fav_anime = favs.get("anime", {}).get("nodes", [])
-    fav_chars = favs.get("characters", {}).get("nodes", [])
-
-    if fav_anime:
         lines.append("")
-        lines.append("❤️ *Favourite Anime:*")
-        for an in fav_anime[:5]:
-            lines.append(f"  • {esc(an['title']['romaji'])}")
+        lines.append("📺 *Аниме*")
+        lines.append(f"  Тайтлов: *{esc(str(count))}* · Эпизодов: *{esc(f'{eps:,}')}*")
+        lines.append(f"  Времени: *{esc(str(days))}д {esc(str(hours))}ч*")
+        if mean:
+            lines.append(f"  Ср\\. оценка: *{esc(str(mean))}*" + (f" \\(σ {esc(str(std))}\\)" if std else ""))
 
-    if fav_chars:
+        mc = mg.get("count", 0)
+        mch = mg.get("chaptersRead", 0)
+        mvol = mg.get("volumesRead", 0)
+        mmean = mg.get("meanScore", 0)
         lines.append("")
-        lines.append("💕 *Favourite Characters:*")
-        for c in fav_chars[:5]:
-            lines.append(f"  • {esc(c['name']['full'])}")
+        lines.append("📚 *Манга*")
+        lines.append(f"  Тайтлов: *{esc(str(mc))}* · Глав: *{esc(f'{mch:,}')}*" + (f" · Томов: *{esc(f'{mvol:,}')}*" if mvol else ""))
+        if mmean:
+            lines.append(f"  Ср\\. оценка: *{esc(str(mmean))}*")
+
+        favs = viewer.get("favourites", {})
+        fav_anime = favs.get("anime", {}).get("nodes", [])
+        fav_chars = favs.get("characters", {}).get("nodes", [])
+
+        if fav_anime:
+            lines.append("")
+            lines.append("❤️ *Любимое аниме:*")
+            for an in fav_anime[:5]:
+                title = an["title"].get("english") or an["title"].get("romaji") or "?"
+                aid = an.get("id")
+                url = f"https://anilist.co/anime/{aid}" if aid else ""
+                lines.append(f"  · [{esc(title)}]({url})" if url else f"  · {esc(title)}")
+
+        if fav_chars:
+            lines.append("")
+            lines.append("💕 *Любимые персонажи:*")
+            for c in fav_chars[:5]:
+                cname = c["name"].get("full") or "?"
+                cid = c.get("id")
+                curl = f"https://anilist.co/character/{cid}" if cid else ""
+                lines.append(f"  · [{esc(cname)}]({curl})" if curl else f"  · {esc(cname)}")
+    else:
+        lines = [f"👤 *[{esc(name)}]({site_url})*" if site_url else f"👤 *{esc(name)}*"]
+        if about:
+            lines.append(f"_{esc(about)}_")
+
+        count = a.get("count", 0)
+        eps = a.get("episodesWatched", 0)
+        mins = a.get("minutesWatched", 0)
+        days = mins // 1440
+        hours = (mins % 1440) // 60
+        mean = a.get("meanScore", 0)
+        std = a.get("standardDeviation", 0)
+
+        lines.append("")
+        lines.append("📺 *Anime*")
+        lines.append(f"  Titles: *{esc(str(count))}* · Episodes: *{esc(f'{eps:,}')}*")
+        lines.append(f"  Time: *{esc(str(days))}d {esc(str(hours))}h*")
+        if mean:
+            lines.append(f"  Mean score: *{esc(str(mean))}*" + (f" \\(σ {esc(str(std))}\\)" if std else ""))
+
+        mc = mg.get("count", 0)
+        mch = mg.get("chaptersRead", 0)
+        mvol = mg.get("volumesRead", 0)
+        mmean = mg.get("meanScore", 0)
+        lines.append("")
+        lines.append("📚 *Manga*")
+        lines.append(f"  Titles: *{esc(str(mc))}* · Chapters: *{esc(f'{mch:,}')}*" + (f" · Volumes: *{esc(f'{mvol:,}')}*" if mvol else ""))
+        if mmean:
+            lines.append(f"  Mean score: *{esc(str(mmean))}*")
+
+        favs = viewer.get("favourites", {})
+        fav_anime = favs.get("anime", {}).get("nodes", [])
+        fav_chars = favs.get("characters", {}).get("nodes", [])
+
+        if fav_anime:
+            lines.append("")
+            lines.append("❤️ *Favourite Anime:*")
+            for an in fav_anime[:5]:
+                title = an["title"].get("english") or an["title"].get("romaji") or "?"
+                aid = an.get("id")
+                url = f"https://anilist.co/anime/{aid}" if aid else ""
+                lines.append(f"  · [{esc(title)}]({url})" if url else f"  · {esc(title)}")
+
+        if fav_chars:
+            lines.append("")
+            lines.append("💕 *Favourite Characters:*")
+            for c in fav_chars[:5]:
+                cname = c["name"].get("full") or "?"
+                cid = c.get("id")
+                curl = f"https://anilist.co/character/{cid}" if cid else ""
+                lines.append(f"  · [{esc(cname)}]({curl})" if curl else f"  · {esc(cname)}")
 
     return "\n".join(lines)

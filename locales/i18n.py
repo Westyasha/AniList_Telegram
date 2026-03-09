@@ -1,8 +1,21 @@
 STRINGS = {
     "ru": {
-        "welcome": "👋 *Добро пожаловать в AniList Bot\\!*\n\n{status}\n\n🔍 Поиск аниме, манги, персонажей\n📋 Управление вашим списком\n🔥 Тренды и сезонные новинки\n🗓 Расписание эфиров",
-        "auth_status_ok": "✅ Авторизован как *{name}*",
-        "auth_status_no": "❌ Не авторизован",
+        "welcome": "{status}",
+        "welcome_authed": (
+            "*{name}* — добро пожаловать\\!\n\n"
+            "📺 *{anime\\_count}* аниме в списке · *{days}* дн\\. просмотрено\n"
+            "⭐ Средняя оценка: *{mean\\_score}*\n\n"
+            "Используй кнопки ниже или /help для справки\\."
+        ),
+        "welcome_guest": (
+            "*AniList Bot* — твой аниме\\-дневник в Telegram\\.\n\n"
+            "Без авторизации доступны поиск, тренды и расписание\\.\n"
+            "Авторизуйся в ⚙️ Настройках чтобы управлять списком и получать уведомления\\."
+        ),
+        "auth_status_ok": "✅ *{name}*",
+        "auth_status_no": "Гость",
+        "wrapped_year_select": "📊 *Выберите год для Wrapped:*",
+        "wrapped_year_btn": "📅 {year}",
         "menu_search": "🔍 Поиск",
         "menu_mylist": "📋 Мой список",
         "menu_trending": "🔥 Тренды",
@@ -178,9 +191,22 @@ STRINGS = {
     },
 
     "en": {
-        "welcome": "👋 *Welcome to AniList Bot\\!*\n\n{status}\n\n🔍 Search anime, manga, characters\n📋 Manage your list\n🔥 Trending & seasonal picks\n🗓 Airing schedule",
-        "auth_status_ok": "✅ Logged in as *{name}*",
-        "auth_status_no": "❌ Not authorized",
+        "welcome": "{status}",
+        "welcome_authed": (
+            "*{name}* — welcome back\\!\n\n"
+            "📺 *{anime\\_count}* anime in list · *{days}* days watched\n"
+            "⭐ Mean score: *{mean\\_score}*\n\n"
+            "Use the buttons below or /help for more info\\."
+        ),
+        "welcome_guest": (
+            "*AniList Bot* — your anime diary in Telegram\\.\n\n"
+            "Search, trending and schedule are available without login\\.\n"
+            "Authorize in ⚙️ Settings to manage your list and get notifications\\."
+        ),
+        "auth_status_ok": "✅ *{name}*",
+        "auth_status_no": "Guest",
+        "wrapped_year_select": "📊 *Select year for Wrapped:*",
+        "wrapped_year_btn": "📅 {year}",
         "menu_search": "🔍 Search",
         "menu_mylist": "📋 My List",
         "menu_trending": "🔥 Trending",
