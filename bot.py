@@ -3,6 +3,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from config import BOT_TOKEN
+from storage import init_db
 from handlers import auth, search, media, mylist, browse
 
 logging.basicConfig(
@@ -11,6 +12,8 @@ logging.basicConfig(
 )
 
 async def main():
+    init_db()
+
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
 

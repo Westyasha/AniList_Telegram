@@ -1,66 +1,112 @@
-import json
+import sqlite3
 import os
+from contextlib import contextmanager
 
-STORAGE_FILE = "users.json"
-
-
-def _load():
-    if not os.path.exists(STORAGE_FILE):
-        return {}
-    with open(STORAGE_FILE, "r") as f:
-        return json.load(f)
+DB_PATH = os.getenv("DB_PATH", "users.db")
 
 
-def _save(data: dict):
-    with open(STORAGE_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+def init_db():
+    with _conn() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                user_id     INTEGER PRIMARY KEY,
+                token       TEXT,
+                anilist_id  INTEGER,
+                lang        TEXT NOT NULL DEFAULT 'ru',
+                created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.execute("""
+            CREATE TRIGGER IF NOT EXISTS users_updated_at
+            AFTER UPDATE ON users
+            BEGIN
+                UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE user_id = NEW.user_id;
+            END
+        """)
 
 
-def _get_user(user_id: int) -> dict:
-    return _load().get(str(user_id), {})
+@contextmanager
+def _conn():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
-def _set_user(user_id: int, updates: dict):
-    data = _load()
-    uid = str(user_id)
-    if uid not in data:
-        data[uid] = {}
-    data[uid].update(updates)
-    _save(data)
+def _ensure_user(conn, user_id: int):
+    conn.execute(
+        "INSERT OR IGNORE INTO users (user_id) VALUES (?)",
+        (user_id,)
+    )
 
 
 def get_token(user_id: int):
-    return _get_user(user_id).get("token")
+    with _conn() as conn:
+        row = conn.execute(
+            "SELECT token FROM users WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        return row["token"] if row else None
 
 
 def set_token(user_id: int, token: str, anilist_id: int = None):
-    upd = {"token": token}
-    if anilist_id:
-        upd["anilist_id"] = anilist_id
-    _set_user(user_id, upd)
+    with _conn() as conn:
+        _ensure_user(conn, user_id)
+        if anilist_id:
+            conn.execute(
+                "UPDATE users SET token = ?, anilist_id = ? WHERE user_id = ?",
+                (token, anilist_id, user_id)
+            )
+        else:
+            conn.execute(
+                "UPDATE users SET token = ? WHERE user_id = ?",
+                (token, user_id)
+            )
 
 
 def get_anilist_id(user_id: int):
-    val = _get_user(user_id).get("anilist_id")
-    return int(val) if val else None
+    with _conn() as conn:
+        row = conn.execute(
+            "SELECT anilist_id FROM users WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        return row["anilist_id"] if row else None
 
 
 def set_anilist_id(user_id: int, anilist_id: int):
-    _set_user(user_id, {"anilist_id": anilist_id})
+    with _conn() as conn:
+        _ensure_user(conn, user_id)
+        conn.execute(
+            "UPDATE users SET anilist_id = ? WHERE user_id = ?",
+            (anilist_id, user_id)
+        )
 
 
 def remove_token(user_id: int):
-    data = _load()
-    uid = str(user_id)
-    if uid in data:
-        data[uid].pop("token", None)
-        data[uid].pop("anilist_id", None)
-        _save(data)
+    with _conn() as conn:
+        conn.execute(
+            "UPDATE users SET token = NULL, anilist_id = NULL WHERE user_id = ?",
+            (user_id,)
+        )
 
 
 def get_lang(user_id: int) -> str:
-    return _get_user(user_id).get("lang", "ru")
+    with _conn() as conn:
+        row = conn.execute(
+            "SELECT lang FROM users WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        return row["lang"] if row else "ru"
 
 
 def set_lang(user_id: int, lang: str):
-    _set_user(user_id, {"lang": lang})
+    with _conn() as conn:
+        _ensure_user(conn, user_id)
+        conn.execute(
+            "UPDATE users SET lang = ? WHERE user_id = ?",
+            (lang, user_id)
+        )
