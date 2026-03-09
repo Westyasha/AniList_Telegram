@@ -15,7 +15,8 @@ def init_db():
                 lang        TEXT NOT NULL DEFAULT 'ru',
                 created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
-                notifications  INTEGER DEFAULT 1
+                notifications  INTEGER DEFAULT 1,
+                keyboard_layout TEXT
             )
         """)
         conn.execute("""
@@ -136,3 +137,24 @@ def get_notifications_users() -> list:
             "SELECT user_id FROM users WHERE token IS NOT NULL AND (notifications IS NULL OR notifications = 1)"
         ).fetchall()
         return [row["user_id"] for row in rows]
+
+
+def get_keyboard_layout(user_id: int) -> list:
+    with _conn() as conn:
+        row = conn.execute(
+            "SELECT keyboard_layout FROM users WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        if row and row["keyboard_layout"]:
+            import json
+            return json.loads(row["keyboard_layout"])
+        return None
+
+
+def set_keyboard_layout(user_id: int, layout: list):
+    import json
+    with _conn() as conn:
+        _ensure_user(conn, user_id)
+        conn.execute(
+            "UPDATE users SET keyboard_layout = ? WHERE user_id = ?",
+            (json.dumps(layout), user_id)
+        )

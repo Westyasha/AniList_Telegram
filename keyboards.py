@@ -13,13 +13,53 @@ def btn(text: str, callback_data: str, style: str = None) -> InlineKeyboardButto
     return InlineKeyboardButton(**kwargs)
 
 
+# Default layout — ordered list of button keys shown in main menu
+DEFAULT_LAYOUT = [
+    ["menu_search", "menu_mylist"],
+    ["menu_trending", "menu_schedule"],
+    ["menu_season", "menu_profile"],
+    ["menu_settings"],
+]
+
+# All available buttons user can add to keyboard
+ALL_BUTTONS = {
+    "menu_search":   "🔍",
+    "menu_mylist":   "📋",
+    "menu_trending": "🔥",
+    "menu_schedule": "🗓",
+    "menu_season":   "🌸",
+    "menu_profile":  "👤",
+    "menu_settings": "⚙️",
+}
+
+
 def main_menu(uid: int) -> ReplyKeyboardMarkup:
-    return ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-        [KeyboardButton(text=t(uid, "menu_search")), KeyboardButton(text=t(uid, "menu_mylist"))],
-        [KeyboardButton(text=t(uid, "menu_trending")), KeyboardButton(text=t(uid, "menu_schedule"))],
-        [KeyboardButton(text=t(uid, "menu_season")), KeyboardButton(text=t(uid, "menu_profile"))],
-        [KeyboardButton(text=t(uid, "menu_settings"))],
-    ])
+    from storage import get_keyboard_layout
+    layout = get_keyboard_layout(uid) or DEFAULT_LAYOUT
+    keyboard = []
+    for row_keys in layout:
+        row = [KeyboardButton(text=t(uid, key)) for key in row_keys if key in ALL_BUTTONS]
+        if row:
+            keyboard.append(row)
+    if not keyboard:
+        keyboard = [[KeyboardButton(text=t(uid, "menu_search"))]]
+    return ReplyKeyboardMarkup(resize_keyboard=True, keyboard=keyboard)
+
+
+def keyboard_customizer_kb(uid: int, current_layout: list) -> InlineKeyboardMarkup:
+    from storage import get_keyboard_layout
+    layout = get_keyboard_layout(uid) or DEFAULT_LAYOUT
+    active_keys = {k for row in layout for k in row}
+    b = InlineKeyboardBuilder()
+    for key, icon in ALL_BUTTONS.items():
+        label_text = t(uid, key)
+        is_active = key in active_keys
+        mark = "✅ " if is_active else "☐ "
+        b.add(btn(f"{mark}{label_text}", f"kb_toggle:{key}"))
+    b.add(btn("✅ Сохранить" if uid else "✅ Save", "kb_save", "success"))
+    b.add(btn("🔄 Сбросить", "kb_reset", "danger"))
+    b.adjust(2, 2, 2, 1, 2)
+    return b.as_markup()
 
 
 def search_menu_kb(uid: int) -> InlineKeyboardMarkup:
@@ -411,8 +451,10 @@ def settings_kb(uid: int) -> InlineKeyboardMarkup:
     notif_label = ("🔔 Уведомления: ВКЛ" if lang == "ru" else "🔔 Notifications: ON") if notif else ("🔕 Уведомления: ВЫКЛ" if lang == "ru" else "🔕 Notifications: OFF")
     b = InlineKeyboardBuilder()
     b.add(btn(f"🌐 Language: {lang_label}", "settings:lang"))
+    b.add(btn("⌨️ Настройка клавиатуры" if lang == "ru" else "⌨️ Customize keyboard", "customize_keyboard"))
     if token:
         b.add(btn(notif_label, "settings:notif"))
+        b.add(btn("📊 Wrapped / Статистика", "wrapped"))
         b.add(btn("👤 My profile", "myprofile"))
         b.add(btn("🚪 Log out", "logout", "danger"))
     else:
@@ -452,6 +494,8 @@ def auth_kb(uid: int, auth_url: str) -> InlineKeyboardMarkup:
 def auth_menu_kb(uid: int) -> InlineKeyboardMarkup:
     b = InlineKeyboardBuilder()
     b.add(btn(t(uid, "profile_btn"), "myprofile"))
+    b.add(btn("🪪 Визитка", "profile_card"))
+    b.add(btn("📊 Wrapped", "wrapped"))
     b.add(btn(t(uid, "logout_btn"), "logout", "danger"))
-    b.adjust(1)
+    b.adjust(2, 1, 1)
     return b.as_markup()
