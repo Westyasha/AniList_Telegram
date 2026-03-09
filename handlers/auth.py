@@ -148,6 +148,6 @@ async def logout(cb: CallbackQuery):
 
 @router.callback_query(F.data == "myprofile")
 async def my_profile_cb(cb: CallbackQuery):
-    from handlers.profile import show_profile
-    await show_profile(cb.message, cb.from_user.id)
+    from handlers.browse import show_profile
+    await show_profile(cb, cb.from_user.id)
     await cb.answer()
