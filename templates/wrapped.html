@@ -9,7 +9,7 @@
 
   body {
     width: 1080px;
-    height: 1600px;
+    height: 1920px; 
     font-family: 'Inter', 'DejaVu Sans', Arial, sans-serif;
     background: #0d1117;
     color: #fff;
@@ -42,11 +42,11 @@
   .content {
     position: relative;
     z-index: 2;
-    padding: 40px;
+    padding: 50px; /* Увеличил отступы от краев */
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 40px; /* Больше воздуха между карточками */
   }
 
   .glass-card {
@@ -57,8 +57,8 @@
     border-top: 1px solid rgba(255, 255, 255, 0.3);
     border-left: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    border-radius: 30px;
-    padding: 30px;
+    border-radius: 35px;
+    padding: 35px; /* Больше воздуха внутри карточек */
   }
 
   .section-label {
@@ -67,7 +67,7 @@
     letter-spacing: 3px;
     text-transform: uppercase;
     color: #fff;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
@@ -97,7 +97,7 @@
   .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
   .stat-item {
     background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px; padding: 24px 10px; text-align: center;
+    border-radius: 20px; padding: 28px 10px; text-align: center;
     position: relative; overflow: hidden;
   }
   .stat-item::before {
@@ -105,7 +105,6 @@
     background: var(--c);
   }
   
-  /* Стили для новых SVG иконок */
   .stat-icon { 
     width: 36px; height: 36px; 
     margin: 0 auto 12px; 
@@ -118,12 +117,14 @@
   }
 
   .stat-val { font-size: 48px; font-weight: 900; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.3); line-height: 1; }
-  .stat-lbl { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .stat-lbl { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
   .covers-row { display: flex; gap: 20px; }
   .cover-item { position: relative; flex: 1; }
   .cover-img, .cover-placeholder {
-    width: 100%; height: 250px; border-radius: 16px; display: block;
+    width: 100%; 
+    height: 280px; /* Постеры стали чуть выше */
+    border-radius: 16px; display: block;
     border: 1px solid rgba(255,255,255,0.15); border-top: 1px solid rgba(255,255,255,0.3);
     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   }
@@ -143,7 +144,7 @@
   .rank-3 { background: rgba(205, 127, 50, 0.8); color: #fff; }
   .rank-other { background: rgba(0,0,0,0.4); color: #fff; }
   .cover-title {
-    font-size: 16px; color: #fff; margin-top: 12px; text-align: center;
+    font-size: 16px; color: #fff; margin-top: 14px; text-align: center;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-weight: 700;
   }
@@ -151,7 +152,7 @@
   .bottom-row { display: flex; gap: 30px; flex: 1; }
   
   .genres-col { flex: 1; }
-  .genre-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .genre-row { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
   .genre-name { font-size: 20px; font-weight: 700; color: #fff; width: 160px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
   .genre-bar-bg {
     flex: 1; height: 12px; background: rgba(0,0,0,0.2); border-radius: 6px;
@@ -295,7 +296,7 @@
             {% set max_act = monthly_activity|max if monthly_activity|max > 0 else 1 %}
             {% for i in range(12) %}
             {% set val = monthly_activity[i] %}
-            {% set h = (val / max_act * 180)|int %}
+            {% set h = (val / max_act * 250)|int %} 
             <div class="chart-bar-wrap">
               <div class="chart-bar {{ 'peak' if val == monthly_activity|max and val > 0 else '' }}" style="height: {{ [h, 4]|max }}px"></div>
               <div class="chart-month">{{ months[i] }}</div>
