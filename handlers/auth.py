@@ -220,6 +220,19 @@ async def my_profile_cb(cb: CallbackQuery):
     await cb.answer()
 
 
+@router.callback_query(F.data == "settings")
+async def settings_back_cb(cb: CallbackQuery):
+    from keyboards import settings_kb
+    uid = cb.from_user.id
+    lang = get_lang(uid)
+    text = "⚙️ Настройки" if lang == "ru" else "⚙️ Settings"
+    try:
+        await cb.message.edit_text(text, reply_markup=settings_kb(uid))
+    except Exception:
+        await cb.message.answer(text, reply_markup=settings_kb(uid))
+    await cb.answer()
+
+
 @router.callback_query(F.data == "settings:notif_menu")
 async def settings_notif_menu_cb(cb: CallbackQuery):
     from storage import get_notif_settings
