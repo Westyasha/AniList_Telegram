@@ -36,7 +36,7 @@ async def _render_adaptive(template_name: str, data: dict) -> io.BytesIO:
         )
         page = await browser.new_page(viewport={"width": 8000, "height": 4000})
         await page.set_content(html, wait_until="networkidle")
-        await asyncio.sleep(0.3)
+        await asyncio.sleep(0.5)
         dims = await page.evaluate("""() => ({
             w: document.body.scrollWidth,
             h: document.body.scrollHeight
@@ -76,6 +76,7 @@ async def generate_wrapped(data: dict) -> io.BytesIO:
 
 async def generate_profile_card(data: dict) -> io.BytesIO:
     render_data = {
+        "lang":             data.get("lang", "ru"),
         "username":         data.get("username", "?"),
         "banner_url":       data.get("banner_url") or "",
         "avatar_url":       data.get("avatar_url") or "",
