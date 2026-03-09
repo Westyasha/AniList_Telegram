@@ -9,15 +9,17 @@ from core.formatters import esc
 
 logger = logging.getLogger(__name__)
 
-CHECK_INTERVAL = 3600  # каждый час
+CHECK_INTERVAL = 3600
+
+_sent_notifications: set[tuple[int, int, int]] = set()
 
 Q_AIRING_SOON = """
-query ($page: Int) {
+query ($page: Int, $windowEnd: Int) {
   Page(page: $page, perPage: 50) {
     pageInfo { hasNextPage }
     airingSchedules(
       airingAt_greater: 0
-      airingAt_lesser: %d
+      airingAt_lesser: $windowEnd
       sort: TIME
     ) {
       airingAt
@@ -64,7 +66,7 @@ async def notify_user(bot: Bot, user_id: int, media: dict, episode: int):
     from aiogram.utils.keyboard import InlineKeyboardBuilder
     from keyboards import btn
     b = InlineKeyboardBuilder()
-    b.add(btn(f"▶️ +1 эпизод", f"progress:{media_id}", "success"))
+    b.add(btn(f"▶️ +1 эпизод", f"progress:{media_id}"))
     b.add(btn("📋 Карточка", f"media:{media_id}"))
     b.adjust(2)
 
@@ -89,13 +91,18 @@ async def notify_user(bot: Bot, user_id: int, media: dict, episode: int):
 
 
 async def check_and_notify(bot: Bot):
+    global _sent_notifications
+
     now_ts = int(datetime.now(timezone.utc).timestamp())
     window_end = now_ts + CHECK_INTERVAL
 
-    query = Q_AIRING_SOON % window_end
+    _sent_notifications = {
+        key for key in _sent_notifications
+        if key[2] > now_ts - CHECK_INTERVAL * 2
+    }
 
     try:
-        result = await anilist_query(query, {})
+        result = await anilist_query(Q_AIRING_SOON, {"page": 1, "windowEnd": window_end})
         schedules = result.get("data", {}).get("Page", {}).get("airingSchedules", [])
     except Exception as e:
         logger.error(f"Notifier API error: {e}")
@@ -124,9 +131,17 @@ async def check_and_notify(bot: Bot):
             continue
 
         for media_id, schedule in airing_ids.items():
-            if media_id in watching_ids:
-                await notify_user(bot, user_id, schedule["media"], schedule["episode"])
-                await asyncio.sleep(0.05)
+            if media_id not in watching_ids:
+                continue
+
+            episode = schedule["episode"]
+            dedup_key = (user_id, media_id, episode)
+            if dedup_key in _sent_notifications:
+                continue
+
+            await notify_user(bot, user_id, schedule["media"], episode)
+            _sent_notifications.add(dedup_key)
+            await asyncio.sleep(0.05)
 
 
 async def notifier_loop(bot: Bot):
