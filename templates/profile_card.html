@@ -8,8 +8,8 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    width: 800px;
-    height: 300px;
+    width: 2560px;
+    height: 823px;
     font-family: 'Inter', 'DejaVu Sans', Arial, sans-serif;
     background: #0d1117;
     color: #fff;
@@ -19,132 +19,199 @@
 
   .banner-bg {
     position: absolute;
-    inset: 0;
+    inset: -50px;
     background-image: url('{{ banner_url }}');
     background-size: cover;
-    background-position: center top;
-    filter: blur(2px) brightness(0.3) saturate(1.3);
+    background-position: center;
+    filter: blur(24px) brightness(0.7) saturate(1.4);
     z-index: 0;
   }
-  .banner-overlay {
+  
+  .blobs {
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgba(13,17,23,0.97) 35%, rgba(13,17,23,0.6) 100%);
     z-index: 1;
+    overflow: hidden;
+    mix-blend-mode: overlay;
   }
+  .blob { position: absolute; border-radius: 50%; filter: blur(150px); opacity: 0.5; }
+  .blob-1 { width: 1200px; height: 1200px; background: #63b3ed; top: -300px; left: -200px; }
+  .blob-2 { width: 1000px; height: 1000px; background: #9f7aea; bottom: -300px; right: -100px; }
+  .blob-3 { width: 800px; height: 800px; background: #48bb78; top: 150px; left: 40%; opacity: 0.3; }
 
   .content {
     position: relative;
     z-index: 2;
     display: flex;
     align-items: center;
+    justify-content: center;
     height: 100%;
-    padding: 0 32px;
-    gap: 28px;
+    padding: 60px;
+  }
+
+  .glass-panel {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    gap: 80px;
+    padding: 0 80px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    border-left: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 60px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
   }
 
   .avatar-wrap { position: relative; flex-shrink: 0; }
   .avatar {
-    width: 110px;
-    height: 110px;
+    width: 340px;
+    height: 340px;
     border-radius: 50%;
-    border: 3px solid #63b3ed;
     object-fit: cover;
     display: block;
-    background: #1a2035;
+    background: rgba(0,0,0,0.3);
+    border: 4px solid rgba(255,255,255,0.5);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
   }
   .avatar-ring {
     position: absolute;
-    inset: -6px;
+    inset: -20px;
     border-radius: 50%;
-    border: 1px solid rgba(99,179,237,0.25);
+    background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent, rgba(255,255,255,0.1));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
   }
 
-  .info { flex: 1; }
-  .username { font-size: 28px; font-weight: 800; line-height: 1; }
-  .tagline { font-size: 12px; color: #63b3ed; margin-top: 6px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+  .info { flex: 1; text-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+  .username { font-size: 85px; font-weight: 800; line-height: 1; letter-spacing: -1.5px; }
+  .tagline { 
+    font-size: 28px; 
+    color: #e2e8f0; 
+    margin-top: 20px; 
+    font-weight: 600; 
+    letter-spacing: 6px; 
+    text-transform: uppercase;
+    background: rgba(0,0,0,0.15);
+    display: inline-block;
+    padding: 12px 34px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
 
-  .favs { margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
-  .fav-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #a0aec0; }
-  .fav-row span { color: #fff; font-weight: 500; }
+  .favs { margin-top: 45px; display: flex; flex-direction: column; gap: 18px; }
+  .fav-row { display: flex; align-items: center; gap: 20px; font-size: 34px; color: #cbd5e0; }
+  .fav-row span { color: #fff; font-weight: 600; }
 
-  .stats-col {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
     flex-shrink: 0;
   }
+  
   .stat-pill {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 12px;
-    padding: 10px 20px;
+    background: rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    border-left: 1px solid rgba(255,255,255,0.2);
+    border-radius: 40px;
+    padding: 34px 44px;
     text-align: center;
-    min-width: 90px;
+    min-width: 280px;
+    position: relative;
+    overflow: hidden;
   }
-  .stat-pill-value { font-size: 22px; font-weight: 800; color: var(--c); line-height: 1; }
-  .stat-pill-label { font-size: 10px; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+  
+  .stat-pill::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+    background: var(--c);
+  }
+
+  .stat-pill-value { 
+    font-size: 75px; 
+    font-weight: 800; 
+    color: #fff; 
+    line-height: 1; 
+    text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  .stat-pill-label { 
+    font-size: 26px; 
+    color: rgba(255,255,255,0.8); 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: 1.5px; 
+    margin-top: 12px; 
+  }
 
   .footer-tag {
     position: absolute;
-    bottom: 12px;
-    right: 18px;
-    font-size: 10px;
-    color: #2d3748;
-    font-weight: 500;
+    bottom: -80px;
+    right: 50px;
+    font-size: 26px;
+    color: rgba(255,255,255,0.4);
+    font-weight: 600;
     z-index: 3;
   }
 </style>
 </head>
 <body>
   {% if banner_url %}<div class="banner-bg"></div>{% endif %}
-  <div class="banner-overlay"></div>
-
-  <div class="content">
-    <div class="avatar-wrap">
-      <div class="avatar-ring"></div>
-      {% if avatar_url %}
-      <img class="avatar" src="{{ avatar_url }}" onerror="this.style.background='#1a2035'">
-      {% else %}
-      <div class="avatar"></div>
-      {% endif %}
-    </div>
-
-    <div class="info">
-      <div class="username">{{ username }}</div>
-      <div class="tagline">AniList Profile</div>
-      <div class="favs">
-        {% if fav_anime %}
-        <div class="fav-row">❤️ <span>{{ fav_anime }}</span></div>
-        {% endif %}
-        {% if fav_char %}
-        <div class="fav-row">⭐ <span>{{ fav_char }}</span></div>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="stats-col">
-      <div class="stat-pill" style="--c: #63b3ed">
-        <div class="stat-pill-value">{{ anime_count }}</div>
-        <div class="stat-pill-label">Anime</div>
-      </div>
-      <div class="stat-pill" style="--c: #9f7aea">
-        <div class="stat-pill-value">{{ manga_count }}</div>
-        <div class="stat-pill-label">Manga</div>
-      </div>
-    </div>
-    <div class="stats-col">
-      <div class="stat-pill" style="--c: #f6c636">
-        <div class="stat-pill-value">{{ mean_score }}</div>
-        <div class="stat-pill-label">Score</div>
-      </div>
-      <div class="stat-pill" style="--c: #48bb78">
-        <div class="stat-pill-value">{{ days_watched }}</div>
-        <div class="stat-pill-label">Days</div>
-      </div>
-    </div>
+  
+  <div class="blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
   </div>
 
-  <div class="footer-tag">@westyasha_AniList_bot</div>
+  <div class="content">
+    <div class="glass-panel">
+      <div class="avatar-wrap">
+        <div class="avatar-ring"></div>
+        {% if avatar_url %}
+        <img class="avatar" src="{{ avatar_url }}" onerror="this.style.background='#1a2035'">
+        {% else %}
+        <div class="avatar"></div>
+        {% endif %}
+      </div>
+
+      <div class="info">
+        <div class="username">{{ username }}</div>
+        <div class="tagline">AniList Profile</div>
+        <div class="favs">
+          {% if fav_anime %}
+          <div class="fav-row">❤️ <span>{{ fav_anime }}</span></div>
+          {% endif %}
+          {% if fav_char %}
+          <div class="fav-row">⭐ <span>{{ fav_char }}</span></div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-pill" style="--c: #63b3ed">
+          <div class="stat-pill-value">{{ anime_count }}</div>
+          <div class="stat-pill-label">Anime</div>
+        </div>
+        <div class="stat-pill" style="--c: #f6c636">
+          <div class="stat-pill-value">{{ mean_score }}</div>
+          <div class="stat-pill-label">Score</div>
+        </div>
+        <div class="stat-pill" style="--c: #9f7aea">
+          <div class="stat-pill-value">{{ manga_count }}</div>
+          <div class="stat-pill-label">Manga</div>
+        </div>
+        <div class="stat-pill" style="--c: #48bb78">
+          <div class="stat-pill-value">{{ days_watched }}</div>
+          <div class="stat-pill-label">Days</div>
+        </div>
+      </div>
+      
+      <div class="footer-tag">@westyasha_AniList_bot</div>
+    </div>
+  </div>
 </body>
 </html>
