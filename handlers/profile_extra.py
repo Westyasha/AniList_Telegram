@@ -185,11 +185,11 @@ async def _send_wrapped(target, uid: int):
         await dest.answer(t(uid, "mylist_need_auth"), parse_mode="MarkdownV2")
         return
     dest = target.message if isinstance(target, CallbackQuery) else target
-    wait = await dest.answer("⏳ Generating your Wrapped...")
+    wait = await dest.answer(t(uid, "generating"))
     user = await _fetch_stats(uid)
     activities = await _fetch_activity(uid, token, anilist_id)
     if not user:
-        await wait.edit_text("❌ Failed to load stats")
+        await wait.edit_text(t(uid, "gen_error"))
         return
     data = _build_wrapped_data(user, activities)
     buf = await generate_wrapped(data)
@@ -221,10 +221,10 @@ async def _send_card(target, uid: int):
         await dest.answer(t(uid, "mylist_need_auth"), parse_mode="MarkdownV2")
         return
     dest = target.message if isinstance(target, CallbackQuery) else target
-    wait = await dest.answer("⏳ Generating your card...")
+    wait = await dest.answer(t(uid, "generating"))
     user = await _fetch_stats(uid)
     if not user:
-        await wait.edit_text("❌ Failed to load data")
+        await wait.edit_text(t(uid, "gen_error"))
         return
     data = _build_card_data(user)
     buf = await generate_profile_card(data)
@@ -257,7 +257,7 @@ async def inline_now_watching(query: InlineQuery):
 
     if not token or not anilist_id:
         await query.answer(
-            [], switch_pm_text="🔐 Login to AniList first",
+            [], switch_pm_text="🔐 Войти в AniList" if get_lang(uid)=="ru" else "🔐 Login to AniList first",
             switch_pm_parameter="start", cache_time=1
         )
         return
@@ -294,12 +294,14 @@ async def inline_now_watching(query: InlineQuery):
 
         uid_hash = hashlib.md5(f"nw{media_id}".encode()).hexdigest()
 
+        thumb = cover or ""
         if cover:
             results.append(InlineQueryResultPhoto(
-                id=uid_hash, photo_url=cover, thumbnail_url=cover,
+                id=uid_hash, photo_url=cover, thumbnail_url=thumb,
                 title=f"👀 {title}",
                 description=f"Progress: {progress}/{total}" + (f" • ⭐{score}" if score else ""),
-                caption=text, parse_mode="MarkdownV2",
+                caption=text,
+                parse_mode="MarkdownV2",
             ))
         else:
             results.append(InlineQueryResultArticle(
@@ -309,7 +311,7 @@ async def inline_now_watching(query: InlineQuery):
             ))
 
     if not results:
-        await query.answer([], switch_pm_text="📋 Your watching list is empty",
+        await query.answer([], switch_pm_text="📋 Список пуст" if get_lang(uid)=="ru" else "📋 Watching list is empty",
                            switch_pm_parameter="start", cache_time=10)
         return
     await query.answer(results, cache_time=60)
@@ -324,47 +326,51 @@ async def inline_profile_card(query: InlineQuery):
 
     if not token:
         await query.answer(
-            [], switch_pm_text="🔐 Login to use this feature",
+            [], switch_pm_text="🔐 Нужна авторизация" if get_lang(uid)=="ru" else "🔐 Login to use this feature",
             switch_pm_parameter="start", cache_time=1
         )
         return
 
     user = await _fetch_stats(uid)
     if not user:
-        await query.answer([], switch_pm_text="❌ Failed to load profile",
+        await query.answer([], switch_pm_text="❌ Ошибка загрузки" if get_lang(uid)=="ru" else "❌ Failed to load profile",
                            switch_pm_parameter="start", cache_time=5)
         return
 
+    from storage import get_lang
+    lang = get_lang(uid)
     data = _build_card_data(user)
-    buf = await generate_profile_card(data)
-    photo_bytes = buf.read()
-
-    # send via file_id trick — answer with article pointing to /card command
     uid_hash = hashlib.md5(f"card{uid}".encode()).hexdigest()
-    text = (
-        f"🪪 *{esc(data['username'])}*\n"
-        f"📺 {data['anime_count']} anime \\| 📖 {data['manga_count']} manga\n"
-        f"⭐ Mean score: {data['mean_score']:.1f} \\| ⏱ {data['days_watched']} days\n"
-        f"\n_via @westyasha\\_AniList\\_bot_"
-    )
 
-    # Use avatar as thumbnail for inline result
+    if lang == "ru":
+        text = (
+            f"🪪 *{esc(data['username'])}*\n"
+            f"📺 {data['anime_count']} аниме \\| 📖 {data['manga_count']} манги\n"
+            f"⭐ Средняя оценка: {data['mean_score']} \\| ⏱ {data['days_watched']} дней\n"
+            f"\n_via @westyasha\\_AniList\\_bot_"
+        )
+        title_str = f"🪪 Профиль {data['username']}"
+        desc_str = f"📺 {data['anime_count']} аниме • ⭐ {data['mean_score']}"
+    else:
+        text = (
+            f"🪪 *{esc(data['username'])}*\n"
+            f"📺 {data['anime_count']} anime \\| 📖 {data['manga_count']} manga\n"
+            f"⭐ Mean score: {data['mean_score']} \\| ⏱ {data['days_watched']} days\n"
+            f"\n_via @westyasha\\_AniList\\_bot_"
+        )
+        title_str = f"🪪 {data['username']}'s Profile"
+        desc_str = f"📺 {data['anime_count']} anime • ⭐ {data['mean_score']}"
+
     avatar_url = data.get("avatar_url") or ""
     if avatar_url:
         results = [InlineQueryResultPhoto(
-            id=uid_hash,
-            photo_url=avatar_url,
-            thumbnail_url=avatar_url,
-            title=f"🪪 {data['username']}'s Profile Card",
-            description=f"📺 {data['anime_count']} anime • ⭐ {data['mean_score']:.1f}",
-            caption=text,
-            parse_mode="MarkdownV2",
+            id=uid_hash, photo_url=avatar_url, thumbnail_url=avatar_url,
+            title=title_str, description=desc_str,
+            caption=text, parse_mode="MarkdownV2",
         )]
     else:
         results = [InlineQueryResultArticle(
-            id=uid_hash,
-            title=f"🪪 {data['username']}'s Profile Card",
-            description=f"📺 {data['anime_count']} anime • ⭐ {data['mean_score']:.1f}",
+            id=uid_hash, title=title_str, description=desc_str,
             input_message_content=InputTextMessageContent(message_text=text, parse_mode="MarkdownV2")
         )]
 
@@ -382,7 +388,7 @@ async def customize_keyboard_cb(cb: CallbackQuery):
     layout = get_keyboard_layout(uid) or [row[:] for row in DEFAULT_LAYOUT]
     _kb_temp[uid] = [row[:] for row in layout]
     await cb.message.edit_text(
-        "⌨️ *Keyboard Settings*\n\nTap buttons to toggle them on/off in your main menu:",
+        t(uid, "kb_title"),
         parse_mode="MarkdownV2",
         reply_markup=_customizer_kb(uid)
     )
@@ -397,8 +403,8 @@ def _customizer_kb(uid: int):
         label_text = t(uid, key)
         mark = "✅ " if key in active_keys else "☐ "
         b.add(btn(f"{mark}{label_text}", f"kb_toggle:{key}"))
-    b.add(btn("✅ Save", "kb_save", "success"))
-    b.add(btn("🔄 Reset", "kb_reset", "danger"))
+    b.add(btn(t(uid, "kb_save_btn"), "kb_save", "success"))
+    b.add(btn(t(uid, "kb_reset_btn"), "kb_reset", "danger"))
     b.adjust(2, 2, 2, 1, 2)
     return b.as_markup()
 
@@ -441,7 +447,7 @@ async def kb_save_cb(cb: CallbackQuery):
     set_keyboard_layout(uid, layout)
     await cb.answer("✅ Keyboard saved!", show_alert=True)
     await cb.message.delete()
-    await cb.message.answer("⌨️ Keyboard updated\\!", parse_mode="MarkdownV2", reply_markup=main_menu(uid))
+    await cb.message.answer(t(uid, "kb_saved"), parse_mode="MarkdownV2", reply_markup=main_menu(uid))
 
 
 @router.callback_query(F.data == "kb_reset")
@@ -451,4 +457,4 @@ async def kb_reset_cb(cb: CallbackQuery):
     _kb_temp.pop(uid, None)
     await cb.answer("🔄 Reset to default", show_alert=True)
     await cb.message.delete()
-    await cb.message.answer("⌨️ Keyboard reset\\!", parse_mode="MarkdownV2", reply_markup=main_menu(uid))
+    await cb.message.answer(t(uid, "kb_reset_done"), parse_mode="MarkdownV2", reply_markup=main_menu(uid))
