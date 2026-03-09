@@ -220,6 +220,60 @@ async def my_profile_cb(cb: CallbackQuery):
     await cb.answer()
 
 
+@router.callback_query(F.data == "settings:notif_menu")
+async def settings_notif_menu_cb(cb: CallbackQuery):
+    from storage import get_notif_settings
+    from keyboards import notif_settings_kb
+    uid = cb.from_user.id
+    lang = get_lang(uid)
+
+    ns = get_notif_settings(uid)
+    title_obj = {"id": 21355, "title": {"english": "My Hero Academia", "romaji": "Boku no Hero Academia"}}
+    if lang == "ru":
+        preview = (
+            "🔔 *Новый эпизод\\!*\n\n"
+            "*My Hero Academia*\n"
+            "📺 Вышел эпизод *147*\n\n"
+            "[Открыть на AniList](https://anilist\\.co/anime/21355)\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "⬆️ _Так выглядит уведомление_\n\n"
+            "*Настройки уведомлений:*"
+        )
+    else:
+        preview = (
+            "🔔 *New episode\\!*\n\n"
+            "*My Hero Academia*\n"
+            "📺 Episode *147* is out\n\n"
+            "[Open on AniList](https://anilist\\.co/anime/21355)\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "⬆️ _This is how a notification looks_\n\n"
+            "*Notification settings:*"
+        )
+
+    try:
+        await cb.message.edit_text(preview, parse_mode="MarkdownV2", reply_markup=notif_settings_kb(uid))
+    except Exception:
+        await cb.message.answer(preview, parse_mode="MarkdownV2", reply_markup=notif_settings_kb(uid))
+    await cb.answer()
+
+
+@router.callback_query(F.data.startswith("notif:toggle:"))
+async def notif_toggle_cb(cb: CallbackQuery):
+    from storage import get_notif_settings, set_notif_settings
+    from keyboards import notif_settings_kb
+    uid = cb.from_user.id
+    key = cb.data.split("notif:toggle:")[1]
+    ns = get_notif_settings(uid)
+    if key in ns:
+        ns[key] = not ns[key]
+        set_notif_settings(uid, ns)
+    try:
+        await cb.message.edit_reply_markup(reply_markup=notif_settings_kb(uid))
+    except Exception:
+        pass
+    await cb.answer()
+
+
 @router.callback_query(F.data == "settings:clearcache")
 async def settings_clearcache_cb(cb: CallbackQuery):
     uid = cb.from_user.id
