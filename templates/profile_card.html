@@ -53,20 +53,43 @@
 
   .avatar-wrap { position: relative; flex-shrink: 0; }
 
+  /* glow layer — blurred color bloom behind the ring */
+  .avatar-glow {
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    z-index: 0;
+    opacity: 0.7;
+    filter: blur(20px);
+    background: conic-gradient(#63b3ed, #9f7aea, #63b3ed);
+    transition: background 0.3s;
+  }
+
+  /* glass ring itself */
   .avatar-ring {
     position: absolute;
-    inset: -6px;
+    inset: -8px;
     border-radius: 50%;
     z-index: 1;
-    background: conic-gradient(#63b3ed, #9f7aea, #63b3ed);
+    /* frosted glass base */
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    /* color tint injected by JS via --ring-c1 / --ring-c2 */
+    box-shadow:
+      inset 0 0 0 1.5px rgba(255,255,255,0.35),
+      inset 0 0 24px 4px var(--ring-c1, rgba(99,179,237,0.25)),
+      0 0 32px 8px var(--ring-c2, rgba(99,179,237,0.2));
+    --ring-c1: rgba(99,179,237,0.25);
+    --ring-c2: rgba(99,179,237,0.2);
   }
 
   .avatar {
     position: relative; z-index: 2;
     width: 300px; height: 300px; border-radius: 50%;
     object-fit: cover;
-    border: 4px solid #0d1117;
-    box-shadow: 0 16px 50px rgba(0,0,0,0.6);
+    border: 3px solid rgba(255,255,255,0.18);
+    box-shadow: 0 16px 50px rgba(0,0,0,0.55);
     display: block; background: #1a2035;
   }
 
@@ -131,26 +154,26 @@
   .fav-row { display: flex; gap: 12px; align-items: flex-start; }
 
   /* Poster sizes — CSS vars controlled by data-count attribute */
-  .fav-row[data-count="1"]  { --pw: 160px; --ph: 240px; --cw: 160px; --ch: 240px; }
-  .fav-row[data-count="2"]  { --pw: 140px; --ph: 210px; --cw: 140px; --ch: 210px; }
-  .fav-row[data-count="3"]  { --pw: 120px; --ph: 180px; --cw: 120px; --ch: 180px; }
-  .fav-row[data-count="4"]  { --pw: 108px; --ph: 162px; --cw: 108px; --ch: 162px; }
-  .fav-row[data-count="5"]  { --pw: 96px;  --ph: 144px; --cw: 96px;  --ch: 144px; }
-  .fav-row[data-count="6"]  { --pw: 86px;  --ph: 129px; --cw: 86px;  --ch: 129px; }
-  .fav-row[data-count="7"]  { --pw: 78px;  --ph: 117px; --cw: 78px;  --ch: 117px; }
-  .fav-row[data-count="8"]  { --pw: 72px;  --ph: 108px; --cw: 72px;  --ch: 108px; }
-  .fav-row[data-count="9"]  { --pw: 66px;  --ph: 99px;  --cw: 66px;  --ch: 99px;  }
-  .fav-row[data-count="10"] { --pw: 62px;  --ph: 93px;  --cw: 62px;  --ch: 93px;  }
-  .fav-row[data-count="11"] { --pw: 58px;  --ph: 87px;  --cw: 58px;  --ch: 87px;  }
-  .fav-row[data-count="12"] { --pw: 54px;  --ph: 81px;  --cw: 54px;  --ch: 81px;  }
-  .fav-row[data-count="13"] { --pw: 52px;  --ph: 78px;  --cw: 52px;  --ch: 78px;  }
-  .fav-row[data-count="14"] { --pw: 50px;  --ph: 75px;  --cw: 50px;  --ch: 75px;  }
-  .fav-row[data-count="15"] { --pw: 48px;  --ph: 72px;  --cw: 48px;  --ch: 72px;  }
-  .fav-row[data-count="16"] { --pw: 46px;  --ph: 69px;  --cw: 46px;  --ch: 69px;  }
-  .fav-row[data-count="17"] { --pw: 44px;  --ph: 66px;  --cw: 44px;  --ch: 66px;  }
-  .fav-row[data-count="18"] { --pw: 42px;  --ph: 63px;  --cw: 42px;  --ch: 63px;  }
-  .fav-row[data-count="19"] { --pw: 40px;  --ph: 60px;  --cw: 40px;  --ch: 60px;  }
-  .fav-row[data-count="20"] { --pw: 38px;  --ph: 57px;  --cw: 38px;  --ch: 57px;  }
+  .fav-row[data-count="1"]  { --pw: 200px; --ph: 300px; --cw: 200px; --ch: 300px; }
+  .fav-row[data-count="2"]  { --pw: 175px; --ph: 263px; --cw: 175px; --ch: 263px; }
+  .fav-row[data-count="3"]  { --pw: 150px; --ph: 225px; --cw: 150px; --ch: 225px; }
+  .fav-row[data-count="4"]  { --pw: 135px; --ph: 203px; --cw: 135px; --ch: 203px; }
+  .fav-row[data-count="5"]  { --pw: 120px; --ph: 180px; --cw: 120px; --ch: 180px; }
+  .fav-row[data-count="6"]  { --pw: 108px; --ph: 162px; --cw: 108px; --ch: 162px; }
+  .fav-row[data-count="7"]  { --pw: 98px;  --ph: 147px; --cw: 98px;  --ch: 147px; }
+  .fav-row[data-count="8"]  { --pw: 90px;  --ph: 135px; --cw: 90px;  --ch: 135px; }
+  .fav-row[data-count="9"]  { --pw: 83px;  --ph: 124px; --cw: 83px;  --ch: 124px; }
+  .fav-row[data-count="10"] { --pw: 78px;  --ph: 117px; --cw: 78px;  --ch: 117px; }
+  .fav-row[data-count="11"] { --pw: 73px;  --ph: 109px; --cw: 73px;  --ch: 109px; }
+  .fav-row[data-count="12"] { --pw: 68px;  --ph: 102px; --cw: 68px;  --ch: 102px; }
+  .fav-row[data-count="13"] { --pw: 65px;  --ph: 98px;  --cw: 65px;  --ch: 98px;  }
+  .fav-row[data-count="14"] { --pw: 63px;  --ph: 94px;  --cw: 63px;  --ch: 94px;  }
+  .fav-row[data-count="15"] { --pw: 60px;  --ph: 90px;  --cw: 60px;  --ch: 90px;  }
+  .fav-row[data-count="16"] { --pw: 58px;  --ph: 87px;  --cw: 58px;  --ch: 87px;  }
+  .fav-row[data-count="17"] { --pw: 55px;  --ph: 83px;  --cw: 55px;  --ch: 83px;  }
+  .fav-row[data-count="18"] { --pw: 53px;  --ph: 79px;  --cw: 53px;  --ch: 79px;  }
+  .fav-row[data-count="19"] { --pw: 50px;  --ph: 75px;  --cw: 50px;  --ch: 75px;  }
+  .fav-row[data-count="20"] { --pw: 48px;  --ph: 72px;  --cw: 48px;  --ch: 72px;  }
 
   .anime-poster {
     flex-shrink: 0;
@@ -249,6 +272,7 @@
   <div class="card">
     <div class="left">
       <div class="avatar-wrap">
+        <div class="avatar-glow" id="avatarGlow"></div>
         <div class="avatar-ring" id="avatarRing"></div>
         {% if avatar_url %}
         <img class="avatar" id="avatarImg" src="{{ avatar_url }}" crossorigin="anonymous" onerror="this.style.background='#1a2035'">
@@ -341,77 +365,100 @@
 (function() {
   const img = document.getElementById('avatarImg');
   const ring = document.getElementById('avatarRing');
+  const glow = document.getElementById('avatarGlow');
   if (!img || !ring) return;
 
-  function sample(img) {
-    const size = 80;
+  function getDominantColors(img) {
+    const size = 100;
     const c = document.createElement('canvas');
     c.width = c.height = size;
     const ctx = c.getContext('2d');
     ctx.drawImage(img, 0, 0, size, size);
 
-    // Sample points around the edge of the circle at different angles
-    const angles = 12;
-    const colors = [];
+    // Sample points in a ring near the edge
     const r = size / 2;
-    for (let i = 0; i < angles; i++) {
-      const angle = (i / angles) * Math.PI * 2;
-      const x = Math.round(r + (r - 4) * Math.cos(angle));
-      const y = Math.round(r + (r - 4) * Math.sin(angle));
-      const px = ctx.getImageData(x, y, 1, 1).data;
-      // Boost saturation to make colors pop
-      const [h, s, l] = rgbToHsl(px[0], px[1], px[2]);
-      colors.push(hslToHex(h, Math.min(s * 1.4, 1), Math.max(Math.min(l, 0.65), 0.35)));
+    const samples = 24;
+    const buckets = {};
+
+    for (let i = 0; i < samples; i++) {
+      const angle = (i / samples) * Math.PI * 2;
+      // Sample at ~80% radius to get edge colors
+      const x = Math.round(r + r * 0.82 * Math.cos(angle));
+      const y = Math.round(r + r * 0.82 * Math.sin(angle));
+      const d = ctx.getImageData(x, y, 1, 1).data;
+      // Quantize to reduce unique colors
+      const key = `${Math.round(d[0]/32)*32},${Math.round(d[1]/32)*32},${Math.round(d[2]/32)*32}`;
+      buckets[key] = (buckets[key] || 0) + 1;
     }
-    // Build conic-gradient from sampled colors
-    const stops = colors.map((c, i) => `${c} ${Math.round(i / angles * 360)}deg`).join(', ');
-    ring.style.background = `conic-gradient(${stops}, ${colors[0]} 360deg)`;
-    // Add glow matching first dominant color
-    ring.style.boxShadow = `0 0 18px 4px ${colors[0]}55`;
+
+    // Sort by frequency, pick top 2 distinct colors
+    const sorted = Object.entries(buckets).sort((a,b) => b[1]-a[1]);
+    const top = sorted.slice(0, 5).map(([k]) => k.split(',').map(Number));
+
+    // Boost saturation and normalize lightness
+    return top.slice(0, 2).map(([r,g,b]) => {
+      const [h, s, l] = rgbToHsl(r, g, b);
+      const boostedS = Math.min(s * 1.5 + 0.2, 1);
+      const clampedL = Math.max(Math.min(l, 0.7), 0.4);
+      return hslToRgb(h, boostedS, clampedL);
+    });
   }
 
   function rgbToHsl(r, g, b) {
-    r /= 255; g /= 255; b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    let h, s, l = (max + min) / 2;
-    if (max === min) { h = s = 0; }
-    else {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-        case g: h = ((b - r) / d + 2) / 6; break;
-        case b: h = ((r - g) / d + 4) / 6; break;
+    r/=255; g/=255; b/=255;
+    const max=Math.max(r,g,b), min=Math.min(r,g,b);
+    let h,s,l=(max+min)/2;
+    if(max===min){h=s=0;}
+    else{
+      const d=max-min;
+      s=l>0.5?d/(2-max-min):d/(max+min);
+      switch(max){
+        case r:h=((g-b)/d+(g<b?6:0))/6;break;
+        case g:h=((b-r)/d+2)/6;break;
+        case b:h=((r-g)/d+4)/6;break;
       }
     }
-    return [h, s, l];
+    return[h,s,l];
   }
 
-  function hslToHex(h, s, l) {
-    let r, g, b;
-    if (s === 0) { r = g = b = l; }
-    else {
-      const hue2rgb = (p, q, t) => {
-        if (t < 0) t += 1; if (t > 1) t -= 1;
-        if (t < 1/6) return p + (q - p) * 6 * t;
-        if (t < 1/2) return q;
-        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-        return p;
-      };
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1/3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1/3);
+  function hslToRgb(h,s,l){
+    let r,g,b;
+    if(s===0){r=g=b=l;}
+    else{
+      const q=l<0.5?l*(1+s):l+s-l*s, p=2*l-q;
+      const hue=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};
+      r=hue(p,q,h+1/3);g=hue(p,q,h);b=hue(p,q,h-1/3);
     }
-    return '#' + [r, g, b].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
+    return [Math.round(r*255),Math.round(g*255),Math.round(b*255)];
   }
 
-  if (img.complete && img.naturalWidth) {
-    sample(img);
-  } else {
-    img.addEventListener('load', () => sample(img));
+  function apply(img) {
+    const colors = getDominantColors(img);
+    const [r1,g1,b1] = colors[0] || [99,179,237];
+    const [r2,g2,b2] = colors[1] || [159,122,234];
+
+    const c1 = `rgba(${r1},${g1},${b1}`;
+    const c2 = `rgba(${r2},${g2},${b2}`;
+
+    // Glassmorphism ring: inset tinted glow + outer shadow
+    ring.style.setProperty('--ring-c1', `${c1},0.3)`);
+    ring.style.setProperty('--ring-c2', `${c2},0.25)`);
+    ring.style.boxShadow = [
+      `inset 0 0 0 1.5px rgba(255,255,255,0.4)`,
+      `inset 0 0 28px 6px ${c1},0.25)`,
+      `inset 0 0 14px 2px ${c2},0.15)`,
+      `0 0 36px 10px ${c1},0.22)`,
+      `0 0 60px 20px ${c2},0.12)`,
+    ].join(', ');
+
+    // Outer glow blob
+    if (glow) {
+      glow.style.background = `radial-gradient(ellipse at 40% 40%, ${c1},0.9), ${c2},0.6) 60% 60%)`;
+    }
   }
+
+  if (img.complete && img.naturalWidth) { apply(img); }
+  else { img.addEventListener('load', () => apply(img)); }
 })();
 </script>
 </body>
