@@ -171,10 +171,43 @@
   .anime-ph { width: var(--pw); height: var(--ph); }
   .char-ph  { width: var(--cw); height: var(--ch); }
 
+  .more-tile {
+    flex-shrink: 0;
+    width: var(--pw); height: var(--ph);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px; cursor: default;
+  }
+  .more-tile .more-plus {
+    font-size: 22px; font-weight: 800; color: rgba(255,255,255,0.9); line-height: 1;
+  }
+  .more-tile .more-count {
+    font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.55);
+    letter-spacing: 1px;
+  }
+  .more-tile .more-icon {
+    width: 22px; height: 22px; opacity: 0.5;
+  }
+
   .footer {
-    position: fixed; bottom: 18px; right: 36px;
-    font-size: 17px; color: rgba(255,255,255,0.18);
-    font-weight: 600; z-index: 10; white-space: nowrap;
+    position: fixed; bottom: 16px; right: 28px;
+    display: flex; align-items: center; gap: 7px;
+    z-index: 10;
+    background: rgba(0,0,0,0.38);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 6px 14px 6px 10px;
+    backdrop-filter: blur(10px);
+  }
+  .footer-tg {
+    width: 18px; height: 18px; flex-shrink: 0;
+  }
+  .footer-text {
+    font-size: 15px; color: rgba(255,255,255,0.55);
+    font-weight: 600; white-space: nowrap; letter-spacing: 0.3px;
   }
 </style>
 </head>
@@ -200,9 +233,14 @@
     {% endfor %}
   {% endif %}
 
-  {% set max_cnt = [anime_items|length, char_items|length]|max %}
-  {% set has_favs = max_cnt > 0 %}
-  {% set cnt = max_cnt if max_cnt <= 10 else 10 %}
+  {% set anime_total = anime_items|length %}
+  {% set char_total  = char_items|length %}
+  {% set anime_show  = [anime_total, 10]|min %}
+  {% set char_show   = [char_total,  10]|min %}
+  {% set anime_extra = anime_total - anime_show %}
+  {% set char_extra  = char_total  - char_show %}
+  {% set max_show    = [anime_show, char_show]|max %}
+  {% set has_favs    = max_show > 0 %}
 
   <div class="card">
     <div class="left">
@@ -232,30 +270,54 @@
     <div class="divider"></div>
     <div class="favs">
 
-      {% if anime_items|length > 0 %}
+      {% if anime_show > 0 %}
       <div class="fav-block">
         <div class="fav-label" style="--lc:#fc8181">❤️ Любимое аниме</div>
-        <div class="fav-row" data-count="{{ [anime_items|length, 10]|min }}">
+        <div class="fav-row" data-count="{{ anime_show + (1 if anime_extra > 0 else 0) }}">
+          {% set shown = namespace(n=0) %}
           {% for i in range(fav_anime_covers|length) %}
-            {% if fav_anime_covers[i] %}
+            {% if fav_anime_covers[i] and shown.n < anime_show %}
             <img class="anime-poster" src="{{ fav_anime_covers[i] }}"
                  onerror="this.outerHTML='<div class=&quot;ph anime-ph&quot;></div>'">
+            {% set shown.n = shown.n + 1 %}
             {% endif %}
           {% endfor %}
+          {% if anime_extra > 0 %}
+          <div class="more-tile">
+            <div class="more-plus">+{{ anime_extra }}</div>
+            <div class="more-count">MORE</div>
+            <svg class="more-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" fill="white" fill-opacity="0.15"/>
+              <path d="M8 12H16M16 12L12 8M16 12L12 16" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          {% endif %}
         </div>
       </div>
       {% endif %}
 
-      {% if char_items|length > 0 %}
+      {% if char_show > 0 %}
       <div class="fav-block">
         <div class="fav-label" style="--lc:#f6c636">⭐ Любимые персонажи</div>
-        <div class="fav-row" data-count="{{ [char_items|length, 10]|min }}">
+        <div class="fav-row" data-count="{{ char_show + (1 if char_extra > 0 else 0) }}">
+          {% set shown = namespace(n=0) %}
           {% for i in range(fav_char_images|length) %}
-            {% if fav_char_images[i] %}
+            {% if fav_char_images[i] and shown.n < char_show %}
             <img class="char-portrait" src="{{ fav_char_images[i] }}"
                  onerror="this.outerHTML='<div class=&quot;ph char-ph&quot;></div>'">
+            {% set shown.n = shown.n + 1 %}
             {% endif %}
           {% endfor %}
+          {% if char_extra > 0 %}
+          <div class="more-tile">
+            <div class="more-plus">+{{ char_extra }}</div>
+            <div class="more-count">MORE</div>
+            <svg class="more-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" fill="white" fill-opacity="0.15"/>
+              <path d="M8 12H16M16 12L12 8M16 12L12 16" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          {% endif %}
         </div>
       </div>
       {% endif %}
@@ -264,6 +326,12 @@
     {% endif %}
   </div>
 
-  <div class="footer">@westyasha_AniList_bot</div>
+  <div class="footer">
+    <svg class="footer-tg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="12" fill="#229ED9"/>
+      <path d="M5.5 11.5L17 7L14.5 17.5L10.5 14L8.5 16V13L14 8.5L9 12.5L5.5 11.5Z" fill="white"/>
+    </svg>
+    <span class="footer-text">@westyasha_AniList_bot</span>
+  </div>
 </body>
 </html>
