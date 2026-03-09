@@ -96,7 +96,6 @@ def media_card(media: dict) -> str:
     score = media.get("averageScore") or 0
     pop = media.get("popularity") or 0
     favs = media.get("favourites") or 0
-    src = media.get("source", "")
     country = media.get("countryOfOrigin", "")
 
     lines.append(f"📺 *{esc(mtype)}* \\| {esc(fmt)}" + (f" \\| {esc(country)}" if country else ""))
@@ -104,21 +103,21 @@ def media_card(media: dict) -> str:
     if score:
         score_bar = "█" * (score // 10) + "░" * (10 - score // 10)
         lines.append(f"⭐ *{score}/100* `{score_bar}`")
-        lines.append(f"👥 {pop:,} \\| ❤️ {favs:,}")
+        lines.append(f"👥 {esc(f'{pop:,}')} \\| ❤️ {esc(f'{favs:,}')}")
 
     sea = media.get("season")
     sea_year = media.get("seasonYear")
     if sea:
-        lines.append(f"🗓 *{esc(fseason(sea))} {sea_year or ''}*")
+        lines.append(f"🗓 *{esc(fseason(sea))} {esc(str(sea_year or ''))}*")
 
     eps = media.get("episodes")
     chs = media.get("chapters")
     dur = media.get("duration")
     vols = media.get("volumes")
     if eps:
-        lines.append(f"🎬 *Ep:* {eps}" + (f" × {dur} min" if dur else ""))
+        lines.append(f"🎬 *Ep:* {esc(str(eps))}" + (f" × {esc(str(dur))} min" if dur else ""))
     if chs:
-        lines.append(f"📖 *Ch:* {chs}" + (f" / Vol: {vols}" if vols else ""))
+        lines.append(f"📖 *Ch:* {esc(str(chs))}" + (f" / Vol: {esc(str(vols))}" if vols else ""))
 
     start = fdate(media.get("startDate"))
     end = fdate(media.get("endDate"))
@@ -135,7 +134,7 @@ def media_card(media: dict) -> str:
     next_ep = media.get("nextAiringEpisode")
     if next_ep:
         tstr = ftime_until(next_ep["timeUntilAiring"])
-        lines.append(f"⏰ *Ep {next_ep['episode']}* in {esc(tstr)}")
+        lines.append(f"⏰ *Ep {esc(str(next_ep['episode']))}* in {esc(tstr)}")
 
     ml = media.get("mediaListEntry")
     if ml:
@@ -147,11 +146,10 @@ def media_card(media: dict) -> str:
         }.get(ml["status"], ml["status"])
         lines.append(f"📋 {esc(list_status)}")
         if ml.get("score"):
-            stars = "⭐" * int(ml["score"] // 2)
-            lines.append(f"Your score: *{int(ml['score'])}/10* {esc(stars)}")
+            lines.append(f"Your score: *{esc(str(int(ml['score'])))}/10*")
         if ml.get("progress"):
             total = eps or chs or "?"
-            lines.append(f"Progress: *{ml['progress']}/{total}*")
+            lines.append(f"Progress: *{esc(str(ml['progress']))}/{esc(str(total))}*")
         if ml.get("notes"):
             lines.append(f"📝 _{esc(ml['notes'][:80])}_")
 
@@ -159,17 +157,17 @@ def media_card(media: dict) -> str:
     if rankings:
         lines.append("")
         for r in rankings[:2]:
-            lines.append(f"🏆 *\\#{r['rank']}* {esc(r['context'])}")
+            lines.append(f"🏆 *\\#{esc(str(r['rank']))}* {esc(r['context'])}")
 
     desc = clean_desc(media.get("description", ""))
     if desc:
         lines.append("")
         lines.append(esc(desc))
 
-    ext_links = [l for l in media.get("externalLinks", []) if l.get("site") in ("Crunchyroll", "Funimation", "Netflix", "YouTube")]
+    ext_links = [lnk for lnk in media.get("externalLinks", []) if lnk.get("site") in ("Crunchyroll", "Funimation", "Netflix", "YouTube")]
     if ext_links:
         lines.append("")
-        links_str = " \\| ".join(f"[{esc(l['site'])}]({l['url']})" for l in ext_links[:3])
+        links_str = " \\| ".join(f"[{esc(lnk['site'])}]({lnk['url']})" for lnk in ext_links[:3])
         lines.append(f"🎥 {links_str}")
 
     return "\n".join(lines)
@@ -272,10 +270,10 @@ def profile_card(viewer: dict) -> str:
     days = mins // 1440
     hours = (mins % 1440) // 60
     mean = a.get("meanScore", 0)
-    lines.append(f"  Titles: *{count}* \\| Eps: *{eps:,}*")
-    lines.append(f"  Time: *{days}d {hours}h*")
+    lines.append(f"  Titles: *{esc(str(count))}* \\| Eps: *{esc(f'{eps:,}')}*")
+    lines.append(f"  Time: *{esc(str(days))}d {esc(str(hours))}h*")
     if mean:
-        lines.append(f"  Mean score: *{mean}*")
+        lines.append(f"  Mean score: *{esc(str(mean))}*")
 
     lines.append("")
     lines.append("📚 *Manga Stats*")
@@ -283,9 +281,9 @@ def profile_card(viewer: dict) -> str:
     mch = mg.get("chaptersRead", 0)
     mvol = mg.get("volumesRead", 0)
     mmean = mg.get("meanScore", 0)
-    lines.append(f"  Titles: *{mc}* \\| Ch: *{mch:,}* \\| Vol: *{mvol:,}*")
+    lines.append(f"  Titles: *{esc(str(mc))}* \\| Ch: *{esc(f'{mch:,}')}* \\| Vol: *{esc(f'{mvol:,}')}*")
     if mmean:
-        lines.append(f"  Mean score: *{mmean}*")
+        lines.append(f"  Mean score: *{esc(str(mmean))}*")
 
     favs = viewer.get("favourites", {})
     fav_anime = favs.get("anime", {}).get("nodes", [])
@@ -294,8 +292,8 @@ def profile_card(viewer: dict) -> str:
     if fav_anime:
         lines.append("")
         lines.append("❤️ *Favourite Anime:*")
-        for a in fav_anime[:5]:
-            lines.append(f"  • {esc(a['title']['romaji'])}")
+        for an in fav_anime[:5]:
+            lines.append(f"  • {esc(an['title']['romaji'])}")
 
     if fav_chars:
         lines.append("")
