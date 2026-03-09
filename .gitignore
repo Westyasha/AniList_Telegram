@@ -2,3 +2,5 @@ config.py
 /__pycache__
 /locales/__pycache__
 locales/__pycache__/i18n.cpython-313.pyc
+/core/__pycache__
+users.json
