@@ -175,10 +175,10 @@ query {
       manga { count chaptersRead volumesRead meanScore }
     }
     favourites {
-      anime(perPage: 5) { nodes { id title { romaji } coverImage { extraLarge large } } }
-      manga(perPage: 5) { nodes { id title { romaji } coverImage { extraLarge large } } }
-      characters(perPage: 5) { nodes { id name { full } image { large } } }
-      staff(perPage: 3) { nodes { id name { full } image { large } } }
+      anime(perPage: 25) { nodes { id title { romaji english } coverImage { extraLarge large } } }
+      manga(perPage: 25) { nodes { id title { romaji english } coverImage { extraLarge large } } }
+      characters(perPage: 25) { nodes { id name { full } image { large } } }
+      staff(perPage: 25) { nodes { id name { full } image { large } } }
     }
   }
 }

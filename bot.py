@@ -1,27 +1,30 @@
 import asyncio
 import logging
-from aiogram import Bot, Dispatcher, F, Router
-from aiogram.types import Message
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from config import BOT_TOKEN
-from storage import init_db, get_lang
+from storage import init_db
 from handlers import auth, search, media, mylist, browse
-from handlers import help, profile_extra, inline
+from handlers import help, profile_extra, inline, findprofile
 from notifier import notifier_loop
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
+from aiogram import Router, F
+from aiogram.types import Message
+
 _fallback_router = Router()
 
 @_fallback_router.message(F.text)
-async def unhandled_text(msg: Message):
-    uid = msg.from_user.id
-    lang = get_lang(uid)
+async def fallback_handler(msg: Message):
+    from storage import get_lang
+    lang = get_lang(msg.from_user.id)
     if lang == "ru":
-        text = "Не понял команду\\. Используй /start чтобы открыть меню или /help для справки\\."
+        text = "🤔 Не понимаю эту команду\\.\nИспользуй /start для главного меню или /help для справки\\."
     else:
-        text = "Unknown command\\. Use /start to open the menu or /help for help\\."
+        text = "🤔 I don't understand that\\.\nUse /start for the main menu or /help for help\\."
     await msg.answer(text, parse_mode="MarkdownV2")
+
 
 async def main():
     init_db()
@@ -35,6 +38,7 @@ async def main():
     dp.include_router(browse.router)
     dp.include_router(help.router)
     dp.include_router(profile_extra.router)  # must be before inline (catches watching/card)
+    dp.include_router(findprofile.router)
     dp.include_router(inline.router)
     dp.include_router(_fallback_router)  # must be last
 
