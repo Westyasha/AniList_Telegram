@@ -39,7 +39,7 @@ class FindProfileState(StatesGroup):
     waiting_username = State()
 
 
-def _build_card_data(user: dict) -> dict:
+def _build_card_data(user: dict, lang: str = "ru") -> dict:
     stats = user.get("statistics", {})
     anime = stats.get("anime", {})
     manga = stats.get("manga", {})
@@ -47,6 +47,7 @@ def _build_card_data(user: dict) -> dict:
     fa = favs.get("anime", {}).get("nodes", [])
     fc = favs.get("characters", {}).get("nodes", [])
     return {
+        "lang": lang,
         "username": user.get("name", "?"),
         "banner_url": user.get("bannerImage") or "",
         "avatar_url": (user.get("avatar") or {}).get("large") or "",
@@ -75,7 +76,7 @@ def _profile_kb(uid: int, anilist_id: int, anilist_url: str) -> object:
 
 async def _render_and_send(target, uid: int, user: dict):
     lang = get_lang(uid)
-    card_data = _build_card_data(user)
+    card_data = _build_card_data(user, lang)
     name = user.get("name", "?")
     stats = user.get("statistics", {})
     anime = stats.get("anime", {})
