@@ -445,7 +445,6 @@ def settings_kb(uid: int) -> InlineKeyboardMarkup:
     b.add(btn("⌨️ Настройка клавиатуры" if lang == "ru" else "⌨️ Customize keyboard", "customize_keyboard"))
     if token:
         b.add(btn(notif_label, "settings:notif"))
-        b.add(btn("👤 My profile", "myprofile"))
         b.add(btn("🚪 Log out", "logout", "danger"))
     else:
         b.add(btn("🔐 Authorize", "openauth", "success"))
@@ -482,10 +481,12 @@ def auth_kb(uid: int, auth_url: str) -> InlineKeyboardMarkup:
 
 
 def auth_menu_kb(uid: int) -> InlineKeyboardMarkup:
+    from storage import get_lang
+    lang = get_lang(uid)
+    card_label = "🪪 Визитка" if lang == "ru" else "🪪 Profile Card"
     b = InlineKeyboardBuilder()
-    b.add(btn(t(uid, "profile_btn"), "myprofile"))
-    b.add(btn("🪪 Визитка", "profile_card"))
+    b.add(btn(card_label, "profile_card"))
     b.add(btn("📊 Wrapped", "wrapped"))
     b.add(btn(t(uid, "logout_btn"), "logout", "danger"))
-    b.adjust(2, 1, 1)
+    b.adjust(2, 1)
     return b.as_markup()

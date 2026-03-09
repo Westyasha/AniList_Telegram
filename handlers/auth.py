@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery, InputMediaPhoto
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
@@ -24,39 +24,91 @@ def auth_url(uid: int) -> str:
 
 
 async def _send_welcome(msg: Message, uid: int, viewer: dict = None):
-    if viewer:
-        name = esc(viewer.get("name", "?"))
-        status = t(uid, "auth_status_ok", name=name)
-        banner = viewer.get("bannerImage")
-        avatar = (viewer.get("avatar") or {}).get("large")
-        welcome_text = t(uid, "welcome", status=status)
+    from core.image_gen import generate_profile_card
+    from core.api import anilist_query
+    from aiogram.types import BufferedInputFile
+    from storage import get_anilist_id
 
-        if banner and avatar:
-            try:
-                media_group = [
-                    InputMediaPhoto(media=banner, caption=welcome_text, parse_mode="MarkdownV2"),
-                    InputMediaPhoto(media=avatar),
-                ]
-                await msg.answer_media_group(media=media_group)
-                await msg.answer("⬇️", reply_markup=main_menu(uid))
-                return
-            except Exception:
-                pass
-        photo = banner or avatar
-        if photo:
-            try:
-                await msg.answer_photo(photo=photo, caption=welcome_text, parse_mode="MarkdownV2", reply_markup=main_menu(uid))
-                return
-            except Exception:
-                pass
-        await msg.answer(welcome_text, parse_mode="MarkdownV2", reply_markup=main_menu(uid))
-    else:
-        status = t(uid, "auth_status_no")
-        welcome_text = t(uid, "welcome", status=status)
+    if viewer:
+        stats = viewer.get("statistics", {})
+        anime = stats.get("anime", {})
+        days = round(anime.get("minutesWatched", 0) / 1440, 1)
+        mean = anime.get("meanScore", 0)
+        anime_count = anime.get("count", 0)
+        name = viewer.get("name", "?")
+        lang = get_lang(uid)
+
+        if lang == "ru":
+            text = (
+                f"*{esc(name)}* — добро пожаловать\\!\n\n"
+                f"📺 *{esc(str(anime_count))}* аниме в списке · *{esc(str(days))}* дн\\. просмотрено\n"
+                f"⭐ Средняя оценка: *{esc(str(mean))}*\n\n"
+                f"Используй кнопки ниже или /help для справки\\."
+            )
+        else:
+            text = (
+                f"*{esc(name)}* — welcome back\\!\n\n"
+                f"📺 *{esc(str(anime_count))}* anime in list · *{esc(str(days))}* days watched\n"
+                f"⭐ Mean score: *{esc(str(mean))}*\n\n"
+                f"Use the buttons below or /help for more info\\."
+            )
+
+        favs = viewer.get("favourites", {})
+        fa = favs.get("anime", {}).get("nodes", [])
+        fc = favs.get("characters", {}).get("nodes", [])
+        manga = stats.get("manga", {})
+
+        card_data = {
+            "username": name,
+            "banner_url": viewer.get("bannerImage") or "",
+            "avatar_url": (viewer.get("avatar") or {}).get("large") or "",
+            "anime_count": anime_count,
+            "manga_count": manga.get("count", 0),
+            "days_watched": days,
+            "mean_score": mean,
+            "fav_anime": (fa[0]["title"].get("english") or fa[0]["title"].get("romaji") or "") if fa else "",
+            "fav_char": (fc[0]["name"].get("full") or "") if fc else "",
+            "fav_anime_covers": [(n.get("coverImage") or {}).get("large") or "" for n in fa[:5]],
+            "fav_char_images": [(n.get("image") or {}).get("large") or "" for n in fc[:5]],
+            "fav_anime_names": [(n["title"].get("english") or n["title"].get("romaji") or "") for n in fa[:5]],
+            "fav_char_names": [(n["name"].get("full") or "") for n in fc[:5]],
+        }
         try:
-            await msg.answer_photo(photo=WELCOME_IMAGE, caption=welcome_text, parse_mode="MarkdownV2", reply_markup=main_menu(uid))
+            buf = await generate_profile_card(card_data)
+            await msg.answer_photo(
+                photo=BufferedInputFile(buf.read(), filename="card.png"),
+                caption=text,
+                parse_mode="MarkdownV2",
+                reply_markup=main_menu(uid)
+            )
+            return
         except Exception:
-            await msg.answer(welcome_text, parse_mode="MarkdownV2", reply_markup=main_menu(uid))
+            pass
+
+        await msg.answer(text, parse_mode="MarkdownV2", reply_markup=main_menu(uid))
+    else:
+        lang = get_lang(uid)
+        if lang == "ru":
+            text = (
+                "*AniList Bot* — твой аниме\\-дневник в Telegram\\.\n\n"
+                "Без авторизации доступны поиск, тренды и расписание\\.\n"
+                "Авторизуйся в ⚙️ Настройках чтобы управлять списком и получать уведомления\\."
+            )
+        else:
+            text = (
+                "*AniList Bot* — your anime diary in Telegram\\.\n\n"
+                "Search, trending and schedule are available without login\\.\n"
+                "Authorize in ⚙️ Settings to manage your list and get notifications\\."
+            )
+        try:
+            await msg.answer_photo(
+                photo=WELCOME_IMAGE,
+                caption=text,
+                parse_mode="MarkdownV2",
+                reply_markup=main_menu(uid)
+            )
+        except Exception:
+            await msg.answer(text, parse_mode="MarkdownV2", reply_markup=main_menu(uid))
 
 
 @router.message(F.text == "/start")

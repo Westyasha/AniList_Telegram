@@ -175,9 +175,9 @@ query {
       manga { count chaptersRead volumesRead meanScore }
     }
     favourites {
-      anime(perPage: 5) { nodes { id title { romaji } coverImage { extraLarge large } } }
+      anime(perPage: 10) { nodes { id title { romaji english } coverImage { extraLarge large } } }
       manga(perPage: 5) { nodes { id title { romaji } coverImage { extraLarge large } } }
-      characters(perPage: 5) { nodes { id name { full } image { large } } }
+      characters(perPage: 10) { nodes { id name { full } image { large } } }
       staff(perPage: 3) { nodes { id name { full } image { large } } }
     }
   }

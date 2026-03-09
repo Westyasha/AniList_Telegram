@@ -29,8 +29,8 @@ query ($userId: Int) {
       manga { count meanScore chaptersRead }
     }
     favourites {
-      anime(perPage: 5) { nodes { id title { romaji english } coverImage { extraLarge large } } }
-      characters(perPage: 3) { nodes { id name { full } } }
+      anime(perPage: 10) { nodes { id title { romaji english } coverImage { extraLarge large } } }
+      characters(perPage: 10) { nodes { id name { full } image { large } } }
     }
   }
 }
@@ -79,7 +79,10 @@ async def _fetch_activity(uid: int, token: str, anilist_id: int) -> list:
     return result.get("data", {}).get("Page", {}).get("activities", [])
 
 
-def _build_wrapped_data(user: dict, activities: list) -> dict:
+def _build_wrapped_data(user: dict, activities: list, year: int = None) -> dict:
+    from datetime import datetime
+    if year is None:
+        year = datetime.now().year
     stats = user.get("statistics", {})
     anime = stats.get("anime", {})
     manga = stats.get("manga", {})
@@ -94,14 +97,13 @@ def _build_wrapped_data(user: dict, activities: list) -> dict:
         top_anime.append(n["title"].get("english") or n["title"].get("romaji") or "?")
         cover = (n.get("coverImage") or {}).get("extraLarge") or (n.get("coverImage") or {}).get("large")
         top_covers.append(cover or "")
-    from datetime import datetime
     monthly = [0] * 12
     list_activity = 0
     for act in activities:
         ts = act.get("createdAt", 0)
         if ts:
             dt = datetime.fromtimestamp(ts)
-            if dt.year == 2025:
+            if dt.year == year:
                 monthly[dt.month - 1] += 1
             list_activity += 1
     return {
@@ -121,6 +123,7 @@ def _build_wrapped_data(user: dict, activities: list) -> dict:
         "top_covers": top_covers,
         "monthly_activity": monthly,
         "list_activity": list_activity,
+        "year": year,
     }
 
 
@@ -141,18 +144,25 @@ def _build_card_data(user: dict) -> dict:
         "mean_score": anime.get("meanScore", 0),
         "fav_anime": (fa[0]["title"].get("english") or fa[0]["title"].get("romaji") or "") if fa else "",
         "fav_char": (fc[0]["name"].get("full") or "") if fc else "",
+        "fav_anime_covers": [(n.get("coverImage") or {}).get("large") or "" for n in fa],
+        "fav_anime_names": [(n["title"].get("english") or n["title"].get("romaji") or "") for n in fa],
+        "fav_char_images": [(n.get("image") or {}).get("large") or "" for n in fc],
+        "fav_char_names": [(n["name"].get("full") or "") for n in fc],
     }
 
 
 # ─── WRAPPED ──────────────────────────────────────────────────────────────────
 
-async def _send_wrapped(target, uid: int):
+async def _send_wrapped(target, uid: int, year: int = None):
+    from datetime import datetime
     token = get_token(uid)
     anilist_id = get_anilist_id(uid)
     if not token or not anilist_id:
         dest = target.message if isinstance(target, CallbackQuery) else target
         await dest.answer(t(uid, "mylist_need_auth"), parse_mode="MarkdownV2")
         return
+    if year is None:
+        year = datetime.now().year
     dest = target.message if isinstance(target, CallbackQuery) else target
     wait = await dest.answer(t(uid, "generating"))
     user = await _fetch_stats(uid)
@@ -160,25 +170,49 @@ async def _send_wrapped(target, uid: int):
     if not user:
         await wait.edit_text(t(uid, "gen_error"))
         return
-    data = _build_wrapped_data(user, activities)
+    data = _build_wrapped_data(user, activities, year=year)
     buf = await generate_wrapped(data)
     await wait.delete()
     await dest.answer_photo(
         photo=BufferedInputFile(buf.read(), filename="wrapped.png"),
-        caption=f"🎉 *{esc(data['username'])}* — AniList Wrapped 2025",
+        caption=f"🎉 *{esc(data['username'])}* — AniList Wrapped {year}",
         parse_mode="MarkdownV2"
     )
 
 
+def _wrapped_year_kb(uid: int) -> object:
+    from datetime import datetime
+    from aiogram.utils.keyboard import InlineKeyboardBuilder
+    current_year = datetime.now().year
+    b = InlineKeyboardBuilder()
+    for y in range(current_year, current_year - 5, -1):
+        b.add(btn(str(y), f"wrapped_year:{y}"))
+    b.adjust(3)
+    return b.as_markup()
+
+
 @router.callback_query(F.data == "wrapped")
 async def wrapped_cb(cb: CallbackQuery):
+    uid = cb.from_user.id
+    lang = get_lang(uid)
+    text = t(uid, "wrapped_year_select")
+    await cb.message.answer(text, parse_mode="MarkdownV2", reply_markup=_wrapped_year_kb(uid))
     await cb.answer()
-    await _send_wrapped(cb, cb.from_user.id)
+
+
+@router.callback_query(F.data.startswith("wrapped_year:"))
+async def wrapped_year_cb(cb: CallbackQuery):
+    uid = cb.from_user.id
+    year = int(cb.data.split(":")[1])
+    await cb.answer()
+    await _send_wrapped(cb, uid, year=year)
 
 
 @router.message(F.text.in_({"📊 Wrapped", "📊 Статистика", "/wrapped"}))
 async def wrapped_msg(msg: Message):
-    await _send_wrapped(msg, msg.from_user.id)
+    uid = msg.from_user.id
+    text = t(uid, "wrapped_year_select")
+    await msg.answer(text, parse_mode="MarkdownV2", reply_markup=_wrapped_year_kb(uid))
 
 
 # ─── PROFILE CARD ─────────────────────────────────────────────────────────────

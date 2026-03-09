@@ -39,7 +39,8 @@ async def show_profile(target, uid: int):
         await _dest(target).answer(t(uid, "profile_error"), parse_mode="MarkdownV2")
         return
     set_anilist_id(uid, viewer["id"])
-    caption = profile_card(viewer)
+    from storage import get_lang
+    caption = profile_card(viewer, lang=get_lang(uid))
     banner = viewer.get("bannerImage")
     avatar = (viewer.get("avatar") or {}).get("large")
     dest = _dest(target)
