@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 800px;
+    height: 300px;
+    font-family: 'Inter', 'DejaVu Sans', Arial, sans-serif;
+    background: #0d1117;
+    color: #fff;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .banner-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('{{ banner_url }}');
+    background-size: cover;
+    background-position: center top;
+    filter: blur(2px) brightness(0.3) saturate(1.3);
+    z-index: 0;
+  }
+  .banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(13,17,23,0.97) 35%, rgba(13,17,23,0.6) 100%);
+    z-index: 1;
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 32px;
+    gap: 28px;
+  }
+
+  .avatar-wrap { position: relative; flex-shrink: 0; }
+  .avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 3px solid #63b3ed;
+    object-fit: cover;
+    display: block;
+    background: #1a2035;
+  }
+  .avatar-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid rgba(99,179,237,0.25);
+  }
+
+  .info { flex: 1; }
+  .username { font-size: 28px; font-weight: 800; line-height: 1; }
+  .tagline { font-size: 12px; color: #63b3ed; margin-top: 6px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+
+  .favs { margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
+  .fav-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #a0aec0; }
+  .fav-row span { color: #fff; font-weight: 500; }
+
+  .stats-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 10px 20px;
+    text-align: center;
+    min-width: 90px;
+  }
+  .stat-pill-value { font-size: 22px; font-weight: 800; color: var(--c); line-height: 1; }
+  .stat-pill-label { font-size: 10px; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+
+  .footer-tag {
+    position: absolute;
+    bottom: 12px;
+    right: 18px;
+    font-size: 10px;
+    color: #2d3748;
+    font-weight: 500;
+    z-index: 3;
+  }
+</style>
+</head>
+<body>
+  {% if banner_url %}<div class="banner-bg"></div>{% endif %}
+  <div class="banner-overlay"></div>
+
+  <div class="content">
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      {% if avatar_url %}
+      <img class="avatar" src="{{ avatar_url }}" onerror="this.style.background='#1a2035'">
+      {% else %}
+      <div class="avatar"></div>
+      {% endif %}
+    </div>
+
+    <div class="info">
+      <div class="username">{{ username }}</div>
+      <div class="tagline">AniList Profile</div>
+      <div class="favs">
+        {% if fav_anime %}
+        <div class="fav-row">❤️ <span>{{ fav_anime }}</span></div>
+        {% endif %}
+        {% if fav_char %}
+        <div class="fav-row">⭐ <span>{{ fav_char }}</span></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="stats-col">
+      <div class="stat-pill" style="--c: #63b3ed">
+        <div class="stat-pill-value">{{ anime_count }}</div>
+        <div class="stat-pill-label">Anime</div>
+      </div>
+      <div class="stat-pill" style="--c: #9f7aea">
+        <div class="stat-pill-value">{{ manga_count }}</div>
+        <div class="stat-pill-label">Manga</div>
+      </div>
+    </div>
+    <div class="stats-col">
+      <div class="stat-pill" style="--c: #f6c636">
+        <div class="stat-pill-value">{{ mean_score }}</div>
+        <div class="stat-pill-label">Score</div>
+      </div>
+      <div class="stat-pill" style="--c: #48bb78">
+        <div class="stat-pill-value">{{ days_watched }}</div>
+        <div class="stat-pill-label">Days</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-tag">@westyasha_AniList_bot</div>
+</body>
+</html>
