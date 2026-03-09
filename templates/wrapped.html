@@ -104,7 +104,19 @@
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
     background: var(--c);
   }
-  .stat-icon { font-size: 34px; margin-bottom: 12px; color: var(--c); text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+  
+  /* Стили для новых SVG иконок */
+  .stat-icon { 
+    width: 36px; height: 36px; 
+    margin: 0 auto 12px; 
+    color: var(--c); 
+  }
+  .stat-icon svg { 
+    width: 100%; height: 100%; 
+    stroke: currentColor; stroke-width: 2.2; 
+    stroke-linecap: round; stroke-linejoin: round; fill: none; 
+  }
+
   .stat-val { font-size: 48px; font-weight: 900; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.3); line-height: 1; }
   .stat-lbl { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
@@ -190,12 +202,55 @@
     <div class="glass-card">
       <div class="section-label">Year Overview</div>
       <div class="stats-grid">
-        <div class="stat-item" style="--c: #63b3ed"><div class="stat-icon">📺</div><div class="stat-val">{{ anime_count }}</div><div class="stat-lbl">Anime</div></div>
-        <div class="stat-item" style="--c: #48bb78"><div class="stat-icon">⏱</div><div class="stat-val">{{ days_watched }}</div><div class="stat-lbl">Days</div></div>
-        <div class="stat-item" style="--c: #f6c636"><div class="stat-icon">⭐</div><div class="stat-val">{{ mean_score }}</div><div class="stat-lbl">Score</div></div>
-        <div class="stat-item" style="--c: #9f7aea"><div class="stat-icon">📖</div><div class="stat-val">{{ manga_count }}</div><div class="stat-lbl">Manga</div></div>
-        <div class="stat-item" style="--c: #fc8181"><div class="stat-icon">🎬</div><div class="stat-val">{{ episodes_watched }}</div><div class="stat-lbl">Episodes</div></div>
-        <div class="stat-item" style="--c: #f6ad55"><div class="stat-icon">📚</div><div class="stat-val">{{ chapters_read }}</div><div class="stat-lbl">Chapters</div></div>
+        
+        <div class="stat-item" style="--c: #63b3ed">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+          </div>
+          <div class="stat-val">{{ anime_count }}</div>
+          <div class="stat-lbl">Anime</div>
+        </div>
+        
+        <div class="stat-item" style="--c: #48bb78">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>
+          </div>
+          <div class="stat-val">{{ days_watched }}</div>
+          <div class="stat-lbl">Days</div>
+        </div>
+        
+        <div class="stat-item" style="--c: #f6c636">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="stat-val">{{ mean_score }}</div>
+          <div class="stat-lbl">Score</div>
+        </div>
+        
+        <div class="stat-item" style="--c: #9f7aea">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <div class="stat-val">{{ manga_count }}</div>
+          <div class="stat-lbl">Manga</div>
+        </div>
+        
+        <div class="stat-item" style="--c: #fc8181">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+          </div>
+          <div class="stat-val">{{ episodes_watched }}</div>
+          <div class="stat-lbl">Episodes</div>
+        </div>
+        
+        <div class="stat-item" style="--c: #f6ad55">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+          </div>
+          <div class="stat-val">{{ chapters_read }}</div>
+          <div class="stat-lbl">Chapters</div>
+        </div>
+
       </div>
     </div>
 
