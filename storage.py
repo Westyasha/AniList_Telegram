@@ -14,7 +14,8 @@ def init_db():
                 anilist_id  INTEGER,
                 lang        TEXT NOT NULL DEFAULT 'ru',
                 created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+                updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+                notifications  INTEGER DEFAULT 1
             )
         """)
         conn.execute("""
@@ -110,3 +111,28 @@ def set_lang(user_id: int, lang: str):
             "UPDATE users SET lang = ? WHERE user_id = ?",
             (lang, user_id)
         )
+
+
+def get_notifications_enabled(user_id: int) -> bool:
+    with _conn() as conn:
+        row = conn.execute(
+            "SELECT notifications FROM users WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        return bool(row["notifications"]) if row and row["notifications"] is not None else True
+
+
+def set_notifications_enabled(user_id: int, enabled: bool):
+    with _conn() as conn:
+        _ensure_user(conn, user_id)
+        conn.execute(
+            "UPDATE users SET notifications = ? WHERE user_id = ?",
+            (int(enabled), user_id)
+        )
+
+
+def get_notifications_users() -> list:
+    with _conn() as conn:
+        rows = conn.execute(
+            "SELECT user_id FROM users WHERE token IS NOT NULL AND (notifications IS NULL OR notifications = 1)"
+        ).fetchall()
+        return [row["user_id"] for row in rows]

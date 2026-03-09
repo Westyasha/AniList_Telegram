@@ -106,7 +106,7 @@ async def do_search(target, q: str, mtype: str, page: int, uid: int):
             await send_text(t(uid, "search_empty", q=q), parse_mode="MarkdownV2")
             return
 
-        covers = [item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("large")]
+        covers = [item.get("coverImage", {}).get("extraLarge") or item.get("coverImage", {}).get("large") for item in items if item.get("coverImage", {}).get("extraLarge") or item.get("coverImage", {}).get("large")]
         await send_media(covers)
 
         text = t(uid, "search_results", q=q, page=page, total=pinfo.get("lastPage", 1))
