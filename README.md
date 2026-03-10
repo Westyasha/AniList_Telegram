@@ -7,7 +7,7 @@
 **A Telegram bot for tracking anime & manga via your AniList account.**  
 Profile cards · Episode notifications · Inline search · Full list management
 
-[**Try the bot**](https://t.me/westyasha_AniList_bot) x [Report a Bug](../../issues)
+[**Try the bot**](https://t.me/westyasha_AniList_bot)
 
 </div>
 
