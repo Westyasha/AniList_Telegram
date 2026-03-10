@@ -139,8 +139,8 @@ Use `@westyasha_AniList_bot` in any chat:
 **1. Clone & install**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
-cd YOUR_REPO
+git clone https://github.com/Westyasha/AniList_Telegram.git
+cd AniList_Telegram
 
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
