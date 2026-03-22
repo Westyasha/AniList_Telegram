@@ -14,11 +14,11 @@ CHECK_INTERVAL = 3600
 _sent_notifications: set[tuple[int, int, int, str]] = set()
 
 Q_AIRING_SOON = """
-query ($page: Int, $windowEnd: Int) {
+query ($page: Int, $windowStart: Int, $windowEnd: Int) {
   Page(page: $page, perPage: 50) {
     pageInfo { hasNextPage }
     airingSchedules(
-      airingAt_greater: 0
+      airingAt_greater: $windowStart
       airingAt_lesser: $windowEnd
       sort: TIME
     ) {
@@ -53,12 +53,12 @@ query ($userId: Int) {
 """
 
 Q_RELATED_ADDITIONS = """
-query ($page: Int, $windowEnd: Int) {
+query ($page: Int, $windowStart: Int, $windowEnd: Int) {
   Page(page: $page, perPage: 50) {
     pageInfo { hasNextPage }
     media(
       type: ANIME
-      startDate_greater: 0
+      startDate_greater: $windowStart
       startDate_lesser: $windowEnd
       sort: START_DATE_DESC
     ) {
@@ -158,20 +158,42 @@ async def _send_related_notification(bot: Bot, user_id: int, media: dict, rel_ty
         logger.warning(f"Failed related notify user {user_id}: {e}")
 
 
+async def _fetch_all_pages(query: str, variables: dict) -> list[dict]:
+    results = []
+    page = 1
+    while True:
+        try:
+            variables["page"] = page
+            data = await anilist_query(query, variables)
+            page_data = data.get("data", {}).get("Page", {})
+            items = page_data.get("airingSchedules") or page_data.get("media") or []
+            results.extend(items)
+            if not page_data.get("pageInfo", {}).get("hasNextPage"):
+                break
+            page += 1
+        except Exception as e:
+            logger.error(f"Pagination error at page {page}: {e}")
+            break
+    return results
+
+
 async def check_and_notify(bot: Bot):
     global _sent_notifications
 
     now_ts = int(datetime.now(timezone.utc).timestamp())
+    window_start = now_ts - CHECK_INTERVAL
     window_end = now_ts + CHECK_INTERVAL
 
     _sent_notifications = {
         key for key in _sent_notifications
-        if isinstance(key[2], int) and key[2] > now_ts - CHECK_INTERVAL * 2
+        if isinstance(key[2], int) and key[2] > window_start
     }
 
     try:
-        result = await anilist_query(Q_AIRING_SOON, {"page": 1, "windowEnd": window_end})
-        schedules = result.get("data", {}).get("Page", {}).get("airingSchedules", [])
+        schedules = await _fetch_all_pages(
+            Q_AIRING_SOON,
+            {"windowStart": window_start, "windowEnd": window_end}
+        )
     except Exception as e:
         logger.error(f"Notifier airing API error: {e}")
         return
@@ -208,7 +230,8 @@ async def check_and_notify(bot: Bot):
             if media_id not in want_airing:
                 continue
             episode = schedule["episode"]
-            dedup = (user_id, media_id, episode, "airing")
+            airing_at = schedule["airingAt"]
+            dedup = (user_id, media_id, airing_at, "airing")
             if dedup in _sent_notifications:
                 continue
             await _send_airing_notification(bot, user_id, schedule["media"], episode)
@@ -220,24 +243,34 @@ async def check_and_notify(bot: Bot):
             for s in by_status.values():
                 all_user_ids |= s
 
-            for schedule in schedules:
-                media = schedule["media"]
+            try:
+                new_media_list = await _fetch_all_pages(
+                    Q_RELATED_ADDITIONS,
+                    {"windowStart": window_start, "windowEnd": window_end}
+                )
+            except Exception as e:
+                logger.error(f"Related additions API error for user {user_id}: {e}")
+                new_media_list = []
+
+            for media in new_media_list:
+                child_id = media.get("id")
+                if child_id in all_user_ids:
+                    continue
                 for edge in (media.get("relations") or {}).get("edges", []):
                     rel_node = edge.get("node", {})
                     rel_type = edge.get("relationType", "")
                     parent_id = rel_node.get("id")
-                    child_id = media.get("id")
                     if (
                         rel_type in ("SEQUEL", "PREQUEL", "SIDE_STORY", "SPIN_OFF", "ALTERNATIVE")
                         and parent_id in all_user_ids
-                        and child_id not in all_user_ids
                     ):
-                        dedup = (user_id, child_id, schedule["episode"], "related")
+                        dedup = (user_id, child_id, 0, "related")
                         if dedup in _sent_notifications:
                             continue
                         await _send_related_notification(bot, user_id, media, rel_type)
                         _sent_notifications.add(dedup)
                         await asyncio.sleep(0.05)
+                        break
 
         await asyncio.sleep(0.1)
 
