@@ -100,5 +100,5 @@ const search = data.search.media.map((m) => ({
   score: m.averageScore,
 }));
 
-await writeFile(new URL("../src/data/anilist.json", import.meta.url), `${JSON.stringify({ featured, search, covers, aired }, null, 2)}\n`);
+await writeFile(new URL("../src/snapshot/anilist.json", import.meta.url), `${JSON.stringify({ featured, search, covers, aired }, null, 2)}\n`);
 console.log(`covers ${covers.length}, aired ${aired.length}`);

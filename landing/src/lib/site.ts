@@ -1,4 +1,4 @@
-import snapshot from "@/data/anilist.json";
+import snapshot from "@/snapshot/anilist.json";
 
 export const BOT_URL = "https://t.me/westyasha_AniList_bot";
 export const BOT_HANDLE = "@westyasha_AniList_bot";
