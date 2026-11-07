@@ -1,0 +1,492 @@
+[lang]
+name = "English 🇬🇧"
+
+[bot]
+short_description = "AniList in Telegram: lists, episode alerts, profile cards and a full Mini App."
+description = """Unofficial AniList client for Telegram.
+
+• Search anime, manga, characters and staff
+• Manage your list: progress, scores, notes
+• Alerts for new episodes and sequels
+• Profile card and AniList Wrapped
+• A full AniList-style Mini App"""
+
+[commands]
+start = "Main menu"
+search = "Search anime"
+anime = "Search anime"
+manga = "Search manga"
+list = "My list"
+schedule = "Airing schedule"
+trending = "Trending"
+season = "Seasonal anime"
+user = "AniList user profile"
+card = "Profile card"
+wrapped = "Yearly AniList Wrapped"
+app = "Open the Mini App"
+settings = "Settings"
+help = "Help"
+
+[menu]
+search = "🔍 Search"
+list = "📋 My List"
+trending = "🔥 Trending"
+schedule = "🗓 Schedule"
+season = "🌸 Season"
+profile = "👤 Profile"
+settings = "⚙️ Settings"
+app = "📱 App"
+help = "❔ Help"
+placeholder = "Anime title or a menu button"
+
+[nav]
+back = "‹ Back"
+home = "🏠 Menu"
+
+[common]
+on = "on"
+off = "off"
+cancelled = "Cancelled."
+
+[start]
+keyboard_ready = "The menu is at the bottom. You can also just send me an anime title."
+
+[app]
+invite = "The Mini App puts all of AniList in one window: lists, schedule, stats and a full entry editor."
+
+[home]
+open_app = "📱 Open AniList App"
+guest_title = "<b>AniList in Telegram</b>"
+guest_body = """Search anime and manga, browse trending, the current season and the airing schedule — no account needed.
+
+Connect AniList to manage your list right here, rate titles, get new-episode alerts and generate your profile card.
+
+<i>Tip: just send an anime title and I'll find it.</i>"""
+hello = "Welcome back, <b>{name}</b>!"
+stats = "📺 {anime} anime · {days} days · ★ {score} · 📚 {manga} manga"
+watching = "▶️ Watching: {n} · behind on: {behind}"
+unread = "🔔 Unread notifications: {n}"
+next_up = "<b>Up next:</b>"
+ep_in = "episode {ep} in {time}"
+inbox = "🔔 Notifications ({n})"
+inbox_short = "🔔 Notifications"
+
+[inbox]
+title = "<b>🔔 AniList notifications</b>"
+empty = "Nothing here yet."
+airing = "Episode {ep} of {title} aired"
+related = "New related media: {title}"
+changed = "Data updated: {title}"
+following = "{user} started following you"
+like = "{user} liked your activity"
+reply = "{user} replied to you"
+
+[auth]
+login_button = "🔐 Log in with AniList"
+open_anilist = "🔗 Open AniList"
+instructions = """<b>Log in with AniList</b>
+
+1. Tap the button below and sign in to AniList.
+2. Confirm the link on the bot's page.
+3. Come back to Telegram — everything connects automatically.
+
+<i>The link is valid for 15 minutes and only for your Telegram account.</i>"""
+pin_instructions = """<b>Log in with AniList</b>
+
+1. Tap the button below and authorize the app.
+2. Copy the code shown on AniList.
+3. Send it here — I'll delete the message with the code right away."""
+success = "✅ Done! You're logged in as {name}."
+failed = "❌ Login failed: the code is invalid or expired. Try again with /login."
+already = "You're already logged in as <b>{name}</b>."
+
+[search]
+menu = "<b>🔍 Search</b>\n\nWhat are we looking for? You can also skip the menu and just send a title."
+anime = "📺 Anime"
+manga = "📚 Manga"
+characters = "👥 Characters"
+staff = "🎬 Staff"
+users = "👤 Users"
+filter = "🎯 Filter"
+prompt = "✏️ Send {what} in one message."
+what_A = "an anime title"
+what_M = "a manga title"
+what_C = "a character name"
+what_P = "a staff or voice actor name"
+what_U = "an AniList username"
+results = "🔍 {what}: {q}"
+empty = "Nothing found for {q}."
+again = "🔁 New search"
+expired = "This search has expired — start a new one."
+
+[filter]
+title = "<b>🎯 Anime filter</b>"
+any = "any"
+genres = "Genres"
+year = "Year"
+format = "Format"
+score = "Score"
+sort = "Sort"
+reset = "Reset"
+go = "🔍 Show results"
+edit = "🎯 Edit filter"
+pick_genres = "Pick one or more genres:"
+pick_year = "Pick a release year:"
+pick_format = "Pick a format:"
+pick_score = "Minimum average score:"
+pick_sort = "Sort by:"
+results = "🎯 Found: {n}"
+empty = "Nothing matches these filters. Try loosening them."
+
+[sort]
+popularity_desc = "Popularity"
+score_desc = "Score"
+trending_desc = "Trending"
+start_date_desc = "Newest"
+
+[media]
+add = "➕ Add to list"
+rate = "★ Rate"
+characters = "👥 Characters"
+staff = "🎬 Staff"
+relations = "🔗 Relations"
+recs = "💡 Similar"
+open_app = "📱 Open in app"
+trailer = "▶️ Trailer"
+share = "↗ Share"
+rank = "#{n} all time"
+eps = "{n} eps"
+chs = "{n} ch"
+vols = "{n} vol"
+minutes = "{n} min"
+next = "Episode {ep} in {time}"
+next_short = "ep {ep} in {time}"
+progress = "{cur}/{total}"
+your_score = "your score {score}"
+rewatches = "rewatches: {n}"
+unit_ep = "ep"
+unit_ch = "ch"
+characters_title = "<b>👥 Characters</b>"
+staff_title = "<b>🎬 Staff</b>"
+relations_title = "<b>🔗 Related to</b> {title}"
+recs_title = "<b>💡 Similar to</b> {title}"
+empty = "Nothing here yet."
+
+[editor]
+title = "<b>📋 List:</b> {title}"
+state = "Now: {status} · progress {cur}/{total}"
+not_in_list = "This title isn't on your list yet — pick a status."
+notes = "📝 Notes"
+delete = "🗑 Remove from list"
+delete_question = "Remove {title} from your list? Progress and score will be lost."
+delete_confirm = "🗑 Yes, remove"
+notes_prompt = "📝 Send a note for {title} in one message."
+notes_clear = "🧹 Clear note"
+
+[score]
+title = "<b>★ Score:</b> {title}"
+format = "<i>Score format: {fmt}</i>"
+clear = "✖️ Clear score"
+
+[score_format]
+point_100 = "100 point"
+point_10_decimal = "10 point decimal"
+point_10 = "10 point"
+point_5 = "5 stars"
+point_3 = "3 smileys"
+
+[status]
+current = "Watching"
+current_manga = "Reading"
+planning = "Planning"
+completed = "Completed"
+repeating = "Rewatching"
+repeating_manga = "Rereading"
+paused = "Paused"
+dropped = "Dropped"
+
+[release]
+finished = "Finished"
+releasing = "Releasing"
+not_yet_released = "Not yet released"
+cancelled = "Cancelled"
+hiatus = "Hiatus"
+
+[format]
+tv = "TV"
+tv_short = "TV Short"
+movie = "Movie"
+special = "Special"
+ova = "OVA"
+ona = "ONA"
+music = "Music"
+manga = "Manga"
+novel = "Light Novel"
+one_shot = "One Shot"
+
+[source]
+original = "Original"
+manga = "Manga"
+light_novel = "Light novel"
+visual_novel = "Visual novel"
+video_game = "Video game"
+novel = "Novel"
+web_novel = "Web novel"
+other = "Other"
+
+[season]
+winter = "Winter"
+spring = "Spring"
+summer = "Summer"
+fall = "Fall"
+
+[relation]
+prequel = "Prequel"
+sequel = "Sequel"
+parent = "Parent"
+side_story = "Side story"
+spin_off = "Spin-off"
+alternative = "Alternative"
+adaptation = "Adaptation"
+source = "Source"
+summary = "Summary"
+compilation = "Compilation"
+contains = "Contains"
+character = "Shared characters"
+other = "Other"
+
+[role]
+main = "main"
+supporting = "supporting"
+background = "background"
+
+[people]
+age = "age {age}"
+voiced_by = "🎙 Voiced by: {names}"
+voices = "🎙 Roles: {names}"
+appears_in = "Appears in"
+works = "Works"
+
+[library]
+title_anime = "<b>📋 My list — anime</b>"
+title_manga = "<b>📚 My list — manga</b>"
+behind = "⏳ You're behind on {n} airing shows"
+switch_manga = "📚 Manga"
+switch_anime = "📺 Anime"
+open_app = "📱 List in the app"
+count = "{n} titles"
+empty = "Nothing here yet."
+
+[browse]
+trending_anime = "<b>🔥 Trending — anime</b>"
+trending_manga = "<b>🔥 Trending — manga</b>"
+to_manga = "📚 Manga"
+to_anime = "📺 Anime"
+season = "<b>Season:</b> {season}"
+empty = "Nothing here yet."
+schedule_day = "<b>🗓 Schedule:</b> {day}"
+schedule_empty = "No episodes air on this day."
+schedule_mine = "📋 Only my list"
+schedule_all = "🌐 All titles"
+timezone = "Times in {tz}"
+ep = "ep {ep}"
+
+[weekday]
+0 = "Monday"
+1 = "Tuesday"
+2 = "Wednesday"
+3 = "Thursday"
+4 = "Friday"
+5 = "Saturday"
+6 = "Sunday"
+
+[weekday_short]
+0 = "Mon"
+1 = "Tue"
+2 = "Wed"
+3 = "Thu"
+4 = "Fri"
+5 = "Sat"
+6 = "Sun"
+
+[time]
+dh = "{d}d {h}h"
+hm = "{h}h {m}m"
+m = "{m}m"
+
+[profile]
+anime = "📺 Anime"
+manga = "📚 Manga"
+anime_stats = "{count} titles · {eps} episodes · {days}d {hours}h · ★ {score}"
+manga_stats = "{count} titles · {chapters} chapters · {volumes} volumes · ★ {score}"
+top_genres = "Top genres"
+fav_anime = "Favourite anime"
+fav_manga = "Favourite manga"
+fav_chars = "Favourite characters"
+fav_staff = "Favourite staff"
+fav_title = "<b>❤️ Favourites of</b> {name}"
+no_favourites = "No favourites yet."
+since = "On AniList since {date}"
+card = "🪪 Card"
+stats = "📊 Stats"
+favourites = "❤️ Favourites"
+wrapped = "🎁 Wrapped"
+list = "📋 List"
+follow = "➕ Follow"
+unfollow = "✓ Following"
+open_app = "📱 Open in app"
+not_found = "User {name} was not found on AniList."
+stats_title = "<b>📊 Stats of</b> {name}"
+by_status = "By status"
+by_score = "Score distribution"
+by_format = "Formats"
+by_year = "Release years"
+studios = "Studios"
+voice_actors = "Voice actors"
+
+[card]
+caption = "📺 {anime} anime · ⏱ {days} days · ★ {score}"
+generating = "🎨 Drawing your card…"
+open_profile = "👤 Profile"
+share = "↗ Share"
+
+[wrapped]
+pick = "<b>🎁 AniList Wrapped</b> — {name}\n\nPick a year:"
+caption = "🎁 <b>AniList Wrapped {year}</b> — {name}\n{episodes} episodes · {hours} hours"
+empty = "No AniList activity in {year}."
+
+[settings]
+title = "<b>⚙️ Settings</b>"
+language = "🌐 Language: {lang}"
+account = "👤 Account: {name}"
+score_format = "★ Score format: {fmt}"
+notifications = "🔔 Notifications: {state}"
+guest = "No AniList account connected."
+lang_button = "🌐 Language"
+keyboard_button = "⌨️ Keyboard"
+notifications_button = "🔔 Notifications"
+cache_button = "🧹 Clear cache"
+logout_button = "🚪 Log out"
+logout_question = "Unlink {name}? Your list on AniList stays untouched."
+logout_confirm = "🚪 Yes, log out"
+pick_language = "🌐 Pick a language:"
+language_changed = "✅ Language switched to English."
+keyboard_title = "<b>⌨️ Menu buttons</b>\nChoose what the bottom keyboard shows:"
+keyboard_reset = "↺ Default"
+keyboard_saved = "⌨️ Keyboard updated."
+
+[notify]
+title = "<b>🔔 Notifications</b>"
+preview = """Example:
+<blockquote>🔔 <b>New episode!</b>
+<b>Frieren: Beyond Journey's End</b>
+Episode <b>12</b> of 28 is out</blockquote>"""
+hint = "I check the schedule every 5 minutes and only message you about episodes that actually aired."
+master = "Notifications"
+airing_watching = "New episodes: watching"
+airing_planning = "New episodes: planning"
+airing_paused = "New episodes: paused"
+airing_dropped = "New episodes: dropped"
+related = "Sequels and spin-offs"
+anilist_activity = "AniList follows, likes and replies"
+airing_head = "🔔 <b>New episode!</b>"
+airing_body = "Episode {ep} of {total} is out"
+behind = "⏳ {n} more unwatched"
+mark = "✓ Mark episode {ep}"
+open = "📋 Open"
+related_head = "📢 <b>New {relation}</b>"
+social_head = "💬 <b>AniList activity</b>"
+
+[toast]
+progress = "Progress: {cur}/{total}"
+completed = "🎉 Completed!"
+status = "Status: {status}"
+score = "Score: {score}"
+score_cleared = "Score cleared"
+deleted = "Removed from list"
+favourite = "Favourites updated"
+followed = "Following"
+unfollowed = "Unfollowed"
+language = "Language changed"
+cache_cleared = "Card and request cache cleared."
+logged_out = "Account unlinked"
+notes_saved = "Note saved"
+
+[inline]
+open_bot = "🤖 Open in bot"
+login = "🔐 Log in with AniList"
+progress = "Progress: {cur}/{total}"
+watching_head = "👀 {name} is watching:"
+card_title = "{name}'s card"
+card_cached = "Preparing your card…"
+hint_search_title = "🔍 Search anime"
+hint_search_desc = "Type a title after the bot name. Prefix with “m” for manga."
+hint_search_message = "Type <code>@{bot} title</code> to share an anime in any chat."
+hint_watching_title = "👀 What I'm watching"
+hint_watching_desc = "Type: watching"
+hint_watching_message = "Type <code>@{bot} watching</code> to share what you're watching now."
+hint_card_title = "🪪 Profile card"
+hint_card_desc = "Type: card or card username"
+hint_card_message = "Type <code>@{bot} card</code> to send your profile card."
+
+[help]
+main = """<b>❔ Help</b>
+
+An unofficial AniList client: everything the site does, right inside Telegram.
+
+• Send a title — I'll find the anime
+• /login — connect AniList
+• /app — open the Mini App
+• Bottom menu — quick sections"""
+search_button = "🔍 Search"
+list_button = "📋 List"
+notify_button = "🔔 Notifications"
+inline_button = "💬 Inline mode"
+app_button = "📱 Mini App"
+search = """<b>🔍 Search</b>
+
+• Just send a title to the chat
+• /anime, /manga, /character, /staff + query
+• /user name — any AniList profile
+• 🎯 Filter: genres, year, format, score and sort"""
+list = """<b>📋 List</b>
+
+Open a title to manage it: status, +1 episode, score in your AniList format, notes, removal.
+Changes sync with AniList instantly."""
+notify = """<b>🔔 Notifications</b>
+
+I message you when an episode of a title on your list airs (pick which statuses), when a sequel comes out, and I relay AniList follows, likes and replies.
+Configure in ⚙️ Settings → 🔔 Notifications."""
+inline = """<b>💬 Inline mode</b>
+
+In any chat:
+• <code>@{bot} title</code> — anime card
+• <code>@{bot} m title</code> — manga
+• <code>@{bot} watching</code> — what you're watching
+• <code>@{bot} card</code> — profile card"""
+app = """<b>📱 Mini App</b>
+
+A full AniList inside Telegram: home with trending, search with filters, weekly schedule, a library with an entry editor, profile stats and notifications.
+Tap “AniList” next to the input field or use /app."""
+
+[errors]
+not_found = "Not found."
+auth_required = "Connect your AniList account first."
+rate_limited = "AniList asks us to slow down — try again in a minute."
+anilist = "AniList isn't responding right now. Try again shortly."
+unknown = "Something went wrong. We're on it."
+
+[web]
+confirm_title = "Connect this account?"
+confirm_text = "Make sure you're linking your own AniList account to your own Telegram."
+confirm_button = "Connect"
+cancel_button = "Cancel"
+confirm_warning = "If the Telegram account on the right isn't yours, press Cancel — someone may have sent you their link."
+done_title = "All set, {name}!"
+done_text = "Your account is connected. Head back to Telegram — the bot has already messaged you."
+fail_title = "That didn't work"
+fail_expired = "This link has expired or was already used. Get a new one in the bot: /login."
+fail_exchange = "AniList didn't confirm the login. Please try again."
+fail_rate = "Too many attempts. Wait a minute."
+fail_cancelled = "Linking cancelled."
+back_to_telegram = "Back to Telegram"

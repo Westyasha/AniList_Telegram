@@ -1,0 +1,492 @@
+[lang]
+name = "Русский 🇷🇺"
+
+[bot]
+short_description = "AniList в Telegram: списки, уведомления о сериях, карточки профиля и Mini App."
+description = """Неофициальный клиент AniList в Telegram.
+
+• Поиск аниме, манги, персонажей и стаффа
+• Управление списком: прогресс, оценки, заметки
+• Уведомления о новых сериях и продолжениях
+• Карточка профиля и AniList Wrapped
+• Полноценное Mini App в стиле AniList"""
+
+[commands]
+start = "Главное меню"
+search = "Поиск аниме"
+anime = "Поиск аниме"
+manga = "Поиск манги"
+list = "Мой список"
+schedule = "Расписание выхода серий"
+trending = "Тренды"
+season = "Аниме сезона"
+user = "Профиль пользователя AniList"
+card = "Карточка профиля"
+wrapped = "AniList Wrapped за год"
+app = "Открыть Mini App"
+settings = "Настройки"
+help = "Справка"
+
+[menu]
+search = "🔍 Поиск"
+list = "📋 Мой список"
+trending = "🔥 Тренды"
+schedule = "🗓 Расписание"
+season = "🌸 Сезон"
+profile = "👤 Профиль"
+settings = "⚙️ Настройки"
+app = "📱 Приложение"
+help = "❔ Справка"
+placeholder = "Название аниме или кнопка меню"
+
+[nav]
+back = "‹ Назад"
+home = "🏠 Меню"
+
+[common]
+on = "вкл"
+off = "выкл"
+cancelled = "Действие отменено."
+
+[start]
+keyboard_ready = "Меню под рукой — снизу. Можно просто прислать название аниме, и я его найду."
+
+[app]
+invite = "Mini App — весь AniList в одном окне: списки, расписание, статистика и редактор записей."
+
+[home]
+open_app = "📱 Открыть AniList App"
+guest_title = "<b>AniList в Telegram</b>"
+guest_body = """Ищи аниме и мангу, смотри тренды, сезон и расписание — без регистрации.
+
+Подключи AniList, чтобы вести список прямо отсюда, ставить оценки, получать уведомления о новых сериях и генерировать карточку профиля.
+
+<i>Совет: просто пришли название аниме — я найду.</i>"""
+hello = "С возвращением, <b>{name}</b>!"
+stats = "📺 {anime} аниме · {days} дн. · ★ {score} · 📚 {manga} манги"
+watching = "▶️ Смотрю: {n} · отстаю: {behind}"
+unread = "🔔 Новых уведомлений: {n}"
+next_up = "<b>Ближайшие серии:</b>"
+ep_in = "серия {ep} через {time}"
+inbox = "🔔 Уведомления ({n})"
+inbox_short = "🔔 Уведомления"
+
+[inbox]
+title = "<b>🔔 Уведомления AniList</b>"
+empty = "Пока пусто."
+airing = "Вышла серия {ep} — {title}"
+related = "Добавлено связанное: {title}"
+changed = "Обновлены данные: {title}"
+following = "{user} подписался на тебя"
+like = "{user} оценил твою активность"
+reply = "{user} ответил тебе"
+
+[auth]
+login_button = "🔐 Войти через AniList"
+open_anilist = "🔗 Открыть AniList"
+instructions = """<b>Вход через AniList</b>
+
+1. Нажми кнопку ниже и войди в аккаунт AniList.
+2. Подтверди привязку на странице бота.
+3. Вернись в Telegram — всё подключится само.
+
+<i>Ссылка действует 15 минут и подходит только для твоего аккаунта Telegram.</i>"""
+pin_instructions = """<b>Вход через AniList</b>
+
+1. Нажми кнопку ниже и разреши доступ приложению.
+2. Скопируй код со страницы AniList.
+3. Пришли его сюда — сообщение с кодом я сразу удалю."""
+success = "✅ Готово! Ты вошёл как {name}."
+failed = "❌ Не получилось войти: код неверный или устарел. Попробуй ещё раз через /login."
+already = "Ты уже вошёл как <b>{name}</b>."
+
+[search]
+menu = "<b>🔍 Поиск</b>\n\nЧто ищем? Можно и без меню — просто пришли название в чат."
+anime = "📺 Аниме"
+manga = "📚 Манга"
+characters = "👥 Персонажи"
+staff = "🎬 Стафф"
+users = "👤 Пользователи"
+filter = "🎯 Фильтр"
+prompt = "✏️ Пришли {what} одним сообщением."
+what_A = "название аниме"
+what_M = "название манги"
+what_C = "имя персонажа"
+what_P = "имя автора или актёра"
+what_U = "ник пользователя AniList"
+results = "🔍 {what}: {q}"
+empty = "Ничего не нашлось по запросу {q}."
+again = "🔁 Новый поиск"
+expired = "Запрос устарел — начни поиск заново."
+
+[filter]
+title = "<b>🎯 Фильтр аниме</b>"
+any = "любой"
+genres = "Жанры"
+year = "Год"
+format = "Формат"
+score = "Оценка"
+sort = "Сортировка"
+reset = "Сбросить"
+go = "🔍 Показать"
+edit = "🎯 Изменить фильтр"
+pick_genres = "Выбери один или несколько жанров:"
+pick_year = "Выбери год выхода:"
+pick_format = "Выбери формат:"
+pick_score = "Минимальная средняя оценка:"
+pick_sort = "Как сортировать:"
+results = "🎯 Найдено: {n}"
+empty = "По этим параметрам ничего нет. Попробуй ослабить фильтр."
+
+[sort]
+popularity_desc = "Популярность"
+score_desc = "Оценка"
+trending_desc = "В тренде"
+start_date_desc = "Новизна"
+
+[media]
+add = "➕ В список"
+rate = "★ Оценка"
+characters = "👥 Персонажи"
+staff = "🎬 Стафф"
+relations = "🔗 Связанные"
+recs = "💡 Похожие"
+open_app = "📱 В приложении"
+trailer = "▶️ Трейлер"
+share = "↗ Поделиться"
+rank = "#{n} за всё время"
+eps = "{n} эп."
+chs = "{n} гл."
+vols = "{n} т."
+minutes = "{n} мин"
+next = "Серия {ep} через {time}"
+next_short = "эп. {ep} через {time}"
+progress = "{cur}/{total}"
+your_score = "твоя оценка {score}"
+rewatches = "пересмотров: {n}"
+unit_ep = "серия"
+unit_ch = "глава"
+characters_title = "<b>👥 Персонажи</b>"
+staff_title = "<b>🎬 Создатели</b>"
+relations_title = "<b>🔗 Связанное с</b> {title}"
+recs_title = "<b>💡 Похожее на</b> {title}"
+empty = "Здесь пока пусто."
+
+[editor]
+title = "<b>📋 Список:</b> {title}"
+state = "Сейчас: {status} · прогресс {cur}/{total}"
+not_in_list = "Тайтла ещё нет в твоём списке — выбери статус."
+notes = "📝 Заметка"
+delete = "🗑 Удалить из списка"
+delete_question = "Удалить {title} из списка? Прогресс и оценка пропадут."
+delete_confirm = "🗑 Да, удалить"
+notes_prompt = "📝 Пришли заметку к {title} одним сообщением."
+notes_clear = "🧹 Очистить заметку"
+
+[score]
+title = "<b>★ Оценка:</b> {title}"
+format = "<i>Формат оценок: {fmt}</i>"
+clear = "✖️ Убрать оценку"
+
+[score_format]
+point_100 = "100 баллов"
+point_10_decimal = "10.0 баллов"
+point_10 = "10 баллов"
+point_5 = "5 звёзд"
+point_3 = "3 смайлика"
+
+[status]
+current = "Смотрю"
+current_manga = "Читаю"
+planning = "В планах"
+completed = "Завершено"
+repeating = "Пересматриваю"
+repeating_manga = "Перечитываю"
+paused = "На паузе"
+dropped = "Брошено"
+
+[release]
+finished = "Вышло"
+releasing = "Выходит"
+not_yet_released = "Анонс"
+cancelled = "Отменено"
+hiatus = "Перерыв"
+
+[format]
+tv = "TV"
+tv_short = "TV-короткометражка"
+movie = "Фильм"
+special = "Спешл"
+ova = "OVA"
+ona = "ONA"
+music = "Клип"
+manga = "Манга"
+novel = "Ранобэ"
+one_shot = "Ваншот"
+
+[source]
+original = "Оригинал"
+manga = "По манге"
+light_novel = "По ранобэ"
+visual_novel = "По визуальной новелле"
+video_game = "По игре"
+novel = "По роману"
+web_novel = "По веб-новелле"
+other = "Другое"
+
+[season]
+winter = "Зима"
+spring = "Весна"
+summer = "Лето"
+fall = "Осень"
+
+[relation]
+prequel = "Приквел"
+sequel = "Сиквел"
+parent = "Основа"
+side_story = "Побочная история"
+spin_off = "Спин-офф"
+alternative = "Альтернатива"
+adaptation = "Адаптация"
+source = "Первоисточник"
+summary = "Пересказ"
+compilation = "Компиляция"
+contains = "Содержит"
+character = "Общие персонажи"
+other = "Другое"
+
+[role]
+main = "главный"
+supporting = "второстепенный"
+background = "эпизодический"
+
+[people]
+age = "возраст {age}"
+voiced_by = "🎙 Озвучка: {names}"
+voices = "🎙 Роли: {names}"
+appears_in = "Появляется в"
+works = "Работы"
+
+[library]
+title_anime = "<b>📋 Мой список — аниме</b>"
+title_manga = "<b>📚 Мой список — манга</b>"
+behind = "⏳ Отстаёшь в {n} онгоингах"
+switch_manga = "📚 Манга"
+switch_anime = "📺 Аниме"
+open_app = "📱 Список в приложении"
+count = "{n} тайтлов"
+empty = "Здесь пока пусто."
+
+[browse]
+trending_anime = "<b>🔥 В тренде — аниме</b>"
+trending_manga = "<b>🔥 В тренде — манга</b>"
+to_manga = "📚 Манга"
+to_anime = "📺 Аниме"
+season = "<b>Сезон:</b> {season}"
+empty = "Пока пусто."
+schedule_day = "<b>🗓 Расписание:</b> {day}"
+schedule_empty = "В этот день серий нет."
+schedule_mine = "📋 Только мой список"
+schedule_all = "🌐 Все тайтлы"
+timezone = "Время: {tz}"
+ep = "эп. {ep}"
+
+[weekday]
+0 = "Понедельник"
+1 = "Вторник"
+2 = "Среда"
+3 = "Четверг"
+4 = "Пятница"
+5 = "Суббота"
+6 = "Воскресенье"
+
+[weekday_short]
+0 = "Пн"
+1 = "Вт"
+2 = "Ср"
+3 = "Чт"
+4 = "Пт"
+5 = "Сб"
+6 = "Вс"
+
+[time]
+dh = "{d} д {h} ч"
+hm = "{h} ч {m} мин"
+m = "{m} мин"
+
+[profile]
+anime = "📺 Аниме"
+manga = "📚 Манга"
+anime_stats = "{count} тайтлов · {eps} серий · {days} д {hours} ч · ★ {score}"
+manga_stats = "{count} тайтлов · {chapters} глав · {volumes} томов · ★ {score}"
+top_genres = "Любимые жанры"
+fav_anime = "Любимое аниме"
+fav_manga = "Любимая манга"
+fav_chars = "Любимые персонажи"
+fav_staff = "Любимые авторы"
+fav_title = "<b>❤️ Избранное</b> {name}"
+no_favourites = "Избранного пока нет."
+since = "На AniList с {date}"
+card = "🪪 Карточка"
+stats = "📊 Статистика"
+favourites = "❤️ Избранное"
+wrapped = "🎁 Wrapped"
+list = "📋 Список"
+follow = "➕ Подписаться"
+unfollow = "✓ Вы подписаны"
+open_app = "📱 В приложении"
+not_found = "Пользователь {name} не найден на AniList."
+stats_title = "<b>📊 Статистика</b> {name}"
+by_status = "По статусам"
+by_score = "Распределение оценок"
+by_format = "Форматы"
+by_year = "Годы выхода"
+studios = "Студии"
+voice_actors = "Сэйю"
+
+[card]
+caption = "📺 {anime} аниме · ⏱ {days} дн. · ★ {score}"
+generating = "🎨 Рисую карточку…"
+open_profile = "👤 Профиль"
+share = "↗ Поделиться"
+
+[wrapped]
+pick = "<b>🎁 AniList Wrapped</b> — {name}\n\nВыбери год:"
+caption = "🎁 <b>AniList Wrapped {year}</b> — {name}\n{episodes} серий · {hours} часов"
+empty = "За {year} год на AniList нет активности."
+
+[settings]
+title = "<b>⚙️ Настройки</b>"
+language = "🌐 Язык: {lang}"
+account = "👤 Аккаунт: {name}"
+score_format = "★ Формат оценок: {fmt}"
+notifications = "🔔 Уведомления: {state}"
+guest = "Аккаунт AniList не подключён."
+lang_button = "🌐 Язык"
+keyboard_button = "⌨️ Клавиатура"
+notifications_button = "🔔 Уведомления"
+cache_button = "🧹 Сбросить кэш"
+logout_button = "🚪 Выйти"
+logout_question = "Отвязать аккаунт {name}? Список на AniList останется нетронутым."
+logout_confirm = "🚪 Да, выйти"
+pick_language = "🌐 Выбери язык:"
+language_changed = "✅ Язык переключён на русский."
+keyboard_title = "<b>⌨️ Кнопки меню</b>\nОтметь, что показывать в нижней клавиатуре:"
+keyboard_reset = "↺ По умолчанию"
+keyboard_saved = "⌨️ Клавиатура обновлена."
+
+[notify]
+title = "<b>🔔 Уведомления</b>"
+preview = """Пример:
+<blockquote>🔔 <b>Новая серия!</b>
+<b>Frieren: Beyond Journey's End</b>
+Вышла серия <b>12</b> из 28</blockquote>"""
+hint = "Проверяю расписание каждые 5 минут и пишу только о реально вышедших сериях."
+master = "Уведомления"
+airing_watching = "Новые серии: смотрю"
+airing_planning = "Новые серии: в планах"
+airing_paused = "Новые серии: на паузе"
+airing_dropped = "Новые серии: брошено"
+related = "Продолжения и спин-оффы"
+anilist_activity = "Подписки, лайки и ответы AniList"
+airing_head = "🔔 <b>Новая серия!</b>"
+airing_body = "Вышла серия {ep} из {total}"
+behind = "⏳ Не просмотрено ещё {n}"
+mark = "✓ Отметить серию {ep}"
+open = "📋 Открыть"
+related_head = "📢 <b>Вышло связанное: {relation}</b>"
+social_head = "💬 <b>Активность на AniList</b>"
+
+[toast]
+progress = "Прогресс: {cur}/{total}"
+completed = "🎉 Тайтл завершён!"
+status = "Статус: {status}"
+score = "Оценка: {score}"
+score_cleared = "Оценка убрана"
+deleted = "Удалено из списка"
+favourite = "Избранное обновлено"
+followed = "Вы подписались"
+unfollowed = "Вы отписались"
+language = "Язык изменён"
+cache_cleared = "Кэш карточек и запросов очищен."
+logged_out = "Аккаунт отвязан"
+notes_saved = "Заметка сохранена"
+
+[inline]
+open_bot = "🤖 Открыть в боте"
+login = "🔐 Войти через AniList"
+progress = "Прогресс: {cur}/{total}"
+watching_head = "👀 {name} сейчас смотрит:"
+card_title = "Карточка {name}"
+card_cached = "Готовлю карточку для отправки…"
+hint_search_title = "🔍 Поиск аниме"
+hint_search_desc = "Напиши название после имени бота. Для манги — «m название»."
+hint_search_message = "Пиши <code>@{bot} название</code>, чтобы поделиться аниме в любом чате."
+hint_watching_title = "👀 Что я смотрю"
+hint_watching_desc = "Напиши: watching"
+hint_watching_message = "Пиши <code>@{bot} watching</code>, чтобы показать, что смотришь сейчас."
+hint_card_title = "🪪 Карточка профиля"
+hint_card_desc = "Напиши: card или card ник"
+hint_card_message = "Пиши <code>@{bot} card</code>, чтобы отправить карточку профиля."
+
+[help]
+main = """<b>❔ Справка</b>
+
+Это неофициальный клиент AniList: всё, что есть на сайте, — прямо в Telegram.
+
+• Пришли название — найду аниме
+• /login — подключить AniList
+• /app — открыть Mini App
+• Меню снизу — быстрые разделы"""
+search_button = "🔍 Поиск"
+list_button = "📋 Список"
+notify_button = "🔔 Уведомления"
+inline_button = "💬 Inline-режим"
+app_button = "📱 Mini App"
+search = """<b>🔍 Поиск</b>
+
+• Просто напиши название в чат
+• /anime, /manga, /character, /staff + запрос
+• /user ник — профиль любого пользователя
+• 🎯 Фильтр: жанры, год, формат, оценка и сортировка"""
+list = """<b>📋 Список</b>
+
+Открой тайтл и управляй им: статус, +1 серия, оценка в твоём формате AniList, заметки, удаление.
+Список синхронизируется с AniList мгновенно."""
+notify = """<b>🔔 Уведомления</b>
+
+Пишу, когда выходит серия тайтла из твоего списка (по статусам на выбор), когда выходит продолжение, а также пересылаю подписки, лайки и ответы с AniList.
+Настрой в ⚙️ Настройки → 🔔 Уведомления."""
+inline = """<b>💬 Inline-режим</b>
+
+В любом чате:
+• <code>@{bot} название</code> — карточка аниме
+• <code>@{bot} m название</code> — манга
+• <code>@{bot} watching</code> — что смотришь
+• <code>@{bot} card</code> — карточка профиля"""
+app = """<b>📱 Mini App</b>
+
+Полноценный AniList внутри Telegram: главная с трендами, поиск с фильтрами, расписание недели, библиотека с редактором записей, статистика профиля и уведомления.
+Кнопка «AniList» слева от поля ввода или /app."""
+
+[errors]
+not_found = "Не найдено."
+auth_required = "Нужно подключить AniList."
+rate_limited = "AniList просит подождать минутку — слишком много запросов."
+anilist = "AniList сейчас не отвечает. Попробуй чуть позже."
+unknown = "Что-то пошло не так. Уже чиним."
+
+[web]
+confirm_title = "Подключить аккаунт?"
+confirm_text = "Проверь, что привязываешь свой аккаунт AniList к своему Telegram."
+confirm_button = "Подключить"
+cancel_button = "Отмена"
+confirm_warning = "Если Telegram-аккаунт справа не твой — нажми «Отмена». Кто-то мог прислать тебе чужую ссылку."
+done_title = "Готово, {name}!"
+done_text = "Аккаунт подключён. Возвращайся в Telegram — бот уже прислал сообщение."
+fail_title = "Не получилось"
+fail_expired = "Ссылка устарела или уже использована. Запроси новую в боте: /login."
+fail_exchange = "AniList не подтвердил вход. Попробуй ещё раз."
+fail_rate = "Слишком много попыток. Подожди минуту."
+fail_cancelled = "Привязка отменена."
+back_to_telegram = "Вернуться в Telegram"
