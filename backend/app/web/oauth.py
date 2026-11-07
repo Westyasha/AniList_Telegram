@@ -1,14 +1,12 @@
+import json
 import logging
 import secrets
-import time
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
+from dataclasses import asdict
+from urllib.parse import urlencode
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramAPIError
 from aiohttp import web
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from app.anilist.client import AniListError
 from app.anilist.oauth import authorize_url, exchange_code
@@ -19,54 +17,23 @@ from app.bot.ui import b
 from app.container import Container
 from app.i18n import i18n
 from app.services.auth import Viewer, fetch_viewer, link_account
-from app.web.api import APP_KEY, client_ip
+from app.web.api import APP_KEY, client_ip, error
 from app.web.ratelimit import TokenBucket
 
 log = logging.getLogger(__name__)
 
 BOT_KEY = web.AppKey("bot", Bot)
 PENDING_TTL = 600
-SECURITY_HEADERS = {
-    "Content-Security-Policy": "default-src 'none'; img-src https: data:; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
-    "X-Frame-Options": "DENY",
-    "Referrer-Policy": "no-referrer",
-    "X-Content-Type-Options": "nosniff",
-    "Cache-Control": "no-store",
-}
+NO_STORE = {"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"}
 
-templates = Environment(
-    loader=FileSystemLoader(Path(__file__).parent / "templates"),
-    autoescape=select_autoescape(["html"]),
-)
 callback_limiter = TokenBucket(rate=0.2, burst=10)
+confirm_limiter = TokenBucket(rate=0.5, burst=10)
 
 
-@dataclass(slots=True)
-class Pending:
-    nonce: str
-    csrf: str
-    user_id: int
-    chat_id: int | None
-    message_id: int | None
-    token: str
-    expires_at: int
-    viewer: Viewer
-    created: float
-
-
-_pending: dict[str, Pending] = {}
-
-
-def _cleanup() -> None:
-    now = time.monotonic()
-    for key in [k for k, v in _pending.items() if now - v.created > PENDING_TTL]:
-        _pending.pop(key, None)
-
-
-def render(name: str, lang: str, status: int = 200, **context: Any) -> web.Response:
-    _ = i18n.get(lang)
-    html = templates.get_template(name).render(_=_, lang=lang, **context)
-    return web.Response(text=html, status=status, content_type="text/html", headers=SECURITY_HEADERS)
+def _redirect(container: Container, path: str, **params: str) -> web.HTTPFound:
+    base = container.settings.public_url.rstrip("/")
+    query = f"?{urlencode(params)}" if params else ""
+    return web.HTTPFound(f"{base}{path}{query}", headers=NO_STORE)
 
 
 async def _lang_for(container: Container, user_id: int | None) -> str:
@@ -81,22 +48,22 @@ async def login(request: web.Request) -> web.StreamResponse:
     nonce = request.query.get("state", "")
     state = await container.oauth.peek(nonce) if nonce else None
     if state is None:
-        return render("auth_result.html", "en", 400, ok=False, bot=container.bot_username, reason="expired")
-    url = authorize_url(container.settings.anilist_client_id, container.settings.callback_url, nonce)
-    raise web.HTTPFound(url, headers={"Referrer-Policy": "no-referrer", "Cache-Control": "no-store"})
+        raise _redirect(container, "/auth/result", status="expired")
+    raise web.HTTPFound(
+        authorize_url(container.settings.anilist_client_id, container.settings.callback_url, nonce), headers=NO_STORE
+    )
 
 
 async def callback(request: web.Request) -> web.StreamResponse:
     container = request.app[APP_KEY]
-    bot = request.app[BOT_KEY]
     if not callback_limiter.allow(client_ip(request)):
-        return render("auth_result.html", "en", 429, ok=False, bot=container.bot_username, reason="rate")
+        raise _redirect(container, "/auth/result", status="rate")
     nonce = request.query.get("state", "")
     code = request.query.get("code", "")
     state = await container.oauth.peek(nonce) if nonce else None
-    lang = await _lang_for(container, state["user_id"] if state else None)
     if state is None or not code:
-        return render("auth_result.html", lang, 400, ok=False, bot=container.bot_username, reason="expired")
+        raise _redirect(container, "/auth/result", status="expired")
+    lang = await _lang_for(container, state["user_id"])
     settings = container.settings
     try:
         token = await exchange_code(
@@ -109,79 +76,92 @@ async def callback(request: web.Request) -> web.StreamResponse:
         viewer = await fetch_viewer(container, token.access_token)
     except AniListError as exc:
         log.warning("OAuth exchange failed: %s", exc.message)
-        return render("auth_result.html", lang, 400, ok=False, bot=container.bot_username, reason="exchange")
-    _cleanup()
-    pending = Pending(
+        raise _redirect(container, "/auth/result", status="exchange", lang=lang) from None
+    csrf = secrets.token_urlsafe(24)
+    await container.pending.save(
         nonce=nonce,
-        csrf=secrets.token_urlsafe(24),
-        user_id=state["user_id"],
-        chat_id=state.get("chat_id"),
-        message_id=state.get("message_id"),
+        csrf=csrf,
+        state=state,
         token=token.access_token,
-        expires_at=token.expires_at,
-        viewer=viewer,
-        created=time.monotonic(),
+        token_expires_at=token.expires_at,
+        viewer=asdict(viewer),
+        ttl=PENDING_TTL,
     )
-    _pending[nonce] = pending
-    telegram_name, telegram_username = str(pending.user_id), None
+    base = container.settings.public_url.rstrip("/")
+    raise web.HTTPFound(f"{base}/auth/confirm#{urlencode({'nonce': nonce, 'csrf': csrf})}", headers=NO_STORE)
+
+
+async def pending(request: web.Request) -> web.Response:
+    container = request.app[APP_KEY]
+    bot = request.app[BOT_KEY]
+    item = await container.pending.get(request.query.get("nonce", ""))
+    if item is None:
+        return error(404, "expired")
+    viewer = item["viewer"]
+    telegram_name, telegram_username = str(item["user_id"]), None
     try:
-        chat = await bot.get_chat(pending.user_id)
+        chat = await bot.get_chat(item["user_id"])
         telegram_name = " ".join(p for p in (chat.first_name, chat.last_name) if p) or telegram_name
         telegram_username = chat.username
     except TelegramAPIError:
         pass
-    return render(
-        "auth_confirm.html",
-        lang,
-        viewer=viewer,
-        telegram_name=telegram_name,
-        telegram_username=telegram_username,
-        nonce=nonce,
-        csrf=pending.csrf,
+    return web.json_response(
+        {
+            "anilist": {"name": viewer["name"], "avatar": viewer.get("avatar")},
+            "telegram": {"name": telegram_name, "username": telegram_username},
+            "lang": await _lang_for(container, item["user_id"]),
+            "expires_in": PENDING_TTL,
+        },
+        headers=NO_STORE,
     )
 
 
-async def confirm(request: web.Request) -> web.StreamResponse:
+async def confirm(request: web.Request) -> web.Response:
     container = request.app[APP_KEY]
     bot = request.app[BOT_KEY]
-    form = await request.post()
-    nonce = str(form.get("nonce", ""))
-    csrf = str(form.get("csrf", ""))
-    action = str(form.get("action", ""))
-    pending = _pending.get(nonce)
-    lang = await _lang_for(container, pending.user_id if pending else None)
-    if pending is None or not secrets.compare_digest(pending.csrf, csrf):
-        return render("auth_result.html", lang, 400, ok=False, bot=container.bot_username, reason="expired")
-    _pending.pop(nonce, None)
+    if not confirm_limiter.allow(client_ip(request)):
+        return error(429, "rate")
+    try:
+        body = await request.json()
+    except json.JSONDecodeError:
+        return error(400, "bad_request")
+    if not isinstance(body, dict):
+        return error(400, "bad_request")
+    nonce, csrf = str(body.get("nonce", "")), str(body.get("csrf", ""))
+    item = await container.pending.get(nonce)
+    if item is None or not secrets.compare_digest(item["csrf"], csrf):
+        return error(400, "expired")
+    await container.pending.delete(nonce)
     state = await container.oauth.consume(nonce)
     if state is None:
-        return render("auth_result.html", lang, 400, ok=False, bot=container.bot_username, reason="expired")
-    if action != "confirm":
-        return render("auth_result.html", lang, ok=False, bot=container.bot_username, reason="cancelled")
+        return error(400, "expired")
+    if body.get("action") != "confirm":
+        return web.json_response({"status": "cancelled"}, headers=NO_STORE)
     try:
-        viewer = await link_account(container, pending.user_id, pending.token, pending.expires_at)
+        viewer = await link_account(container, item["user_id"], item["token"], item["token_expires_at"])
     except AniListError:
-        return render("auth_result.html", lang, 400, ok=False, bot=container.bot_username, reason="exchange")
-    await notify_linked(container, bot, pending, viewer)
-    return render("auth_result.html", lang, ok=True, bot=container.bot_username, viewer=viewer)
+        return error(400, "exchange")
+    await notify_linked(container, bot, item, viewer)
+    return web.json_response({"status": "ok", "anilist": {"name": viewer.name}}, headers=NO_STORE)
 
 
-async def notify_linked(container: Container, bot: Bot, pending: Pending, viewer: Viewer) -> None:
-    user = await container.users.get(pending.user_id)
+async def notify_linked(container: Container, bot: Bot, item: dict, viewer: Viewer) -> None:
+    user = await container.users.get(item["user_id"])
     if user is None:
         return
     ctx = Ctx(bot=bot, app=container, user=user, _=i18n.get(user.lang))
     try:
-        await bot.send_message(pending.user_id, ctx._("auth.success", name=b(viewer.name)), reply_markup=main_menu(ctx))
-        if pending.chat_id and pending.message_id:
-            await nav.open_at(ctx, nav.Target(pending.chat_id, pending.message_id), nav.HOME)
+        await bot.send_message(user.user_id, ctx._("auth.success", name=b(viewer.name)), reply_markup=main_menu(ctx))
+        if item.get("chat_id") and item.get("message_id"):
+            await nav.open_at(ctx, nav.Target(item["chat_id"], item["message_id"]), nav.HOME)
         else:
-            await nav.send(ctx, pending.user_id, nav.HOME)
+            await nav.send(ctx, user.user_id, nav.HOME)
     except TelegramAPIError as exc:
-        log.warning("Could not notify %s about login: %s", pending.user_id, exc)
+        log.warning("Could not notify %s about login: %s", user.user_id, exc)
 
 
 def build_routes(app: web.Application) -> None:
     app.router.add_get("/auth/login", login)
     app.router.add_get("/auth/callback", callback)
-    app.router.add_post("/auth/confirm", confirm)
+    app.router.add_get("/api/auth/pending", pending)
+    app.router.add_post("/api/auth/confirm", confirm)

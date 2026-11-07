@@ -126,4 +126,4 @@ def webapp_url(ctx: Ctx, route: str = "") -> str | None:
     base = ctx.app.settings.webapp_url
     if not base:
         return None
-    return f"{base}#/{route.lstrip('/')}" if route else base
+    return f"{base}{route.lstrip('/')}" if route else base

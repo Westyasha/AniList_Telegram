@@ -34,7 +34,6 @@ DYNAMIC_FAMILIES = {
         "inline_button",
         "app_button",
     ],
-    "web": ["fail_expired", "fail_exchange", "fail_rate", "fail_cancelled"],
     "sort": ["popularity_desc", "score_desc", "trending_desc", "start_date_desc"],
     "menu": ["search", "list", "trending", "schedule", "season", "profile", "settings", "app"],
     "commands": ["start", "search", "anime", "manga", "list", "schedule", "trending", "season", "user", "card"],

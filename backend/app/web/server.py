@@ -1,6 +1,5 @@
 import logging
 from collections.abc import Awaitable, Callable
-from pathlib import Path
 
 from aiogram import Bot
 from aiohttp import web
@@ -24,23 +23,7 @@ async def cache_headers(request: web.Request, handler: Handler) -> web.StreamRes
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     if request.path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
-    elif request.path.startswith("/assets/"):
-        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     return response
-
-
-def mount_webapp(app: web.Application, dist: Path) -> None:
-    index = dist / "index.html"
-    if not index.is_file():
-        log.info("Mini App build not found at %s, static serving disabled", dist)
-        return
-
-    async def spa(request: web.Request) -> web.FileResponse:
-        return web.FileResponse(index, headers={"Cache-Control": "no-cache"})
-
-    app.router.add_get("/", spa)
-    app.router.add_get("/index.html", spa)
-    app.router.add_static("/", dist, append_version=False)
 
 
 def create_app(container: Container, bot: Bot) -> web.Application:
@@ -50,7 +33,6 @@ def create_app(container: Container, bot: Bot) -> web.Application:
     app.router.add_get("/healthz", health)
     api.build_routes(app)
     oauth.build_routes(app)
-    mount_webapp(app, container.settings.webapp_dist)
     return app
 
 
