@@ -9,6 +9,21 @@ function forms(n: number, one: string, few: string, many: string): string {
 }
 
 const num = (n: number) => n.toLocaleString("ru-RU");
+
+const MONTHS_GENITIVE = [
+  "января",
+  "февраля",
+  "марта",
+  "апреля",
+  "мая",
+  "июня",
+  "июля",
+  "августа",
+  "сентября",
+  "октября",
+  "ноября",
+  "декабря",
+];
 const plural = (n: number, one: string, few: string, many: string) => `${num(n)} ${forms(n, one, few, many)}`;
 
 export const ru: Dict = {
@@ -267,7 +282,10 @@ export const ru: Dict = {
     noStats: "Пока мало данных",
     openOnAniList: "Открыть на AniList",
     notFound: "Пользователя с таким именем нет",
-    joined: (date) => `На AniList с ${date}`,
+    joined: (unix) => {
+      const date = new Date(unix * 1000);
+      return `На AniList с ${MONTHS_GENITIVE[date.getMonth()]} ${date.getFullYear()}`;
+    },
     watched: "Время просмотра",
     read: "Прочитано глав",
     daysUnit: (n) => forms(n, "день", "дня", "дней"),

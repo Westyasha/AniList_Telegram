@@ -68,10 +68,6 @@ export function formatRelative(unix: number, locale: string): string {
   return rtf.format(Math.round(diff / (86400 * 365)), "year");
 }
 
-export function formatMonthYear(unix: number, locale: string): string {
-  return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date(unix * 1000));
-}
-
 export function fuzzyToInput(date: FuzzyDate | null | undefined): string {
   if (!date?.year || !date.month || !date.day) return "";
   return `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`;

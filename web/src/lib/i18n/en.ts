@@ -268,7 +268,8 @@ export const en = {
     noStats: "Not enough data yet",
     openOnAniList: "Open on AniList",
     notFound: "No user with this name",
-    joined: (date: string) => `On AniList since ${date}`,
+    joined: (unix: number) =>
+      `On AniList since ${new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(new Date(unix * 1000))}`,
     watched: "Time watched",
     read: "Chapters read",
     daysUnit: (n: number): string => (n === 1 ? "day" : "days"),

@@ -11,7 +11,6 @@ import { useToggleFollow } from "@/api/mutations";
 import { useViewer } from "@/api/session";
 import type { MediaType, UserProfile } from "@/api/types";
 import { useT } from "@/lib/i18n";
-import { formatMonthYear } from "@/lib/format";
 import { openExternal } from "@/lib/telegram";
 import { Banner } from "@/components/media/Banner";
 import { Avatar } from "@/components/media/Poster";
@@ -101,7 +100,7 @@ function ProfileView({ lookup, isSelf }: { lookup: { id?: number; name?: string 
             <div className="flex min-w-0 flex-col gap-1">
               <h1 className="truncate text-32 leading-tight font-semibold text-fg">{user.name}</h1>
               <p className="flex flex-wrap gap-x-3 text-13 text-fg3">
-                {user.createdAt ? <span>{t.profile.joined(formatMonthYear(user.createdAt, t.locale))}</span> : null}
+                {user.createdAt ? <span>{t.profile.joined(user.createdAt)}</span> : null}
                 {user.isFollower ? <span className="text-fg2">{t.profile.followsYou}</span> : null}
               </p>
             </div>
