@@ -13,7 +13,7 @@ import { Final } from "./Final";
 export function Landing({ locale }: { locale: Locale }) {
   return (
     <SmoothScroll>
-      <div lang={locale}>
+      <div>
         <Nav locale={locale} />
         <main>
           <Hero locale={locale} />
