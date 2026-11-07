@@ -1,12 +1,38 @@
 services:
-  bot:
-    build: .
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: anilist
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-anilist}
+      POSTGRES_DB: anilist
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anilist"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
     restart: unless-stopped
     env_file: .env
     environment:
+      DATABASE_URL: postgresql+asyncpg://anilist:${POSTGRES_PASSWORD:-anilist}@postgres:5432/anilist
       WEB_HOST: 0.0.0.0
-      DATABASE_PATH: data/bot.db
-    volumes:
-      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build: ./web
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:8090
+    depends_on:
+      - backend
     ports:
-      - "127.0.0.1:8090:8090"
+      - "127.0.0.1:3000:3000"
+
+volumes:
+  postgres:

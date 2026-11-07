@@ -1,17 +1,18 @@
 [Unit]
-Description=AniList Telegram bot and Mini App backend
-After=network-online.target
+Description=AniList Telegram bot and API
+After=network-online.target postgresql.service
 Wants=network-online.target
 
 [Service]
 Type=simple
 User=anilist
 Group=anilist
-WorkingDirectory=/opt/anilist-telegram
+WorkingDirectory=/opt/anilist-telegram/backend
 EnvironmentFile=/opt/anilist-telegram/.env
 Environment=PYTHONUNBUFFERED=1
 Environment=HOME=/opt/anilist-telegram/data
 Environment=PLAYWRIGHT_BROWSERS_PATH=/opt/anilist-telegram/.browsers
+ExecStartPre=/opt/anilist-telegram/.venv/bin/alembic upgrade head
 ExecStart=/opt/anilist-telegram/.venv/bin/python -m app
 Restart=always
 RestartSec=5

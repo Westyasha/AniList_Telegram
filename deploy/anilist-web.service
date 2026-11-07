@@ -1,0 +1,26 @@
+[Unit]
+Description=AniList Telegram Mini App (Next.js)
+After=network-online.target anilist-bot.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=anilist
+Group=anilist
+WorkingDirectory=/opt/anilist-telegram/web/.next/standalone
+Environment=NODE_ENV=production
+Environment=HOSTNAME=172.17.0.1
+Environment=PORT=3090
+Environment=BACKEND_URL=http://172.17.0.1:8090
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/opt/anilist-telegram/web/.next/standalone/.next/cache
+MemoryMax=400M
+
+[Install]
+WantedBy=multi-user.target
