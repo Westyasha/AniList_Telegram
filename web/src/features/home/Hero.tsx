@@ -19,6 +19,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { Figures } from "@/components/ui/Figures";
 import { Wordmark } from "@/components/brand/Mark";
 import { HeaderActions } from "@/components/shell/PageHeader";
+import { useAmbient } from "@/components/shell/Ambient";
 
 const HERO_HEIGHT = 340;
 
@@ -81,6 +82,7 @@ export function Hero({ items, loading }: { items: TrendingMedia[] | undefined; l
   const t = useT();
   const slides = (items ?? []).filter((media) => media.bannerImage && !media.isAdult).slice(0, 5);
   const [active, setActive] = useState(0);
+  useAmbient(slides[active]?.coverImage.large ?? slides[active]?.bannerImage);
   const scroller = useRef<HTMLDivElement>(null);
   const frame = useRef(0);
 

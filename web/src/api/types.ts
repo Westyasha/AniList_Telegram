@@ -1,3 +1,4 @@
+import type { Appearance } from "@/lib/appearance";
 export type Lang = "ru" | "en";
 
 export type ScoreFormat = "POINT_100" | "POINT_10_DECIMAL" | "POINT_10" | "POINT_5" | "POINT_3";
@@ -196,11 +197,13 @@ export interface Session {
   bot_username: string;
   anilist: SessionAniList | null;
   notifications: NotificationSettings;
+  appearance?: Appearance;
 }
 
 export interface SettingsPayload {
   lang?: Lang;
   notifications?: Partial<NotificationSettings>;
+  appearance?: Appearance;
 }
 
 export interface AuthLinkResponse {

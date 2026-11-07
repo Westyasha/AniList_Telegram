@@ -8,7 +8,7 @@ import { Icon } from "./Icon";
 type Variant = "primary" | "secondary" | "ghost" | "quiet";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "chamfer-btn bg-accent font-semibold text-white hover:bg-accent-press disabled:bg-s3 disabled:text-fg3",
+  primary: "chamfer-btn bg-accent font-semibold text-on-accent hover:bg-accent-press disabled:bg-s3 disabled:text-fg3",
   secondary: "border border-line bg-s2 font-medium text-fg hover:bg-s3 disabled:text-fg3",
   ghost: "font-medium text-fg2 hover:bg-s2 hover:text-fg disabled:text-fg3",
   quiet: "font-medium text-fg2 hover:text-fg disabled:text-fg3",

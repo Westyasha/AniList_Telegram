@@ -46,6 +46,8 @@ interface WebApp {
   openTelegramLink(url: string): void;
   switchInlineQuery(query: string, chatTypes?: InlineChatType[]): void;
   showConfirm(message: string, callback: (ok: boolean) => void): void;
+  onEvent?(event: "themeChanged", callback: () => void): void;
+  offEvent?(event: "themeChanged", callback: () => void): void;
 }
 
 declare global {
@@ -93,18 +95,31 @@ export function getTelegramUser(): TelegramUser | null {
   return webApp()?.initDataUnsafe.user ?? null;
 }
 
+export function setChromeColor(color: string): void {
+  const app = webApp();
+  if (!app) return;
+  if (supports("6.9")) {
+    safely(() => app.setHeaderColor(color));
+    safely(() => app.setBackgroundColor(color));
+  }
+  if (supports("7.10") && app.setBottomBarColor) {
+    safely(() => app.setBottomBarColor?.(color));
+  }
+}
+
+export function onTelegramThemeChange(callback: () => void): () => void {
+  const app = webApp();
+  if (!app?.onEvent) return () => undefined;
+  app.onEvent("themeChanged", callback);
+  return () => app.offEvent?.("themeChanged", callback);
+}
+
 export function setupTelegram(): void {
   const app = webApp();
   if (!app) return;
   safely(() => app.ready());
   safely(() => app.expand());
-  if (supports("6.9")) {
-    safely(() => app.setHeaderColor(BRAND_BG));
-    safely(() => app.setBackgroundColor(BRAND_BG));
-  }
-  if (supports("7.10") && app.setBottomBarColor) {
-    safely(() => app.setBottomBarColor?.(BRAND_BG));
-  }
+  setChromeColor(BRAND_BG);
   if (supports("7.7") && app.disableVerticalSwipes) {
     safely(() => app.disableVerticalSwipes?.());
   }

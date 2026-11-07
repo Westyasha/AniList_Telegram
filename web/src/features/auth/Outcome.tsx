@@ -36,7 +36,7 @@ export function Outcome({ kind, t, name, botHref }: { kind: OutcomeKind; t: Dict
         rel="noopener noreferrer"
         className={
           success
-            ? "chamfer-btn inline-flex h-11 items-center rounded-control bg-accent px-5 text-15 font-semibold text-white transition-[transform,background-color] duration-120 hover:bg-accent-press pressed:scale-[0.98]"
+            ? "chamfer-btn inline-flex h-11 items-center rounded-control bg-accent px-5 text-15 font-semibold text-on-accent transition-[transform,background-color] duration-120 hover:bg-accent-press pressed:scale-[0.98]"
             : "inline-flex h-11 items-center rounded-control border border-line bg-s2 px-5 text-15 font-medium text-fg transition-colors duration-120 hover:bg-s3"
         }
       >

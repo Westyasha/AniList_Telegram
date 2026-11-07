@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import Script from "next/script";
 import { Overpass, Overpass_Mono } from "next/font/google";
 import { Providers } from "@/components/shell/Providers";
+import { BOOT_SCRIPT } from "@/lib/appearanceBoot";
 import "./globals.css";
 
 const sans = Overpass({ subsets: ["latin", "cyrillic"], variable: "--font-overpass", display: "swap" });
@@ -20,12 +21,15 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: "#0B0B0D",
-  colorScheme: "dark",
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
+      </head>
       <body>
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
         <Providers>{children}</Providers>

@@ -13,6 +13,7 @@ import { FloatingBack } from "@/components/shell/PageHeader";
 import { MediaHeader } from "./MediaHeader";
 import { Overview } from "./Overview";
 import { CharactersTab, RecommendationsTab, StaffTab } from "./MediaTabs";
+import { useAmbient } from "@/components/shell/Ambient";
 
 type TabKey = "overview" | "characters" | "staff" | "recommendations";
 
@@ -53,6 +54,7 @@ export function MediaScreen() {
   const tab: TabKey = tabParam && TAB_KEYS.includes(tabParam) ? tabParam : "overview";
   const { data, isPending, isError, error, refetch } = useMedia(id);
   const media = data?.Media;
+  useAmbient(media?.coverImage.large ?? media?.coverImage.medium);
 
   useEffect(() => {
     if (!media) return;

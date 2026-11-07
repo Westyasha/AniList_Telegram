@@ -27,6 +27,7 @@ import { ActivityFeed } from "./Activity";
 import { Breakdown, Headline } from "./Stats";
 import { FavouriteShelf } from "./Shelf";
 import { profileAccent } from "@/lib/profileColor";
+import { useAmbient } from "@/components/shell/Ambient";
 
 function ProfileSkeleton() {
   return (
@@ -63,6 +64,7 @@ function ProfileView({ lookup, isSelf }: { lookup: { id?: number; name?: string 
   const { data, isPending, isError, error, refetch } = useUserProfile(lookup);
   const [type, setType] = useState<MediaType>("ANIME");
   const user = data?.User;
+  useAmbient(user?.bannerImage ?? user?.avatar.large);
 
   if (isPending) return <ProfileSkeleton />;
   if (isError || !user) {

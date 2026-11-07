@@ -14,7 +14,7 @@ interface BannerProps {
 const BANNER_RATIO = 1900 / 400;
 
 const FADE =
-  "linear-gradient(to bottom, rgb(11 11 13 / 0.6) 0%, rgb(11 11 13 / 0) 28%, rgb(11 11 13 / 0) 42%, rgb(11 11 13 / 0.72) 78%, rgb(11 11 13) 100%)";
+  "linear-gradient(to bottom, color-mix(in srgb, var(--color-bg) 60%, transparent) 0%, transparent 28%, transparent 42%, color-mix(in srgb, var(--color-bg) 72%, transparent) 78%, var(--color-bg) 100%)";
 
 export function Banner({ src, height, preload = false, dim = false, className, children }: BannerProps) {
   return (

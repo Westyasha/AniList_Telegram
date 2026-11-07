@@ -16,6 +16,7 @@ import { Mark } from "@/components/brand/Mark";
 import { Icon } from "@/components/ui/Icon";
 import { Switch } from "@/components/ui/Switch";
 import { Figures } from "@/components/ui/Figures";
+import { AppearancePicker } from "./AppearancePicker";
 
 const NOTIFICATION_KEYS: (keyof NotificationSettings)[] = ["airing_watching", "airing_planning", "airing_paused", "airing_dropped", "related", "anilist_activity"];
 
@@ -91,6 +92,8 @@ export function SettingsScreen() {
           <LoginGate compact className="border-b-0" />
         )}
       </Group>
+
+      <AppearancePicker />
 
       <Group title={t.settings.language} hint={t.settings.languageHint}>
         {LANGUAGES.map((option) => (

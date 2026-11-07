@@ -9,6 +9,7 @@ import { dictionaries, I18nContext, type Dict, type I18nValue } from "@/lib/i18n
 import { haptic } from "@/lib/telegram";
 import { toast } from "@/lib/toast";
 import { Toaster } from "@/components/ui/Toaster";
+import { AppearanceProvider } from "./AppearanceProvider";
 
 const dictRef: { current: Dict } = { current: dictionaries.en };
 
@@ -77,8 +78,10 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={client}>
       <I18nProvider>
-        {children}
-        <Toaster />
+        <AppearanceProvider>
+          {children}
+          <Toaster />
+        </AppearanceProvider>
       </I18nProvider>
     </QueryClientProvider>
   );

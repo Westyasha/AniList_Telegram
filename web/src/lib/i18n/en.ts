@@ -1,3 +1,4 @@
+import type { Accent, Theme } from "@/lib/appearance";
 import type {
   CharacterRole,
   MediaFormat,
@@ -33,6 +34,8 @@ export const en = {
     clear: "Clear",
     any: "Any",
     back: "Back",
+    next: "Next",
+    today: "Today",
     loadMore: "Load more",
     showLess: "Show less",
     readMore: "Read more",
@@ -335,6 +338,21 @@ export const en = {
     source: "Source code",
     bot: "Bot",
     guestNotice: "Settings sync with the bot when the app is opened from Telegram",
+    appearance: "Appearance",
+    appearanceHint: "Saved to your account and synced across devices",
+    theme: "Theme",
+    themes: { dark: "Dark", light: "Light", system: "System", glass: "Liquid Glass" } satisfies Record<Theme, string>,
+    accent: "Accent color",
+    accents: {
+      crimson: "Crimson",
+      profile: "AniList profile color",
+      blue: "Blue",
+      violet: "Violet",
+      green: "Green",
+      amber: "Amber",
+      pink: "Pink",
+      teal: "Teal",
+    } satisfies Record<Accent, string>,
   },
   auth: {
     title: "Connect AniList",

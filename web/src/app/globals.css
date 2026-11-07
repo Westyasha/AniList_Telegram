@@ -22,6 +22,7 @@
   --color-accent: #e0233d;
   --color-accent-press: #c81d35;
   --color-accent-ink: #f2546a;
+  --color-on-accent: #ffffff;
 
   --color-score-high: #4cc38a;
   --color-score-mid: #e0a33b;
@@ -70,6 +71,18 @@
   --animate-enter: enter 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   --animate-rest: rest 2400ms ease-in-out infinite;
   --animate-live: live 1600ms ease-in-out infinite;
+  --animate-pop: pop 160ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 
   @keyframes enter {
     from {
@@ -140,8 +153,8 @@
   }
 
   ::selection {
-    background: rgb(224 35 61 / 0.4);
-    color: var(--color-white);
+    background: color-mix(in srgb, var(--color-accent) 40%, transparent);
+    color: var(--color-fg);
   }
 
   :focus-visible {
@@ -180,9 +193,128 @@
     display: none;
   }
 
+}
+
+@layer base {
+  [data-theme="light"] {
+    color-scheme: light;
+    --color-bg: #f5f5f7;
+    --color-s1: #ffffff;
+    --color-s2: #ececf0;
+    --color-s3: #e0e0e6;
+    --color-line: rgb(20 20 24 / 0.08);
+    --color-line-strong: rgb(20 20 24 / 0.14);
+    --color-fg: #131316;
+    --color-fg2: #54545e;
+    --color-fg3: #8a8a95;
+    --color-score-high: #1e9a5f;
+    --color-score-mid: #b97a12;
+    --color-score-low: #d0353a;
+    --color-st-watching: #2a7fd8;
+    --color-st-completed: #1e9a5f;
+    --color-st-planning: #c98a1b;
+    --color-st-paused: #7158e0;
+    --color-st-dropped: #d0353a;
+    --color-st-repeating: #13999a;
+  }
+
+  [data-theme="glass"] {
+    color-scheme: dark;
+    --color-bg: #07070a;
+    --color-s1: rgb(255 255 255 / 0.08);
+    --color-s2: rgb(255 255 255 / 0.12);
+    --color-s3: rgb(255 255 255 / 0.2);
+    --color-line: rgb(255 255 255 / 0.12);
+    --color-line-strong: rgb(255 255 255 / 0.22);
+    --color-fg: #f4f4f7;
+    --color-fg2: rgb(244 244 247 / 0.72);
+    --color-fg3: rgb(244 244 247 / 0.5);
+  }
+
+  [data-theme="glass"] body {
+    background: transparent;
+  }
+
+  [data-theme="glass"] :is(.bg-s1, .bg-s2, .bg-s3, .glass) {
+    -webkit-backdrop-filter: blur(22px) saturate(170%);
+    backdrop-filter: blur(22px) saturate(170%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.22),
+      inset 0 -1px 0 rgb(255 255 255 / 0.04),
+      0 8px 24px -12px rgb(0 0 0 / 0.5);
+  }
+
+  [data-theme="glass"] :is(.bg-bg, .bg-bg\/80) {
+    background-color: rgb(10 10 14 / 0.28);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    backdrop-filter: blur(28px) saturate(180%);
+  }
+
+  [data-theme="glass"] .popover {
+    background-color: rgb(16 16 22 / 0.8);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    backdrop-filter: blur(32px) saturate(180%);
+  }
+
   input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.6);
+    opacity: 0.6;
     cursor: pointer;
+  }
+
+  [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+  [data-theme="glass"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}
+
+@layer components {
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: var(--color-bg);
+    pointer-events: none;
+  }
+
+  .ambient-img {
+    object-fit: cover;
+    transform: scale(1.4);
+    filter: blur(48px) saturate(1.8) brightness(0.9);
+  }
+
+  .ambient-in {
+    animation: ambient-in 700ms var(--ease-out) both;
+  }
+
+  .ambient-out {
+    animation: ambient-out 700ms var(--ease-out) both;
+  }
+
+  .ambient-shade {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(130% 80% at 30% 10%, rgb(7 7 10 / 0) 0%, rgb(7 7 10 / 0.35) 70%),
+      linear-gradient(to bottom, rgb(7 7 10 / 0.05), rgb(7 7 10 / 0.5));
+  }
+
+  @keyframes ambient-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes ambient-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
   }
 }
 
