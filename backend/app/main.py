@@ -25,7 +25,6 @@ async def run() -> None:
     setup_logging(settings.log_level)
     container = Container.build(settings)
     await container.db.connect()
-    await container.db.migrate(container.cipher, settings.legacy_database_path)
     await container.anilist.start()
     await container.renderer.start()
 

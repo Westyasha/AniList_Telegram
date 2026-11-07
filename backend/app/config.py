@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -7,7 +5,7 @@ PIN_REDIRECT_URI = "https://anilist.co/api/v2/oauth/pin"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=(".env", "../.env"), env_file_encoding="utf-8", extra="ignore")
 
     bot_token: SecretStr
     secret_key: SecretStr
@@ -20,10 +18,8 @@ class Settings(BaseSettings):
     public_url: str = ""
     web_host: str = "127.0.0.1"
     web_port: int = 8090
-    webapp_dist: Path = Path("webapp/dist")
-
-    database_path: Path = Path("data/bot.db")
-    legacy_database_path: Path = Path("users.db")
+    database_url: SecretStr = SecretStr("postgresql+asyncpg://anilist:anilist@127.0.0.1:5432/anilist")
+    database_pool_size: int = 5
 
     notifier_interval: int = 300
     renderer_concurrency: int = 2

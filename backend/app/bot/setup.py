@@ -15,7 +15,7 @@ from app.bot import screens
 from app.bot.handlers import actions, cards, commands, errors, inline, inputs, navigation
 from app.bot.middlewares import ContextMiddleware
 from app.container import Container
-from app.db.fsm import SQLiteStorage
+from app.db.fsm import PostgresStorage
 from app.i18n import LANGUAGES, i18n
 
 log = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ def create_bot(token: str) -> Bot:
 
 
 def create_dispatcher(container: Container) -> Dispatcher:
-    dp = Dispatcher(storage=SQLiteStorage(container.db))
+    dp = Dispatcher(storage=PostgresStorage(container.db))
     dp.update.outer_middleware(ContextMiddleware(container))
     dp.include_routers(
         errors.router,

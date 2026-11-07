@@ -8,6 +8,7 @@ from app.db.repositories import (
     KeyValueRepository,
     NavigationRepository,
     NotificationLog,
+    OAuthPendingRepository,
     OAuthStateRepository,
     TextRepository,
     UserRepository,
@@ -26,6 +27,7 @@ class Container:
     images: ImageCacheRepository
     nav: NavigationRepository
     oauth: OAuthStateRepository
+    pending: OAuthPendingRepository
     texts: TextRepository
     kv: KeyValueRepository
     sent: NotificationLog
@@ -34,7 +36,7 @@ class Container:
 
     @classmethod
     def build(cls, settings: Settings) -> "Container":
-        db = Database(settings.database_path)
+        db = Database(settings.database_url.get_secret_value(), settings.database_pool_size)
         cipher = TokenCipher(settings.secret_key.get_secret_value())
         return cls(
             settings=settings,
@@ -45,6 +47,7 @@ class Container:
             images=ImageCacheRepository(db),
             nav=NavigationRepository(db),
             oauth=OAuthStateRepository(db),
+            pending=OAuthPendingRepository(db, cipher),
             texts=TextRepository(db),
             kv=KeyValueRepository(db),
             sent=NotificationLog(db),
