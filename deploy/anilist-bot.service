@@ -1,0 +1,26 @@
+[Unit]
+Description=AniList Telegram bot and Mini App backend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=anilist
+Group=anilist
+WorkingDirectory=/opt/anilist-telegram
+EnvironmentFile=/opt/anilist-telegram/.env
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/opt/anilist-telegram/data
+Environment=PLAYWRIGHT_BROWSERS_PATH=/opt/anilist-telegram/.browsers
+ExecStart=/opt/anilist-telegram/.venv/bin/python -m app
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/opt/anilist-telegram/data
+MemoryMax=900M
+
+[Install]
+WantedBy=multi-user.target
