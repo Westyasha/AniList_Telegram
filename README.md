@@ -12,7 +12,7 @@
 ![Next.js](https://img.shields.io/badge/Next.js-16-E0233D?logo=nextdotjs&logoColor=white)
 ![Languages](https://img.shields.io/badge/i18n-EN%20%7C%20RU-E0233D)
 
-[**Open the bot →**](https://t.me/westyasha_AniList_bot)
+[**Open the bot →**](https://t.me/westyasha_AniList_bot) &nbsp;·&nbsp; [**Website**](https://westyasha.github.io/AniList_Telegram/)
 
 </div>
 
