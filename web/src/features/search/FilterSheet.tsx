@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type CSSProperties, type ReactNode } from "react";
-import { ChevronDown } from "lucide-react";
 import { useGenres } from "@/api/hooks";
 import type { MediaSort } from "@/api/types";
 import { useT } from "@/lib/i18n";
@@ -10,7 +9,7 @@ import { haptic } from "@/lib/telegram";
 import { Sheet } from "@/components/ui/Sheet";
 import { ToggleChip } from "@/components/ui/Chip";
 import { Button } from "@/components/ui/Button";
-import { Icon } from "@/components/ui/Icon";
+import { Select } from "@/components/ui/Select";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ANIME_FORMATS, EMPTY_FILTERS, MANGA_FORMATS, MEDIA_STATUSES, SORTS, type MediaFilters } from "./searchState";
 
@@ -90,22 +89,13 @@ function FilterForm({ onClose, kind, value, onApply, hasQuery }: FilterSheetProp
       </Group>
 
       <Group title={t.search.year}>
-        <div className="relative">
-          <select
-            value={draft.year ?? ""}
-            onChange={(event) => patch({ year: event.target.value ? Number(event.target.value) : null })}
-            className="figure h-11 w-full appearance-none rounded-control border border-line bg-s2 px-3 text-15 text-fg outline-none"
-            aria-label={t.search.year}
-          >
-            <option value="">{t.common.any}</option>
-            {years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-          <Icon icon={ChevronDown} className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-fg3" />
-        </div>
+        <Select<number>
+          mono
+          label={t.search.year}
+          value={draft.year ?? 0}
+          onChange={(year) => patch({ year: year || null })}
+          options={[{ value: 0, label: t.common.any }, ...years.map((year) => ({ value: year, label: String(year) }))]}
+        />
       </Group>
 
       {kind === "anime" ? (

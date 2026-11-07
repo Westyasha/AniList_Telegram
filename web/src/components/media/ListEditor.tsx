@@ -14,6 +14,7 @@ import { toast } from "@/lib/toast";
 import { cn } from "@/lib/cn";
 import { Sheet } from "@/components/ui/Sheet";
 import { Button } from "@/components/ui/Button";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Stepper } from "@/components/ui/Stepper";
 import { Switch } from "@/components/ui/Switch";
 import { LoginGate } from "@/components/shell/LoginGate";
@@ -315,14 +316,7 @@ function DateField({ label, value, onChange }: { label: string; value: string; o
         ) : null
       }
     >
-      <input
-        type="date"
-        value={value}
-        max="2100-12-31"
-        onChange={(event) => onChange(event.target.value)}
-        aria-label={label}
-        className="figure h-11 w-full min-w-0 rounded-control border border-line bg-s2 px-3 text-13 text-fg outline-none [color-scheme:dark] focus-visible:border-line-strong"
-      />
+      <DatePicker label={label} value={value} onChange={onChange} />
     </Field>
   );
 }

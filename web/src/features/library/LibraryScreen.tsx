@@ -18,6 +18,7 @@ import { PageHeader } from "@/components/shell/PageHeader";
 import { LoginGate } from "@/components/shell/LoginGate";
 import { Tabs } from "@/components/ui/Tabs";
 import { Icon } from "@/components/ui/Icon";
+import { Select } from "@/components/ui/Select";
 import { EmptyState, ErrorState } from "@/components/ui/States";
 import { RowsSkeleton } from "@/components/ui/Skeleton";
 import { Sentinel } from "@/components/ui/Sentinel";
@@ -59,25 +60,15 @@ export function LibraryScreen() {
 function SortControl({ value, onChange }: { value: SortKey; onChange: (value: SortKey) => void }) {
   const t = useT();
   return (
-    <label className="relative inline-flex h-11 items-center gap-2 rounded-control px-3 text-13 text-fg2 transition-colors hover:bg-s2 hover:text-fg">
-      <Icon icon={ArrowUpDown} />
-      <span>{t.library.sort[value]}</span>
-      <select
-        value={value}
-        onChange={(event) => {
-          haptic.selection();
-          onChange(event.target.value as SortKey);
-        }}
-        aria-label={t.search.sort}
-        className="absolute inset-0 cursor-pointer opacity-0"
-      >
-        {SORT_KEYS.map((key) => (
-          <option key={key} value={key}>
-            {t.library.sort[key]}
-          </option>
-        ))}
-      </select>
-    </label>
+    <Select<SortKey>
+      variant="inline"
+      align="end"
+      label={t.search.sort}
+      value={value}
+      onChange={onChange}
+      icon={<Icon icon={ArrowUpDown} />}
+      options={SORT_KEYS.map((key) => ({ value: key, label: t.library.sort[key] }))}
+    />
   );
 }
 
