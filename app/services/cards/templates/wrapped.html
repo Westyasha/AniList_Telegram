@@ -1,0 +1,100 @@
+{% extends "_base.html" %}
+{% set ru = lang == "ru" %}
+{% set months = ["Я","Ф","М","А","М","И","И","А","С","О","Н","Д"] if ru else ["J","F","M","A","M","J","J","A","S","O","N","D"] %}
+{% set month_names = ["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"] if ru else ["January","February","March","April","May","June","July","August","September","October","November","December"] %}
+{% block style %}
+<style>
+.story { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+.content { position: relative; z-index: 2; height: 100%; padding: 80px 80px 56px; display: flex; flex-direction: column; gap: 30px; }
+.top { display: flex; align-items: center; justify-content: space-between; }
+.top .logo { font-size: 54px; }
+.top .tag { font-size: 22px; font-weight: 800; letter-spacing: 6px; text-transform: uppercase; color: var(--muted); }
+.hero { display: flex; align-items: center; gap: 34px; }
+.avatar { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 5px solid var(--crimson); box-shadow: 0 0 0 8px rgba(224,35,61,.18); }
+.hero .year { font-size: 140px; font-weight: 900; line-height: .8; letter-spacing: -6px;
+  background: linear-gradient(135deg, #FFFFFF 30%, #F0475E 75%, #B0122C); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero .name { font-size: 40px; font-weight: 800; margin-top: 14px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.tile { padding: 28px 34px 22px; border-radius: 28px; background: var(--surface); border: 1px solid var(--line); position: relative; overflow: hidden; }
+.tile::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: linear-gradient(180deg, #F0475E, #B0122C); }
+.tile .value { font-size: 76px; font-weight: 900; line-height: 1; letter-spacing: -2px; }
+.tile .label { margin-top: 12px; font-size: 18px; }
+.panel { padding: 28px 34px; border-radius: 28px; background: var(--surface); border: 1px solid var(--line); }
+.panel .label { margin-bottom: 22px; }
+.chart { display: flex; align-items: flex-end; gap: 12px; height: 160px; }
+.bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; height: 100%; justify-content: flex-end; }
+.bar i { display: block; width: 100%; border-radius: 10px 10px 4px 4px; background: linear-gradient(180deg, #F0475E, #8E0C22); min-height: 6px; }
+.bar.best i { background: linear-gradient(180deg, #FFFFFF, #F0475E); }
+.bar span { font-size: 18px; font-weight: 800; color: var(--muted); }
+.genres { display: flex; flex-direction: column; gap: 10px; }
+.genre { display: grid; grid-template-columns: 230px 1fr 70px; align-items: center; gap: 18px; font-size: 24px; font-weight: 700; }
+.genre .track { height: 14px; border-radius: 7px; background: rgba(255,255,255,.06); overflow: hidden; }
+.genre .track i { display: block; height: 100%; border-radius: 7px; background: linear-gradient(90deg, #B0122C, #F0475E); }
+.genre b { text-align: right; color: var(--muted); font-weight: 800; }
+.covers { display: flex; gap: 16px; }
+.cover { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.cover img, .cover .placeholder { width: 100%; aspect-ratio: 5/7; border-radius: 16px; object-fit: cover; border: 1px solid var(--line); }
+.cover .t { font-size: 17px; font-weight: 700; line-height: 1.2; height: 42px; overflow: hidden; }
+.cover .c { font-size: 15px; font-weight: 800; color: var(--crimson); }
+.footer { margin-top: auto; display: flex; justify-content: space-between; color: var(--muted); font-size: 22px; font-weight: 700; }
+</style>
+{% endblock %}
+{% block body %}
+<div class="story">
+  {% if backdrop %}<div class="backdrop" style="background-image:url('{{ backdrop }}')"></div>{% endif %}
+  <div class="shade"></div>
+  <div class="stars"></div>
+  <div class="content">
+    <div class="top">
+      <span class="logo"><span class="a">A</span><span class="l">L</span></span>
+      <span class="tag">AniList Wrapped</span>
+    </div>
+    <div class="hero">
+      {% if avatar and avatar in loaded %}<img class="avatar" src="{{ avatar }}">{% endif %}
+      <div>
+        <div class="year">{{ year }}</div>
+        <div class="name">{{ name }}</div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="tile"><div class="value">{{ episodes }}</div><div class="label">{{ "эпизодов" if ru else "episodes" }}</div></div>
+      <div class="tile"><div class="value">{{ hours }}</div><div class="label">{{ "часов просмотра" if ru else "hours watched" }}</div></div>
+      <div class="tile"><div class="value">{{ completed }}</div><div class="label">{{ "тайтлов завершено" if ru else "titles completed" }}</div></div>
+      <div class="tile"><div class="value">{{ titles }}</div><div class="label">{{ "тайтлов в работе" if ru else "titles touched" }}</div></div>
+    </div>
+    <div class="panel">
+      <div class="label">{{ "Активность по месяцам" if ru else "Monthly activity" }}{% if best_month is not none %} · {{ "пик" if ru else "peak" }}: {{ month_names[best_month] }}{% endif %}</div>
+      <div class="chart">
+        {% for value in monthly %}
+        <div class="bar{% if loop.index0 == best_month %} best{% endif %}"><i style="height: {{ (value / max_month * 100) | round(1) }}%"></i><span>{{ months[loop.index0] }}</span></div>
+        {% endfor %}
+      </div>
+    </div>
+    {% if genres %}
+    <div class="panel">
+      <div class="label">{{ "Жанры года" if ru else "Top genres" }}</div>
+      <div class="genres">
+        {% for genre, count in genres %}
+        <div class="genre"><span>{{ genre }}</span><div class="track"><i style="width: {{ (count / max_genre * 100) | round(1) }}%"></i></div><b>{{ count }}</b></div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% if top %}
+    <div class="panel">
+      <div class="label">{{ "Главные тайтлы года" if ru else "Most watched" }}</div>
+      <div class="covers">
+        {% for item in top %}
+        <div class="cover">
+          {% if item.cover and item.cover in loaded %}<img src="{{ item.cover }}">{% else %}<div class="placeholder"></div>{% endif %}
+          <div class="t">{{ item.title }}</div>
+          <div class="c">{{ item.count }} {{ "эп." if ru else "eps" }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <div class="footer"><span>anilist.co</span><span>@{{ bot }}</span></div>
+  </div>
+</div>
+{% endblock %}

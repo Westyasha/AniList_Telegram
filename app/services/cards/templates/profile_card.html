@@ -1,0 +1,100 @@
+{% extends "_base.html" %}
+{% set ru = lang == "ru" %}
+{% block style %}
+<style>
+.card { position: relative; width: 1200px; overflow: hidden; }
+.content { position: relative; z-index: 2; padding: 56px 60px 44px; display: flex; flex-direction: column; gap: 40px; }
+.head { display: flex; align-items: center; gap: 36px; }
+.avatar-wrap { position: relative; width: 196px; height: 196px; flex-shrink: 0; }
+.avatar-wrap::before { content: ""; position: absolute; inset: -7px; border-radius: 50%;
+  background: conic-gradient(from 210deg, var(--accent), var(--crimson), var(--accent2), var(--accent)); }
+.avatar-wrap::after { content: ""; position: absolute; inset: -34px; border-radius: 50%; z-index: -1;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 45%, transparent), transparent); }
+.avatar { position: relative; width: 196px; height: 196px; border-radius: 50%; object-fit: cover; border: 6px solid var(--bg); display: block; }
+.identity { min-width: 0; flex: 1; }
+.kicker { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.kicker .logo { font-size: 30px; }
+.name { font-size: 76px; font-weight: 900; line-height: .95; letter-spacing: -2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chips { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.chip { padding: 8px 16px 6px; border-radius: 999px; font-size: 17px; font-weight: 700; background: rgba(255,255,255,.06); border: 1px solid var(--line); color: #E6E6EC; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.stat { position: relative; padding: 24px 26px 20px; border-radius: 22px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.stat::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: linear-gradient(180deg, #F0475E, #B0122C); }
+.stat .value { font-size: 52px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+.stat .value small { font-size: 26px; color: var(--muted); font-weight: 800; margin-left: 4px; }
+.stat .label { margin-top: 10px; font-size: 14px; }
+.section { display: flex; flex-direction: column; gap: 14px; }
+.section-title { display: flex; align-items: center; gap: 12px; }
+.section-title::before { content: ""; width: 5px; height: 18px; border-radius: 3px; background: var(--crimson); }
+.row { display: flex; gap: 12px; }
+.poster { width: 97px; height: 140px; border-radius: 12px; object-fit: cover; object-position: center top; border: 1px solid var(--line); box-shadow: 0 10px 24px rgba(0,0,0,.45); flex-shrink: 0; }
+.more { width: 97px; height: 140px; border-radius: 12px; border: 1px dashed rgba(255,255,255,.18); display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,.03); flex-shrink: 0; }
+.more b { font-size: 30px; font-weight: 900; }
+.more span { font-size: 13px; font-weight: 800; letter-spacing: 2px; color: var(--muted); }
+.footer { display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid var(--line); }
+.footer .bot { font-size: 18px; font-weight: 700; color: var(--muted); padding-top: 18px; }
+.footer .brand { padding-top: 18px; display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 800; color: var(--muted); }
+.footer .logo { font-size: 28px; }
+.row.big .poster, .row.big .more { width: 150px; height: 216px; }
+.favs { display: flex; flex-direction: column; gap: 34px; }
+.favs.split { flex-direction: row; gap: 44px; }
+.favs.split .poster, .favs.split .more { width: 121px; height: 176px; }
+</style>
+{% endblock %}
+{% block body %}
+<div class="card">
+  {% if backdrop %}<div class="backdrop" style="background-image:url('{{ backdrop }}')"></div>{% endif %}
+  <div class="shade"></div>
+  <div class="stars"></div>
+  <div class="content">
+    <div class="head">
+      <div class="avatar-wrap">
+        {% if avatar and avatar in loaded %}<img class="avatar" src="{{ avatar }}">{% else %}<div class="avatar placeholder"></div>{% endif %}
+      </div>
+      <div class="identity">
+        <div class="kicker"><span class="logo"><span class="a">A</span><span class="l">L</span></span><span class="label">{{ "Профиль AniList" if ru else "AniList profile" }}</span></div>
+        <div class="name">{{ name }}</div>
+        {% if genres %}<div class="chips">{% for g in genres %}<span class="chip">{{ g }}</span>{% endfor %}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="value">{{ anime_count }}</div><div class="label">{{ "Аниме" if ru else "Anime" }}</div></div>
+      <div class="stat"><div class="value">{{ days }}<small>{{ "дн" if ru else "d" }}</small></div><div class="label">{{ "Просмотрено" if ru else "Watched" }}</div></div>
+      <div class="stat"><div class="value">{{ score }}<small>%</small></div><div class="label">{{ "Средняя оценка" if ru else "Mean score" }}</div></div>
+      <div class="stat"><div class="value">{{ manga_count }}</div><div class="label">{{ "Манга" if ru else "Manga" }}</div></div>
+    </div>
+
+    <div class="favs{% if anime|length <= 4 and characters|length <= 4 and anime and characters %} split{% endif %}">
+    {% if anime %}
+    <div class="section">
+      <div class="section-title label">{{ "Любимое аниме" if ru else "Favourite anime" }}</div>
+      <div class="row{% if anime|length <= 6 %} big{% endif %}">
+        {% for item in anime %}
+          {% if item.cover and item.cover in loaded %}<img class="poster" src="{{ item.cover }}">{% else %}<div class="poster placeholder"></div>{% endif %}
+        {% endfor %}
+        {% if anime_more %}<div class="more"><b>+{{ anime_more }}</b><span>{{ "ЕЩЁ" if ru else "MORE" }}</span></div>{% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if characters %}
+    <div class="section">
+      <div class="section-title label">{{ "Любимые персонажи" if ru else "Favourite characters" }}</div>
+      <div class="row{% if characters|length <= 6 %} big{% endif %}">
+        {% for item in characters %}
+          {% if item.image and item.image in loaded %}<img class="poster" src="{{ item.image }}">{% else %}<div class="poster placeholder"></div>{% endif %}
+        {% endfor %}
+        {% if characters_more %}<div class="more"><b>+{{ characters_more }}</b><span>{{ "ЕЩЁ" if ru else "MORE" }}</span></div>{% endif %}
+      </div>
+    </div>
+    {% endif %}
+    </div>
+
+    <div class="footer">
+      <div class="brand"><span class="logo"><span class="a">A</span><span class="l">L</span></span>AniList × Telegram</div>
+      <div class="bot">@{{ bot }}</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
