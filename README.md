@@ -48,19 +48,6 @@
 <img src="docs/screenshots/auth-confirm.jpg" width="520" alt="Login confirmation">
 </div>
 
-## How it compares
-
-| | This project | lostb053/anibot | Fazendaaa/AnilistBot |
-|---|:---:|:---:|:---:|
-| Search anime, manga, characters, staff, users | ✅ | partial | inline only |
-| Edit list: status, progress, score, notes, dates | ✅ | status only | local list |
-| Respects the user's score format | ✅ | — | — |
-| Airing alerts from AniList data, deduplicated | ✅ | scraped sources | own scheduler |
-| AniList follows, likes and replies in Telegram | ✅ | — | — |
-| OAuth login without copying codes | ✅ | PIN | — |
-| Profile card, Wrapped, statistics | ✅ | basic | — |
-| Telegram Mini App | ✅ | — | — |
-
 ## Architecture
 
 ```mermaid
