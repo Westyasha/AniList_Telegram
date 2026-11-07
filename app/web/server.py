@@ -15,14 +15,17 @@ async def health(request: web.Request) -> web.Response:
     return web.json_response({"ok": True})
 
 
+Handler = Callable[[web.Request], Awaitable[web.StreamResponse]]
+
+
 @web.middleware
-async def api_headers(
-    request: web.Request, handler: Callable[[web.Request], Awaitable[web.StreamResponse]]
-) -> web.StreamResponse:
+async def cache_headers(request: web.Request, handler: Handler) -> web.StreamResponse:
     response = await handler(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
     if request.path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
-        response.headers["X-Content-Type-Options"] = "nosniff"
+    elif request.path.startswith("/assets/"):
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     return response
 
 
@@ -35,14 +38,13 @@ def mount_webapp(app: web.Application, dist: Path) -> None:
     async def spa(request: web.Request) -> web.FileResponse:
         return web.FileResponse(index, headers={"Cache-Control": "no-cache"})
 
-    assets = dist / "assets"
-    if assets.is_dir():
-        app.router.add_static("/assets", assets, append_version=False)
     app.router.add_get("/", spa)
+    app.router.add_get("/index.html", spa)
+    app.router.add_static("/", dist, append_version=False)
 
 
 def create_app(container: Container, bot: Bot) -> web.Application:
-    app = web.Application(middlewares=[api_headers], client_max_size=64 * 1024)
+    app = web.Application(middlewares=[cache_headers], client_max_size=64 * 1024)
     app[api.APP_KEY] = container
     app[oauth.BOT_KEY] = bot
     app.router.add_get("/healthz", health)

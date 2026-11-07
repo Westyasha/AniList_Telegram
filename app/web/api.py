@@ -1,3 +1,4 @@
+import ipaddress
 import json
 import logging
 from typing import Any
@@ -29,9 +30,17 @@ def error(status: int, code: str, message: str | None = None) -> web.Response:
     return web.json_response(body, status=status)
 
 
+def is_trusted_proxy(peer: str) -> bool:
+    try:
+        address = ipaddress.ip_address(peer)
+    except ValueError:
+        return False
+    return address.is_loopback or address.is_private
+
+
 def client_ip(request: web.Request) -> str:
     peer = request.remote or ""
-    if peer in ("127.0.0.1", "::1"):
+    if is_trusted_proxy(peer):
         return (
             request.headers.get("X-Real-IP") or request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or peer
         )
