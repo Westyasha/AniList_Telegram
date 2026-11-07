@@ -444,7 +444,7 @@ query CardUser($id: Int, $name: String) {
       manga { count meanScore chaptersRead volumesRead }
     }
     favourites {
-      anime(perPage: 11) { pageInfo { total } nodes { id title { userPreferred romaji english } coverImage { large } } }
+      anime(perPage: 11) { pageInfo { total } nodes { id title { userPreferred romaji english } coverImage { extraLarge large } } }
       characters(perPage: 11) { pageInfo { total } nodes { id name { full } image { large } } }
     }
   }
@@ -458,7 +458,7 @@ query WrappedActivity($userId: Int, $from: Int, $to: Int, $page: Int = 1) {
     activities(userId: $userId, type: ANIME_LIST, createdAt_greater: $from, createdAt_lesser: $to, sort: ID_DESC) {
       ... on ListActivity {
         createdAt status progress
-        media { id episodes duration genres title { userPreferred romaji english } coverImage { large } }
+        media { id episodes duration genres title { userPreferred romaji english } coverImage { extraLarge large } }
       }
     }
   }

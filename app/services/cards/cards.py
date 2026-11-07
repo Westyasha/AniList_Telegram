@@ -12,12 +12,16 @@ from app.services.cards.images import accent_colors, blurred_backdrop
 from app.services.cards.renderer import CardRenderer
 
 FAVOURITES_SHOWN = 10
+RENDER_VERSION = 2
+CARD_SCALE = 2.0
+WRAPPED_SCALE = 4 / 3
 WRAPPED_PAGES = 12
 _RANGE_RE = re.compile(r"(\d+)\s*-\s*(\d+)")
 
 
 def digest(data: Any) -> str:
-    return hashlib.blake2b(json.dumps(data, sort_keys=True, ensure_ascii=False).encode(), digest_size=12).hexdigest()
+    raw = json.dumps([RENDER_VERSION, data], sort_keys=True, ensure_ascii=False)
+    return hashlib.blake2b(raw.encode(), digest_size=12).hexdigest()
 
 
 async def fetch_card_user(client: AniListClient, name: str, token: str | None = None) -> dict[str, Any]:
@@ -46,7 +50,7 @@ def card_payload(user: dict[str, Any]) -> dict[str, Any]:
         "score": anime.get("meanScore") or 0,
         "genres": [g["genre"] for g in (anime.get("genres") or [])[:4]],
         "anime": [
-            {"title": helpers.title(n), "cover": helpers.cover(n, "large")} for n in anime_nodes[:FAVOURITES_SHOWN]
+            {"title": helpers.title(n), "cover": helpers.cover(n, "extraLarge")} for n in anime_nodes[:FAVOURITES_SHOWN]
         ],
         "anime_more": max(0, ((fav_anime.get("pageInfo") or {}).get("total") or len(anime_nodes)) - FAVOURITES_SHOWN),
         "characters": [{"name": helpers.name(n), "image": helpers.image(n)} for n in char_nodes[:FAVOURITES_SHOWN]],
@@ -74,6 +78,7 @@ async def render_profile_card(renderer: CardRenderer, payload: dict[str, Any], l
             "loaded": set(images),
         },
         width=1200,
+        scale=CARD_SCALE,
     )
 
 
@@ -141,7 +146,8 @@ async def wrapped_payload(client: AniListClient, user: dict[str, Any], year: int
         "best_month": best_month,
         "genres": genres.most_common(5),
         "top": [
-            {"title": helpers.title(m), "cover": helpers.cover(m, "large"), "count": per_media[m["id"]]} for m in top
+            {"title": helpers.title(m), "cover": helpers.cover(m, "extraLarge"), "count": per_media[m["id"]]}
+            for m in top
         ],
     }
 
@@ -166,4 +172,5 @@ async def render_wrapped(renderer: CardRenderer, payload: dict[str, Any], lang: 
         },
         width=1080,
         height=1920,
+        scale=WRAPPED_SCALE,
     )

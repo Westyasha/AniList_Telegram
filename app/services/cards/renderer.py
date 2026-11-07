@@ -49,7 +49,6 @@ class CardRenderer:
         self._lock = asyncio.Lock()
         self._playwright: Any = None
         self._browser: Any = None
-        self._context: Any = None
 
     async def start(self) -> None:
         await self.images.start()
@@ -67,18 +66,16 @@ class CardRenderer:
 
     async def _ensure_browser(self) -> Any:
         async with self._lock:
-            if self._context is not None and self._browser is not None and self._browser.is_connected():
-                return self._context
+            if self._browser is not None and self._browser.is_connected():
+                return self._browser
             from playwright.async_api import async_playwright
 
             if self._playwright is None:
                 self._playwright = await async_playwright().start()
             started = time.perf_counter()
             self._browser = await self._playwright.chromium.launch(args=CHROMIUM_ARGS)
-            self._context = await self._browser.new_context(device_scale_factor=1, java_script_enabled=False)
-            await self._context.route("**/*", self._serve)
             log.info("Chromium ready in %.0f ms", (time.perf_counter() - started) * 1000)
-            return self._context
+            return self._browser
 
     async def _serve(self, route: Any) -> None:
         url: str = route.request.url
@@ -101,26 +98,40 @@ class CardRenderer:
             return
         await route.abort()
 
-    async def render(self, template: str, data: dict[str, Any], *, width: int, height: int | None = None) -> bytes:
+    async def render(
+        self,
+        template: str,
+        data: dict[str, Any],
+        *,
+        width: int,
+        height: int | None = None,
+        scale: float = 2.0,
+    ) -> bytes:
         html = self._jinja.get_template(template).render(asset=ASSET_ORIGIN, **data)
         async with self._semaphore:
             started = time.perf_counter()
             for attempt in range(2):
-                context = await self._ensure_browser()
+                browser = await self._ensure_browser()
                 try:
-                    return await self._shoot(context, html, width, height, started)
+                    return await self._shoot(browser, html, width, height, scale, started)
                 except Exception:
                     if attempt:
                         raise
                     log.warning("Renderer failed, restarting Chromium", exc_info=True)
                     async with self._lock:
-                        self._context = None
+                        self._browser = None
             raise RuntimeError("unreachable")
 
-    async def _shoot(self, context: Any, html: str, width: int, height: int | None, started: float) -> bytes:
-        page = await context.new_page()
+    async def _shoot(
+        self, browser: Any, html: str, width: int, height: int | None, scale: float, started: float
+    ) -> bytes:
+        page = await browser.new_page(
+            viewport={"width": width, "height": height or 600},
+            device_scale_factor=scale,
+            java_script_enabled=False,
+        )
+        await page.route("**/*", self._serve)
         try:
-            await page.set_viewport_size({"width": width, "height": height or 600})
             await page.set_content(html, wait_until="load")
             await page.evaluate(
                 "Promise.all([document.fonts.ready, ...Array.from(document.images, i => i.decode().catch(() => null))]).then(() => true)"
@@ -132,9 +143,9 @@ class CardRenderer:
                 width, height = max(size["w"], 600), max(size["h"], 300)
                 await page.set_viewport_size({"width": width, "height": height})
             image = await page.screenshot(
-                type="jpeg", quality=92, clip={"x": 0, "y": 0, "width": width, "height": height}
+                type="jpeg", quality=94, clip={"x": 0, "y": 0, "width": width, "height": height}
             )
         finally:
-            await page.close()
-        log.info("Rendered %dx%d in %.0f ms", width, height, (time.perf_counter() - started) * 1000)
+            await page.context.close()
+        log.info("Rendered %dx%d@%.2gx in %.0f ms", width, height, scale, (time.perf_counter() - started) * 1000)
         return image

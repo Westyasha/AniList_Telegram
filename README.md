@@ -23,7 +23,7 @@
 - **One message, no clutter.** Every menu is a screen that edits itself in place. Back navigation survives restarts.
 - **Real list management.** Status, `+1 episode` from anywhere, rewatch counting, notes, removal — and scores in *your* AniList score format (100 / 10.0 / 10 / ★5 / 🙂3).
 - **Notifications that are right.** Checked every 5 minutes, sent only for episodes that actually aired, deduplicated in the database, per-status toggles, sequel/spin-off alerts and AniList follows, likes and replies relayed to Telegram.
-- **Profile card in ~0.6 s.** A persistent Chromium renders cards from prefetched images (was ~8 s). Cached by content hash, re-sent instantly by `file_id`.
+- **Crisp profile card in under a second.** A persistent Chromium renders 2400 px cards from prefetched full-size images (was ~8 s at 1200 px). Cached by content hash, re-sent instantly by `file_id`.
 - **AniList Wrapped.** A story-format yearly recap built from your real activity: episodes, hours, monthly chart, top genres and titles.
 - **Telegram Mini App.** AniList-style home, search with filters, weekly schedule, library with a full entry editor, profile statistics, notifications inbox.
 - **Proper login.** OAuth authorization-code flow with a confirmation page — no copy-pasting tokens.
@@ -42,7 +42,7 @@
 
 <div align="center">
 <img src="docs/screenshots/card.jpg" width="100%" alt="Profile card">
-<br><sub>Profile card — rendered in ~0.6 s and cached by content hash</sub>
+<br><sub>Profile card — 2400 px, rendered in under a second and cached by content hash</sub>
 </div>
 
 ## How it compares
