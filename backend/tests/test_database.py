@@ -19,6 +19,7 @@ from app.db.repositories import (
     OAuthStateRepository,
     TextRepository,
     UserRepository,
+    normalize_appearance,
     normalize_layout,
 )
 from app.db.schema import Base, UserRow
@@ -171,3 +172,20 @@ def test_normalize_layout() -> None:
     assert normalize_layout(None)[-1] == ["app", "settings"]
     assert normalize_layout([["search", "search", "bogus"]]) == [["search"], ["settings"]]
     assert normalize_layout([["menu_search", "menu_mylist"]])[0] == ["search", "list"]
+
+
+def test_normalize_appearance() -> None:
+    assert normalize_appearance(None) == {"theme": "dark", "accent": "crimson"}
+    assert normalize_appearance({"theme": "glass", "accent": "teal"}) == {"theme": "glass", "accent": "teal"}
+    assert normalize_appearance({"theme": "neon", "accent": "<script>"}) == {"theme": "dark", "accent": "crimson"}
+
+
+@needs_db
+async def test_appearance_roundtrip(db: Database) -> None:
+    users = UserRepository(db, TokenCipher("k"))
+    await users.get_or_create(7)
+    saved = await users.set_appearance(7, {"theme": "light", "accent": "blue", "extra": "x"})
+    assert saved == {"theme": "light", "accent": "blue"}
+    user = await users.get(7)
+    assert user is not None
+    assert user.appearance == saved

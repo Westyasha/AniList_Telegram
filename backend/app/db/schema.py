@@ -35,6 +35,7 @@ class UserRow(Base):
     title_language: Mapped[str] = mapped_column(String(24), default="ENGLISH", server_default="ENGLISH")
     notifications: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default="{}")
     keyboard_layout: Mapped[list[Any] | None] = mapped_column(JSONB)
+    appearance: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default="{}")
     last_notification: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     blocked: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     created_at: Mapped[datetime] = created_column()

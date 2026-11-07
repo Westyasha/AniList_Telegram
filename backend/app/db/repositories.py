@@ -6,7 +6,15 @@ from sqlalchemy import delete, func, select, update
 from sqlalchemy.dialects.postgresql import insert
 
 from app.db.database import Database
-from app.db.models import DEFAULT_LAYOUT, MENU_BUTTONS, NOTIFICATION_DEFAULTS, User
+from app.db.models import (
+    ACCENTS,
+    APPEARANCE_DEFAULTS,
+    DEFAULT_LAYOUT,
+    MENU_BUTTONS,
+    NOTIFICATION_DEFAULTS,
+    THEMES,
+    User,
+)
 from app.db.schema import (
     ImageCacheRow,
     KeyValueRow,
@@ -67,6 +75,16 @@ def normalize_notifications(saved: Any) -> dict[str, bool]:
     return {**NOTIFICATION_DEFAULTS, **{k: bool(v) for k, v in values.items() if k in NOTIFICATION_DEFAULTS}}
 
 
+def normalize_appearance(saved: Any) -> dict[str, str]:
+    values = saved if isinstance(saved, dict) else {}
+    result = dict(APPEARANCE_DEFAULTS)
+    if values.get("theme") in THEMES:
+        result["theme"] = values["theme"]
+    if values.get("accent") in ACCENTS:
+        result["accent"] = values["accent"]
+    return result
+
+
 class UserRepository:
     def __init__(self, db: Database, cipher: TokenCipher) -> None:
         self._db = db
@@ -85,6 +103,7 @@ class UserRepository:
             notifications=normalize_notifications(row.notifications),
             keyboard_layout=normalize_layout(row.keyboard_layout),
             last_notification=row.last_notification,
+            appearance=normalize_appearance(row.appearance),
         )
 
     async def get(self, user_id: int) -> User | None:
@@ -154,6 +173,11 @@ class UserRepository:
 
     async def set_notifications(self, user_id: int, settings: dict[str, bool]) -> None:
         await self._update(user_id, notifications=normalize_notifications(settings))
+
+    async def set_appearance(self, user_id: int, appearance: dict[str, Any]) -> dict[str, str]:
+        clean = normalize_appearance(appearance)
+        await self._update(user_id, appearance=clean)
+        return clean
 
     async def set_layout(self, user_id: int, layout: list[list[str]]) -> None:
         await self._update(user_id, keyboard_layout=normalize_layout(layout))

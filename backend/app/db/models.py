@@ -10,6 +10,10 @@ NOTIFICATION_DEFAULTS: dict[str, bool] = {
     "anilist_activity": False,
 }
 
+THEMES: tuple[str, ...] = ("dark", "light", "system", "glass")
+ACCENTS: tuple[str, ...] = ("crimson", "profile", "blue", "violet", "green", "amber", "pink", "teal")
+APPEARANCE_DEFAULTS: dict[str, str] = {"theme": "dark", "accent": "crimson"}
+
 DEFAULT_LAYOUT: list[list[str]] = [
     ["search", "list"],
     ["trending", "schedule"],
@@ -42,6 +46,7 @@ class User:
     notifications: dict[str, bool] = field(default_factory=lambda: dict(NOTIFICATION_DEFAULTS))
     keyboard_layout: list[list[str]] = field(default_factory=lambda: [row[:] for row in DEFAULT_LAYOUT])
     last_notification: int = 0
+    appearance: dict[str, str] = field(default_factory=lambda: dict(APPEARANCE_DEFAULTS))
     is_new: bool = False
 
     @property

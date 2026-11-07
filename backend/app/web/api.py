@@ -7,7 +7,7 @@ from aiohttp import web
 
 from app.anilist.client import AniListError, RateLimitedError
 from app.container import Container
-from app.db.models import NOTIFICATION_DEFAULTS, User
+from app.db.models import APPEARANCE_DEFAULTS, NOTIFICATION_DEFAULTS, User
 from app.i18n import LANGUAGES
 from app.security import InitDataError, WebAppIdentity, new_nonce, validate_init_data
 from app.web.operations import OPERATIONS
@@ -78,6 +78,7 @@ async def session_payload(
         "bot_username": container.bot_username,
         "anilist": None,
         "notifications": dict(user.notifications) if user else dict(NOTIFICATION_DEFAULTS),
+        "appearance": dict(user.appearance) if user else dict(APPEARANCE_DEFAULTS),
     }
     if who:
         payload["user"] = {
@@ -137,6 +138,9 @@ async def post_settings(request: web.Request) -> web.Response:
     if lang in LANGUAGES:
         await container.users.set_lang(user.user_id, lang)
         user.lang = lang
+    appearance = body.get("appearance")
+    if isinstance(appearance, dict):
+        user.appearance = await container.users.set_appearance(user.user_id, {**user.appearance, **appearance})
     notifications = body.get("notifications")
     if isinstance(notifications, dict):
         merged = {**user.notifications, **{k: bool(v) for k, v in notifications.items() if k in NOTIFICATION_DEFAULTS}}
