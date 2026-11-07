@@ -198,6 +198,7 @@ export interface Session {
   anilist: SessionAniList | null;
   notifications: NotificationSettings;
   appearance?: Appearance;
+  is_admin?: boolean;
 }
 
 export interface SettingsPayload {

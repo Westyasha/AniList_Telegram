@@ -27,6 +27,10 @@ export function formatDayMonth(date: Date, locale: string): string {
   return new Intl.DateTimeFormat(locale, { day: "numeric", month: "long" }).format(date);
 }
 
+export function formatShortDay(isoDay: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${isoDay}T00:00:00Z`));
+}
+
 export function formatFuzzyDate(date: FuzzyDate | null | undefined, locale: string): string | null {
   if (!date?.year) return null;
   if (date.month && date.day) {

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { Check, ChevronRight, ExternalLink } from "lucide-react";
 import { useLogout } from "@/api/auth";
 import { useSession, useUpdateSettings } from "@/api/session";
@@ -54,6 +55,7 @@ export function SettingsScreen() {
   const session = useSession();
   const update = useUpdateSettings();
   const logout = useLogout();
+  const router = useRouter();
   const notifications = session.notifications;
   const anilist = session.anilist;
 
@@ -138,6 +140,7 @@ export function SettingsScreen() {
         </div>
         {session.bot_username ? <Row label={t.settings.bot} value={`@${session.bot_username}`} external onClick={() => openTelegram(`https://t.me/${session.bot_username}`)} /> : null}
         <Row label={t.settings.source} value="GitHub" external onClick={() => openExternal(REPO_URL)} />
+        {session.is_admin ? <Row label={t.admin.entry} onClick={() => router.push("/admin")} /> : null}
       </Group>
     </div>
   );
