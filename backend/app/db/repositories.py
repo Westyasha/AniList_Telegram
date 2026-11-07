@@ -1,5 +1,5 @@
 import hashlib
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import delete, func, select, update
@@ -23,6 +23,7 @@ from app.db.schema import (
     OAuthStateRow,
     SentNotificationRow,
     ShortTextRow,
+    UserActivityRow,
     UserRow,
 )
 from app.security import TokenCipher
@@ -398,4 +399,38 @@ class KeyValueRepository:
                 insert(KeyValueRow)
                 .values(key=key, value=value)
                 .on_conflict_do_update(index_elements=["key"], set_={"value": value})
+            )
+
+
+class ActivityRepository:
+    def __init__(self, db: Database) -> None:
+        self._db = db
+
+    async def record(self, day: date, counts: dict[int, tuple[int, int]], seen_at: datetime) -> None:
+        if not counts:
+            return
+        rows = [
+            {"day": day, "user_id": user_id, "bot_events": bot, "app_events": app}
+            for user_id, (bot, app) in counts.items()
+        ]
+        statement = insert(UserActivityRow).values(rows)
+        statement = statement.on_conflict_do_update(
+            index_elements=[UserActivityRow.day, UserActivityRow.user_id],
+            set_={
+                "bot_events": UserActivityRow.bot_events + statement.excluded.bot_events,
+                "app_events": UserActivityRow.app_events + statement.excluded.app_events,
+            },
+        )
+        async with self._db.begin() as conn:
+            await conn.execute(statement)
+            await conn.execute(
+                update(UserRow)
+                .where(UserRow.user_id.in_(list(counts)))
+                .values(last_seen_at=seen_at, updated_at=UserRow.updated_at)
+            )
+
+    async def prune(self, days: int) -> None:
+        async with self._db.begin() as conn:
+            await conn.execute(
+                delete(UserActivityRow).where(UserActivityRow.day < utcnow().date() - timedelta(days=days))
             )

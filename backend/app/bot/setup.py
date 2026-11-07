@@ -3,9 +3,11 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.exceptions import TelegramAPIError
 from aiogram.types import (
     BotCommand,
     BotCommandScopeAllPrivateChats,
+    BotCommandScopeChat,
     LinkPreviewOptions,
     MenuButtonWebApp,
     WebAppInfo,
@@ -13,7 +15,7 @@ from aiogram.types import (
 
 from app.bot import screens
 from app.bot.handlers import actions, cards, commands, errors, inline, inputs, navigation
-from app.bot.middlewares import ContextMiddleware
+from app.bot.middlewares import ContextMiddleware, MetricsMiddleware
 from app.container import Container
 from app.db.fsm import PostgresStorage
 from app.i18n import LANGUAGES, i18n
@@ -50,6 +52,7 @@ def create_bot(token: str) -> Bot:
 
 def create_dispatcher(container: Container) -> Dispatcher:
     dp = Dispatcher(storage=PostgresStorage(container.db))
+    dp.update.outer_middleware(MetricsMiddleware())
     dp.update.outer_middleware(ContextMiddleware(container))
     dp.include_routers(
         errors.router,
@@ -74,6 +77,14 @@ async def configure_bot(bot: Bot, container: Container) -> None:
         await bot.set_my_commands(commands, scope=BotCommandScopeAllPrivateChats(), language_code=language_code)
         await bot.set_my_short_description(_("bot.short_description"), language_code=language_code)
         await bot.set_my_description(_("bot.description"), language_code=language_code)
+        admin_commands = [*commands, BotCommand(command="admin", description=_("commands.admin"))]
+        for admin_id in container.settings.admins:
+            try:
+                await bot.set_my_commands(
+                    admin_commands, scope=BotCommandScopeChat(chat_id=admin_id), language_code=language_code
+                )
+            except TelegramAPIError as exc:
+                log.warning("Admin commands for %s not set: %s", admin_id, exc)
     if container.settings.webapp_url:
         await bot.set_chat_menu_button(
             menu_button=MenuButtonWebApp(text="AniList", web_app=WebAppInfo(url=container.settings.webapp_url))

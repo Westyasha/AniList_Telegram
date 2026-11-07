@@ -8,6 +8,8 @@ from typing import Any
 
 import aiohttp
 
+from app.services.metrics import metrics
+
 API_URL = "https://graphql.anilist.co"
 USER_AGENT = "AniListTelegram/2.0 (+https://github.com/Westyasha/AniList_Telegram)"
 
@@ -42,6 +44,14 @@ class SlidingWindowLimiter:
         self._calls: deque[float] = deque()
         self._lock = asyncio.Lock()
         self._blocked_until = 0.0
+
+    def usage(self) -> tuple[int, int]:
+        now = time.monotonic()
+        return sum(1 for call in self._calls if now - call < self._window), self._limit
+
+    @property
+    def blocked_for(self) -> float:
+        return max(0.0, self._blocked_until - time.monotonic())
 
     def block(self, seconds: float) -> None:
         self._blocked_until = max(self._blocked_until, time.monotonic() + seconds)
@@ -86,6 +96,9 @@ class TTLCache:
     def clear(self) -> None:
         self._data.clear()
 
+    def __len__(self) -> int:
+        return len(self._data)
+
 
 def _cache_key(document: str, variables: dict[str, Any] | None, token: str | None) -> str:
     raw = json.dumps([document, variables or {}, token or ""], sort_keys=True, ensure_ascii=False)
@@ -120,6 +133,16 @@ class AniListClient:
     def invalidate(self) -> None:
         self._cache.clear()
 
+    def stats(self) -> dict[str, Any]:
+        used, limit = self._limiter.usage()
+        return {
+            "window_used": used,
+            "window_limit": limit,
+            "blocked_for": round(self._limiter.blocked_for, 1),
+            "cache_entries": len(self._cache),
+            "inflight": len(self._inflight),
+        }
+
     async def query(
         self,
         document: str,
@@ -128,6 +151,7 @@ class AniListClient:
         token: str | None = None,
         ttl: float = 0,
     ) -> dict[str, Any]:
+        metrics.anilist_calls.record()
         if ttl <= 0:
             return await self._execute(document, variables, token)
         key = _cache_key(document, variables, token)
@@ -159,9 +183,13 @@ class AniListClient:
         last_error: AniListError | None = None
         for attempt in range(3):
             await self._limiter.acquire()
+            started = time.perf_counter()
             try:
                 async with self.session.post(API_URL, json=payload, headers=headers) as resp:
+                    elapsed = (time.perf_counter() - started) * 1000
+                    metrics.anilist.record(elapsed, error=resp.status >= 400 and resp.status not in (401, 404))
                     if resp.status == 429:
+                        metrics.anilist_limited.record()
                         retry_after = float(resp.headers.get("Retry-After") or 30)
                         self._limiter.block(retry_after)
                         last_error = RateLimitedError(retry_after)
@@ -178,6 +206,7 @@ class AniListClient:
                         continue
                     body = await resp.json(content_type=None)
             except (TimeoutError, aiohttp.ClientError) as exc:
+                metrics.anilist.record((time.perf_counter() - started) * 1000, error=True)
                 last_error = AniListError(f"Network error: {exc.__class__.__name__}", 503)
                 await asyncio.sleep(1 + attempt)
                 continue

@@ -5,6 +5,7 @@ from contextlib import suppress
 from app.bot.setup import configure_bot, create_bot, create_dispatcher
 from app.config import Settings
 from app.container import Container
+from app.services.metrics import MetricsLogHandler, metrics
 from app.services.notifier import Notifier
 from app.web.server import start_server
 
@@ -18,6 +19,7 @@ def setup_logging(level: str) -> None:
     )
     logging.getLogger("aiogram.event").setLevel(logging.WARNING)
     logging.getLogger("aiohttp.access").setLevel(logging.WARNING)
+    logging.getLogger().addHandler(MetricsLogHandler(metrics))
 
 
 async def run() -> None:
@@ -27,6 +29,8 @@ async def run() -> None:
     await container.db.connect()
     await container.anilist.start()
     await container.renderer.start()
+    metrics.start()
+    container.activity.start()
 
     bot = create_bot(settings.bot_token.get_secret_value())
     dispatcher = create_dispatcher(container)
@@ -44,6 +48,8 @@ async def run() -> None:
         )
     finally:
         await notifier.stop()
+        await container.activity.stop()
+        await metrics.stop()
         await runner.cleanup()
         await container.renderer.close()
         await container.anilist.close()

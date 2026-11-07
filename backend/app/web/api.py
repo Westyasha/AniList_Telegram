@@ -65,6 +65,7 @@ async def current_user(request: web.Request) -> tuple[WebAppIdentity | None, Use
     if who is None:
         return None, None
     container = request.app[APP_KEY]
+    container.activity.touch(who.user_id, "app")
     user = await container.users.get_or_create(who.user_id, who.language_code)
     return who, user
 
@@ -79,6 +80,7 @@ async def session_payload(
         "anilist": None,
         "notifications": dict(user.notifications) if user else dict(NOTIFICATION_DEFAULTS),
         "appearance": dict(user.appearance) if user else dict(APPEARANCE_DEFAULTS),
+        "is_admin": bool(who and container.is_admin(who.user_id)),
     }
     if who:
         payload["user"] = {

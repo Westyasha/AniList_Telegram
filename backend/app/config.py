@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     notifier_interval: int = 300
     renderer_concurrency: int = 2
     log_level: str = "INFO"
+    admin_ids: str = ""
+
+    @property
+    def admins(self) -> frozenset[int]:
+        return frozenset(int(part) for part in self.admin_ids.replace(";", ",").split(",") if part.strip().isdigit())
 
     @property
     def pin_flow(self) -> bool:

@@ -2,8 +2,10 @@ from dataclasses import dataclass
 
 from app.anilist.client import AniListClient
 from app.config import Settings
+from app.db.admin import AdminQueries
 from app.db.database import Database
 from app.db.repositories import (
+    ActivityRepository,
     ImageCacheRepository,
     KeyValueRepository,
     NavigationRepository,
@@ -14,6 +16,7 @@ from app.db.repositories import (
     UserRepository,
 )
 from app.security import TokenCipher
+from app.services.activity import ActivityTracker
 from app.services.cards.renderer import CardRenderer
 
 
@@ -32,7 +35,12 @@ class Container:
     kv: KeyValueRepository
     sent: NotificationLog
     renderer: CardRenderer
+    activity: ActivityTracker
+    admin: AdminQueries
     bot_username: str = ""
+
+    def is_admin(self, user_id: int) -> bool:
+        return user_id in self.settings.admins
 
     @classmethod
     def build(cls, settings: Settings) -> "Container":
@@ -52,4 +60,6 @@ class Container:
             kv=KeyValueRepository(db),
             sent=NotificationLog(db),
             renderer=CardRenderer(concurrency=settings.renderer_concurrency),
+            activity=ActivityTracker(ActivityRepository(db)),
+            admin=AdminQueries(db),
         )

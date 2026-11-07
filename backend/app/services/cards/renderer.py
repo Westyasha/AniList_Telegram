@@ -8,6 +8,7 @@ from typing import Any
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from app.services.cards.images import ImageStore
+from app.services.metrics import metrics
 
 log = logging.getLogger(__name__)
 
@@ -147,5 +148,7 @@ class CardRenderer:
             )
         finally:
             await page.context.close()
-        log.info("Rendered %dx%d@%.2gx in %.0f ms", width, height, scale, (time.perf_counter() - started) * 1000)
+        elapsed = (time.perf_counter() - started) * 1000
+        metrics.renders.record(elapsed)
+        log.info("Rendered %dx%d@%.2gx in %.0f ms", width, height, scale, elapsed)
         return image

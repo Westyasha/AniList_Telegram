@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
-from sqlalchemy import BigInteger, Boolean, DateTime, Index, Integer, MetaData, String, Text, func
+from sqlalchemy import BigInteger, Boolean, Date, DateTime, Index, Integer, MetaData, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -38,6 +38,7 @@ class UserRow(Base):
     appearance: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default="{}")
     last_notification: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     blocked: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
     created_at: Mapped[datetime] = created_column()
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
@@ -119,3 +120,13 @@ class KeyValueRow(Base):
 
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     value: Mapped[str] = mapped_column(Text)
+
+
+class UserActivityRow(Base):
+    __tablename__ = "user_activity"
+    __table_args__ = (Index("ix_user_activity_user_id", "user_id"),)
+
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    bot_events: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    app_events: Mapped[int] = mapped_column(Integer, default=0, server_default="0")

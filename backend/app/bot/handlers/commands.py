@@ -57,6 +57,14 @@ async def cmd_menu(message: Message, ctx: Ctx) -> None:
     await open_screen(message, ctx, nav.HOME)
 
 
+@router.message(Command("admin"))
+async def cmd_admin(message: Message, ctx: Ctx) -> None:
+    if not ctx.app.is_admin(ctx.user.user_id):
+        await open_screen(message, ctx, nav.HOME)
+        return
+    await open_screen(message, ctx, "/admin")
+
+
 @router.message(Command("help"))
 async def cmd_help(message: Message, ctx: Ctx) -> None:
     await open_screen(message, ctx, "/help")

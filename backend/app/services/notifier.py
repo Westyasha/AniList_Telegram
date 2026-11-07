@@ -15,6 +15,7 @@ from app.bot.ui import Kb, b, btn, h
 from app.container import Container
 from app.db.models import User
 from app.i18n import i18n
+from app.services.metrics import metrics
 
 log = logging.getLogger(__name__)
 
@@ -68,6 +69,8 @@ class Notifier:
             except Exception:
                 log.exception("Notifier tick failed")
             elapsed = time.monotonic() - started
+            metrics.notifier_last_run = time.time()
+            metrics.notifier_last_duration = elapsed
             await asyncio.sleep(max(30.0, self.app.settings.notifier_interval - elapsed))
 
     async def tick(self) -> None:
@@ -225,6 +228,7 @@ class Notifier:
         for _ in range(2):
             try:
                 await self.bot.send_message(user.user_id, text, reply_markup=markup, link_preview_options=preview)
+                metrics.notifications.record()
                 await asyncio.sleep(0.05)
                 return
             except TelegramRetryAfter as exc:
