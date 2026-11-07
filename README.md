@@ -1,290 +1,177 @@
 <div align="center">
 
-<img src="https://i.imgur.com/6dhiE9d.png" alt="AniList Bot Banner" width="100%">
+<img src="docs/assets/banner.jpg" alt="AniList for Telegram" width="100%">
 
-# AniList Telegram Bot (unofficial)
+# AniList for Telegram
 
-**A Telegram bot for tracking anime & manga via your AniList account.**  
-Profile cards · Episode notifications · Inline search · Full list management
+**The most complete AniList client for Telegram — a fast bot, smart notifications, shareable cards and a full Mini App.**
 
-[**Try the bot**](https://t.me/westyasha_AniList_bot)
+[![CI](https://github.com/Westyasha/AniList_Telegram/actions/workflows/ci.yml/badge.svg)](https://github.com/Westyasha/AniList_Telegram/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.12-E0233D?logo=python&logoColor=white)
+![aiogram](https://img.shields.io/badge/aiogram-3.26-E0233D?logo=telegram&logoColor=white)
+![React](https://img.shields.io/badge/Mini%20App-React%20%2B%20TS-E0233D?logo=react&logoColor=white)
+![Languages](https://img.shields.io/badge/i18n-RU%20%7C%20EN-E0233D)
+
+[**Open the bot →**](https://t.me/westyasha_AniList_bot)
 
 </div>
 
 ---
+
+## Highlights
+
+- **One message, no clutter.** Every menu is a screen that edits itself in place. Back navigation survives restarts.
+- **Real list management.** Status, `+1 episode` from anywhere, rewatch counting, notes, removal — and scores in *your* AniList score format (100 / 10.0 / 10 / ★5 / 🙂3).
+- **Notifications that are right.** Checked every 5 minutes, sent only for episodes that actually aired, deduplicated in the database, per-status toggles, sequel/spin-off alerts and AniList follows, likes and replies relayed to Telegram.
+- **Profile card in ~0.6 s.** A persistent Chromium renders cards from prefetched images (was ~8 s). Cached by content hash, re-sent instantly by `file_id`.
+- **AniList Wrapped.** A story-format yearly recap built from your real activity: episodes, hours, monthly chart, top genres and titles.
+- **Telegram Mini App.** AniList-style home, search with filters, weekly schedule, library with a full entry editor, profile statistics, notifications inbox.
+- **Proper login.** OAuth authorization-code flow with a confirmation page — no copy-pasting tokens.
+- **Fully bilingual.** Russian and English everywhere: bot, cards, auth pages, Mini App, command menu.
+- **Inline mode.** Share any anime, what you're watching, or your profile card in any chat.
 
 ## Screenshots
 
-### Profile Card
+| Home | Title | Profile |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/app-home.jpg" width="260"> | <img src="docs/screenshots/app-media.jpg" width="260"> | <img src="docs/screenshots/app-profile.jpg" width="260"> |
+
+| Schedule | Search | Wrapped |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/app-schedule.jpg" width="260"> | <img src="docs/screenshots/app-search.jpg" width="260"> | <img src="docs/screenshots/wrapped.jpg" width="260"> |
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/1154d3ed-24bf-4eac-b169-088fe8daf96e" alt="Profile Card" width="100%">
+<img src="docs/screenshots/card.jpg" width="100%" alt="Profile card">
+<br><sub>Profile card — rendered in ~0.6 s and cached by content hash</sub>
 </div>
 
----
+## How it compares
 
-### Feature Demos
+| | This project | lostb053/anibot | Fazendaaa/AnilistBot |
+|---|:---:|:---:|:---:|
+| Search anime, manga, characters, staff, users | ✅ | partial | inline only |
+| Edit list: status, progress, score, notes | ✅ | status only | local list |
+| Respects the user's score format | ✅ | — | — |
+| Airing alerts from AniList data, deduplicated | ✅ | scraped sources | own scheduler |
+| AniList follows / likes / replies in Telegram | ✅ | — | — |
+| OAuth login without copying codes | ✅ | PIN | — |
+| Profile card, Wrapped, statistics | ✅ | basic | — |
+| Telegram Mini App | ✅ | — | — |
+| In-place message navigation | ✅ | — | — |
 
+## Architecture
 
-| Profile Card — Generation | Profile Card — Result |
-|:---:|:---:|
-| <img src="https://i.imgur.com/dmAmXBB.gif" width="420"> | <img src="https://imgur.com/IcGSavr.png" width="420"> |
-
-| Wrapped Stats | Anime Search |
-|:---:|:---:|
-| <img src="https://github.com/user-attachments/assets/7a2405f8-81a2-4cd6-805d-df05633c8e1a" width="420"> | <img src="https://github.com/user-attachments/assets/c9913cb4-66fc-4fa5-af9c-35036e828625" width="420"> |
-
-
-
-| Find Profile | Inline Mode |
-| :--- | :--- |
-| <img src="https://github.com/user-attachments/assets/40f67f04-57e5-43c6-bd96-6c0940f7a80c" width="450" /> | <img width="359" height="322" alt="image" src="https://github.com/user-attachments/assets/1d11e9ba-7c59-4b68-a3c4-6113795b439d" />
-
-
----
-
-## Features
-
-### Profile Card
-Generates a glassmorphism-style profile card from your AniList data — avatar, stats, favourite anime and characters. The avatar ring adapts its color to your profile picture automatically. Cards are cached by data hash, so unchanged data returns instantly.
-
-### Search
-- Anime, manga, characters, staff search with paginated results
-- Fuzzy search — finds titles even with typos
-- Advanced filter — by genre, year, minimum score
-- Full media detail view: synopsis, score, episodes, airing status, trailer link
-
-### List Management
-- View your Watching / Completed / Planning / Dropped / Paused / Rewatching lists
-- Add, edit, remove titles directly from Telegram
-- +1 / -1 episode progress buttons
-- Rate titles (1–10), add personal notes
-- Toggle Favourites for anime, manga, characters, staff
-
-### Notifications
-Per-user notification settings for:
-- New episodes of titles in your Watching / Planning / Paused / Dropped lists
-- Related titles (sequels, prequels, spin-offs) being added to AniList
-
-### Browse
-- Trending anime and manga (paginated)
-- Current season picker with navigation between seasons and years
-- Airing schedule — upcoming and recently aired episodes
-
-### Wrapped
-Annual stats card — episodes watched, top genres, most watched anime, monthly activity graph.
-
-### Inline Mode
-Use `@westyasha_AniList_bot` in any chat:
-- Search and share anime cards inline
-- Share your Now Watching list
-- Share your Profile Card
-
-### Settings
-- Language switching (Russian / English)
-- Custom keyboard layout
-- Notification granularity settings
-- Manual cache reset
-
----
-
-## Project Structure
-
-```
-.
-├── bot.py                  # Entry point, router registration
-├── config.py               # Env vars
-├── storage.py              # SQLite DB layer
-├── notifier.py             # Background task — episode notifications
-├── handlers/
-│   ├── auth.py             # /start, authorization flow, onboarding
-│   ├── search.py           # Search + advanced filter
-│   ├── media.py            # Media detail view
-│   ├── mylist.py           # List management
-│   ├── browse.py           # Trending, season, schedule, profile
-│   ├── profile_extra.py    # Profile card, Wrapped, inline card/watching
-│   ├── findprofile.py      # /findprofile — look up any AniList user
-│   ├── inline.py           # Inline query handler
-│   └── help.py             # /help
-├── core/
-│   ├── api.py              # AniList GraphQL queries
-│   ├── formatters.py       # Text formatters, MarkdownV2 escaping
-│   ├── image_gen.py        # Playwright HTML→PNG renderer
-│   ├── fuzzy.py            # Fuzzy title matching
-│   └── filter.py           # Filter state helpers
-├── templates/
-│   ├── profile_card.html   # Glassmorphism profile card template (Jinja2)
-│   └── wrapped.html        # Annual Wrapped card template
-├── locales/
-│   └── i18n.py             # All UI strings (RU / EN)
-├── keyboards.py            # All inline & reply keyboards
-└── requirements.txt
+```mermaid
+flowchart LR
+    TG[Telegram] -->|updates| BOT[aiogram dispatcher]
+    BOT --> NAV[Screen router<br/>edit-in-place + nav stack]
+    NAV --> SCR[Screens]
+    BOT --> ACT[Actions / input / inline]
+    MA[Mini App<br/>React + TS] -->|initData| API[aiohttp API<br/>persisted operations]
+    API --> AL
+    SCR --> AL[AniList client<br/>rate limit · cache · dedupe]
+    ACT --> AL
+    AL --> GQL[(AniList GraphQL)]
+    NOTIF[Notifier] --> AL
+    NOTIF --> TG
+    CARDS[Card renderer<br/>persistent Chromium] --> TG
+    BOT & API & NOTIF --> DB[(SQLite<br/>encrypted tokens)]
+    OAUTH[/auth/callback/] --> DB
 ```
 
----
+```
+app/
+├── anilist/        GraphQL client, queries, OAuth, helpers
+├── bot/
+│   ├── navigation.py   screen router and in-place rendering
+│   ├── screens/        home, search, media, library, browse, profile, settings, auth, help
+│   └── handlers/       commands, actions, input, cards, inline, errors
+├── db/             schema, migrations, repositories, FSM storage
+├── i18n/           ru.toml, en.toml
+├── services/       notifier, cards (renderer, templates, fonts), auth
+└── web/            Mini App API, OAuth pages
+webapp/             Telegram Mini App (Vite, React, TypeScript, Tailwind)
+deploy/             systemd unit, nginx config, deploy script
+tests/              pytest suite
+```
 
-## Setup
+### Design notes
 
-### Prerequisites
+- **Screens are routes.** Callback data like `/m/154587` resolves to a builder that returns `Screen(text, keyboard, image)`. The image is rendered as a large link preview above the text, so every screen is a text message that can always be edited.
+- **AniList rate limits.** The API currently allows 30 requests per minute. A shared sliding-window limiter, `Retry-After` handling, response caching and in-flight request deduplication keep the bot inside that budget.
+- **Security.** AniList tokens are encrypted at rest (Fernet). Mini App requests are authenticated by validating Telegram `initData` (HMAC-SHA256, freshness check) and can only run allow-listed GraphQL operations with per-user rate limits. OAuth `state` is a single-use nonce bound to the Telegram user, and the final step shows both accounts before linking.
 
-- Python 3.11+
-- A [Telegram Bot Token](https://t.me/BotFather)
-- An [AniList OAuth app](https://anilist.co/settings/developer) (Client ID + Secret)
-- Playwright Chromium (for card generation)
+## Self-hosting
 
----
+### Requirements
 
-### Option A — Local / VPS
+- Python 3.12+, Node 20.19+
+- A bot token from [@BotFather](https://t.me/BotFather)
+- An AniList API client from [anilist.co/settings/developer](https://anilist.co/settings/developer) with the redirect URL `https://<your-domain>/auth/callback`
+- A domain with HTTPS for the Mini App and OAuth callback
 
-**1. Clone & install**
+### Local run
 
 ```bash
 git clone https://github.com/Westyasha/AniList_Telegram.git
 cd AniList_Telegram
-
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-pip install -r requirements.txt
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements-dev.txt
 playwright install chromium
+cp .env.example .env
+python -m app
 ```
 
-**2. Configure environment**
+Mini App development server (proxies `/api` to the bot backend):
+
+```bash
+cd webapp
+npm install
+VITE_API_PROXY=http://127.0.0.1:8090 npm run dev
+```
+
+### Docker
 
 ```bash
 cp .env.example .env
+docker compose up -d --build
 ```
 
-Edit `.env`:
-
-```env
-BOT_TOKEN=your_telegram_bot_token
-ANILIST_CLIENT_ID=your_anilist_client_id
-ANILIST_CLIENT_SECRET=your_anilist_client_secret
-ANILIST_REDIRECT_URI=https://anilist.co/api/v2/oauth/pin
-
-# Optional
-DB_PATH=users.db
-```
-
-**3. Run**
+### Production (systemd + nginx)
 
 ```bash
-python bot.py
-```
-
----
-
-### Option B — Docker
-
-```bash
-cp .env.example .env
-docker compose up -d
-```
-
-**`docker-compose.yml`**
-
-```yaml
-version: "3.9"
-
-services:
-  bot:
-    build: .
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - ./data:/app/data
-    environment:
-      - DB_PATH=/app/data/users.db
-```
-
-**`Dockerfile`**
-
-```dockerfile
-FROM python:3.11-slim
-
-RUN apt-get update && apt-get install -y wget gnupg curl \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-RUN playwright install chromium
-RUN playwright install-deps chromium
-
-COPY . .
-
-CMD ["python", "bot.py"]
-```
-
-Logs: `docker compose logs -f bot`  
-Update: `git pull && docker compose up -d --build`
-
----
-
-### Option C — systemd (VPS)
-
-```ini
-[Unit]
-Description=AniList Telegram Bot
-After=network.target
-
-[Service]
-Type=simple
-User=YOUR_USER
-WorkingDirectory=/home/YOUR_USER/anilist-bot
-EnvironmentFile=/home/YOUR_USER/anilist-bot/.env
-ExecStart=/home/YOUR_USER/anilist-bot/venv/bin/python bot.py
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-```
-
-```bash
-sudo systemctl daemon-reload
+sudo useradd --system --home-dir /opt/anilist-telegram anilist
+sudo git clone https://github.com/Westyasha/AniList_Telegram.git /opt/anilist-telegram
+sudo cp deploy/anilist-bot.service /etc/systemd/system/
+sudo cp deploy/nginx.conf /etc/nginx/sites-available/anilist
 sudo systemctl enable anilist-bot
-sudo systemctl start anilist-bot
+sudo /opt/anilist-telegram/deploy/deploy.sh
 ```
 
----
-
-## Environment Variables
+### Configuration
 
 | Variable | Required | Description |
-|---|---|---|
-| `BOT_TOKEN` | yes | Telegram Bot API token from [@BotFather](https://t.me/BotFather) |
-| `ANILIST_CLIENT_ID` | yes | AniList OAuth application Client ID |
-| `ANILIST_CLIENT_SECRET` | yes | AniList OAuth application Client Secret |
-| `ANILIST_REDIRECT_URI` | yes | Set to `https://anilist.co/api/v2/oauth/pin` for PIN flow |
-| `DB_PATH` | no | Path to SQLite database file (default: `users.db`) |
+|---|:---:|---|
+| `BOT_TOKEN` | ✅ | Telegram bot token |
+| `SECRET_KEY` | ✅ | Long random string used to encrypt AniList tokens |
+| `ANILIST_CLIENT_ID` | ✅ | AniList API client id |
+| `ANILIST_CLIENT_SECRET` | ✅ | AniList API client secret |
+| `ANILIST_REDIRECT_URI` | | `https://<domain>/auth/callback`; the PIN URL enables the copy-code fallback |
+| `PUBLIC_URL` | | Public HTTPS origin of the Mini App and OAuth pages |
+| `WEB_HOST`, `WEB_PORT` | | Backend bind address, default `127.0.0.1:8090` |
+| `DATABASE_PATH` | | SQLite file, default `data/bot.db` |
+| `LEGACY_DATABASE_PATH` | | Old `users.db` to import once, default `users.db` |
+| `NOTIFIER_INTERVAL` | | Seconds between notification checks, default `300` |
+| `LOG_LEVEL` | | Default `INFO` |
 
-### Getting AniList credentials
+## Development
 
-1. Go to [anilist.co/settings/developer](https://anilist.co/settings/developer)
-2. Click **Create new client**
-3. Set Redirect URL to `https://anilist.co/api/v2/oauth/pin`
-4. Copy Client ID and Client Secret to your `.env`
+```bash
+ruff check app tests && ruff format app tests
+pytest -q
+cd webapp && npm run lint && npm run build
+```
 
----
+## Acknowledgements
 
-### ⚠️ Known Limitations (as of 10/03/2025)
-
-Heads up! The project is still a work in progress, so there are a few quirks. I might get around to fixing these someday, but for now, it is what it is xd
-
-*   **Profile Card Generation:** Relies on Playwright (headless Chromium). The first generation takes ~3–5s to spin up, but subsequent ones are cached via Telegram `file_id` (so it gets faster).
-*   **FSM:** Currently using `MemoryStorage` by default. If the bot restarts, all user states vanish into the void. 
-*   **OAuth2:** Currently, it only works via hardcoded tokens. Definitely a "todo" for the future to make it normal..
-
-*P.S. If you feel like tackling any of these, feel free to open a PR!!*
-
-## 🛠 A quick note & acknowledgements for anilist dev
-
-Honestly, I originally built this bot mostly as a personal **pet project** to scratch my own itch. Because of that, it's definitely still a bit rough around the edges, might contain some trash code and still has its fair share of bugs (many) 
-
-But hey, if you find it useful, want to self-host it, or feel like yoinking some code for your own projects — absolutely go for it! Feel free to fork, tinker, or just use the bot as is.
-
-Massive shoutout to the AniList team. Their GraphQL API is an absolute joy to work with, and their [API documentation repo](https://github.com/AniList/docs) basically carried this whole project. Without it, this bot simply wouldnt exist. 
-
----
+Built on the excellent [AniList GraphQL API](https://docs.anilist.co) and its [documentation](https://github.com/AniList/docs). Not affiliated with AniList.
