@@ -1,6 +1,6 @@
 import asyncio
 import logging
-import signal
+from contextlib import suppress
 
 from app.bot.setup import configure_bot, create_bot, create_dispatcher
 from app.config import Settings
@@ -42,7 +42,6 @@ async def run() -> None:
         await dispatcher.start_polling(
             bot,
             allowed_updates=dispatcher.resolve_used_update_types(),
-            handle_signals=False,
         )
     finally:
         await notifier.stop()
@@ -54,20 +53,8 @@ async def run() -> None:
 
 
 def main() -> None:
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    task = loop.create_task(run())
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        try:
-            loop.add_signal_handler(sig, task.cancel)
-        except NotImplementedError:
-            pass
-    try:
-        loop.run_until_complete(task)
-    except (asyncio.CancelledError, KeyboardInterrupt):
-        pass
-    finally:
-        loop.close()
+    with suppress(KeyboardInterrupt):
+        asyncio.run(run())
 
 
 if __name__ == "__main__":
